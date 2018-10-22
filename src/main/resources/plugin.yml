@@ -1,0 +1,17 @@
+name: EMI
+version: 0.1.0
+main: com.everneth.EMI.EMI
+author: tptmike, sterling
+commands:
+  emi:
+    description: Ministry Interface version
+    usage: /emi
+  int:
+    description: Ministry of the Interior Toolkit
+    usage: /int
+  comp:
+    description: Ministry of Competition Toolkit
+    usage: /comp
+  comm:
+    description: Ministry of Communications Toolkit
+    usage: /comm
