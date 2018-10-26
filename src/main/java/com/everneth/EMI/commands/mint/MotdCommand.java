@@ -9,6 +9,7 @@ import com.everneth.EMI.EMI;
 import org.apache.commons.lang.UnhandledException;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
@@ -16,13 +17,33 @@ import java.sql.SQLException;
 @CommandPermission("emi.mint.motd")
 public class MotdCommand extends BaseCommand {
     // TODO: Annotations & Calls
+    private String message;
     private int playerId;
     private static EMI plugin;
 
+    public void onMotd(CommandSender sender)
+    {
+        Player player = (Player)sender;
+        try
+        {
+            this.message = DB.getFirstColumn("SELECT message FROM motds WHERE ministry_id = 3");
+        }
+        catch (SQLException e)
+        {
+            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + "✘" + ChatColor.GRAY + "] Error 2 - SQL Error - Contact Comms. :(");
+        }
+
+        if(this.message != null)
+        {
+            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.DARK_PURPLE + "INT" + ChatColor.GRAY + "] " + this.message);
+        }
+    }
+
     @Subcommand("set")
     @CommandPermission("emi.mint.motd.set")
-    public void onSet(Player player, String motd, @Optional boolean isPublic)
+    public void onSet(CommandSender sender, String motd, @Optional boolean isPublic)
     {
+        Player player = (Player)sender;
         // Attempt to get the playerId from players table
         // we're after the int ID not the UUID for speed reasons
         // Ints compare faster than strings!
@@ -34,7 +55,7 @@ public class MotdCommand extends BaseCommand {
         catch (SQLException e)
         {
             plugin.getLogger().severe("SQL Exception: SELECT player_id\n onSet() method\n" + e.getMessage());
-            player.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + "✘" + ChatColor.GRAY + "] Error 1 - SQL Error - Contact Comms. :(");
+            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + "✘" + ChatColor.GRAY + "] Error 1 - SQL Error - Contact Comms. :(");
         }
 
         // By default isPublic is false
@@ -43,12 +64,12 @@ public class MotdCommand extends BaseCommand {
             if(isPublic)
             {
                 DB.executeUpdateAsync("UPDATE motds SET message = ?, player_id = ?, public = ? WHERE ministry_id = 3", motd, playerId, 1);
-                player.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "✓" + ChatColor.GRAY + "] INT MOTD updated successfully!");
+                sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "✓" + ChatColor.GRAY + "] INT MOTD updated successfully!");
             }
             else
             {
                 DB.executeUpdateAsync("UPDATE motds SET message = ?, player_id = ?, WHERE ministry_id = 3", motd, playerId);
-                player.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "✓" + ChatColor.GRAY + "] INT MOTD updated successfully!");
+                sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "✓" + ChatColor.GRAY + "] INT MOTD updated successfully!");
             }
 
         }
