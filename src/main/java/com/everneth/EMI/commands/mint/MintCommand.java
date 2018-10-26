@@ -1,9 +1,7 @@
 package com.everneth.EMI.commands.mint;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CommandPermission;
-import co.aikar.commands.annotation.Optional;
-import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.*;
 import co.aikar.idb.DB;
 import com.everneth.EMI.EMI;
 import org.apache.commons.lang.UnhandledException;
@@ -11,16 +9,20 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import java.sql.SQLException;
-
 @CommandPermission("emi.mint.motd")
-public class MotdCommand extends BaseCommand {
+public class MintCommand extends BaseCommand {
+
+    @Dependency
+    private Plugin plugin;
+
     // TODO: Annotations & Calls
     private String message;
     private int playerId;
-    private static EMI plugin;
 
+    @CommandPermission("emi.mint.motd")
     public void onMotd(CommandSender sender)
     {
         Player player = (Player)sender;
@@ -41,7 +43,7 @@ public class MotdCommand extends BaseCommand {
 
     @Subcommand("set")
     @CommandPermission("emi.mint.motd.set")
-    public void onSet(CommandSender sender, String motd, @Optional boolean isPublic)
+    public void onSet(CommandSender sender, String motd, @Default("false") boolean isPublic)
     {
         Player player = (Player)sender;
         // Attempt to get the playerId from players table

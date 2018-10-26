@@ -8,6 +8,8 @@ import co.aikar.idb.PooledDatabaseOptions;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.everneth.EMI.commands.mint.MintCommand;
+
 public class EMI extends JavaPlugin {
 
     private static EMI plugin;
@@ -37,9 +39,7 @@ public class EMI extends JavaPlugin {
     private void registerCommands()
     {
         commandManager = new BukkitCommandManager(this);
-        commandManager.enableUnstableAPI("help");
-        commandManager.getCommandContexts().registerContext();
-
+        commandManager.registerCommand(new MintCommand());
     }
 
     private void loadConfig()
@@ -50,5 +50,10 @@ public class EMI extends JavaPlugin {
         config.addDefault("dbpass", "secret");
         config.addDefault("dbprefix", "ev_");
         config.options().copyDefaults(true);
+    }
+
+    public static EMI getPlugin()
+    {
+        return plugin;
     }
 }
