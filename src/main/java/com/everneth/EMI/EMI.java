@@ -5,6 +5,7 @@ import co.aikar.idb.DB;
 import co.aikar.idb.Database;
 import co.aikar.idb.DatabaseOptions;
 import co.aikar.idb.PooledDatabaseOptions;
+import com.everneth.EMI.events.JoinEvent;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -29,6 +30,7 @@ public class EMI extends JavaPlugin {
         DB.setGlobalDatabase(db);
 
         registerCommands();
+        registerListeners();
     }
     @Override
     public void onDisable() {
@@ -51,6 +53,12 @@ public class EMI extends JavaPlugin {
         config.addDefault("dbprefix", "ev_");
         config.options().copyDefaults(true);
     }
+
+    private void registerListeners()
+    {
+        getServer().getPluginManager().registerEvents(new JoinEvent(), this);
+    }
+
 
     public static EMI getPlugin()
     {
