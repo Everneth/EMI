@@ -40,7 +40,8 @@ public class JoinEvent implements Listener {
         if(p.hasPermission("emi.mint.motd"))
         {
             List<Motd> result = motdList.stream().filter(motd -> Objects.equals(motd.getId(), 3)).collect(Collectors.toList());
-            p.sendMessage(result.get(0).getMessage());
+            if(result.get(0).getMessage() != null || !result.get(0).getMessage().equals(""))
+                p.sendMessage(result.get(0).getMessage());
         }
     }
 
