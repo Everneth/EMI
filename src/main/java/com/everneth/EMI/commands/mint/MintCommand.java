@@ -42,7 +42,7 @@ public class MintCommand extends BaseCommand {
 
     @Subcommand("set")
     @CommandPermission("emi.mint.motd.set")
-    public void onSet(CommandSender sender, String motd, @Default("false") boolean isPublic)
+    public void onSet(CommandSender sender, String motd)
     {
         Player player = (Player)sender;
         // Attempt to get the playerId from players table
@@ -59,7 +59,6 @@ public class MintCommand extends BaseCommand {
             sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + "✘" + ChatColor.GRAY + "] Error 1 - SQL Error - Contact Comms. :(");
         }
 
-        // By default isPublic is false
         if(playerId != 0)
         {
             DB.executeUpdateAsync("UPDATE motds SET message = ?, player_id = ?, WHERE ministry_id = 3", motd, playerId);

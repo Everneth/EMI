@@ -4,7 +4,6 @@ public class Motd {
     private int id;
     private int playerId;
     private String message;
-    private boolean isPublic;
     public String name;
 
 
