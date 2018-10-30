@@ -72,8 +72,7 @@ public class JoinEvent implements Listener {
                     row.getInt("id"),
                     row.getInt("player_id"),
                     row.getString("message"),
-                    row.getString("ministry_name"),
-                    row.get("isPublic")));
+                    row.getString("ministry_name")));
         }
     }
 }

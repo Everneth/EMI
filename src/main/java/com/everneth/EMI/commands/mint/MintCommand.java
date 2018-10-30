@@ -25,7 +25,6 @@ public class MintCommand extends BaseCommand {
     @CommandPermission("emi.mint.motd")
     public void onMotd(CommandSender sender)
     {
-        Player player = (Player)sender;
         try
         {
             this.message = DB.getFirstColumn("SELECT message FROM motds WHERE ministry_id = 3");
@@ -63,17 +62,8 @@ public class MintCommand extends BaseCommand {
         // By default isPublic is false
         if(playerId != 0)
         {
-            if(isPublic)
-            {
-                DB.executeUpdateAsync("UPDATE motds SET message = ?, player_id = ?, public = ? WHERE ministry_id = 3", motd, playerId, 1);
-                sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "✓" + ChatColor.GRAY + "] INT MOTD updated successfully!");
-            }
-            else
-            {
-                DB.executeUpdateAsync("UPDATE motds SET message = ?, player_id = ?, WHERE ministry_id = 3", motd, playerId);
-                sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "✓" + ChatColor.GRAY + "] INT MOTD updated successfully!");
-            }
-
+            DB.executeUpdateAsync("UPDATE motds SET message = ?, player_id = ?, WHERE ministry_id = 3", motd, playerId);
+            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "✓" + ChatColor.GRAY + "] INT MOTD updated successfully!");
         }
     }
 }

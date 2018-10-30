@@ -8,20 +8,18 @@ public class Motd {
     public String name;
 
 
-    public Motd(int id, int playerId, String message, boolean isPublic)
+    public Motd(int id, int playerId, String message)
     {
         this.id = id;
         this.playerId = playerId;
         this.message = message;
-        this.isPublic = isPublic;
     }
 
-    public Motd(int id, int playerId, String message, String name, boolean isPublic)
+    public Motd(int id, int playerId, String message, String name)
     {
         this.id = id;
         this.playerId = playerId;
         this.message = message;
-        this.isPublic = isPublic;
         this.name = name;
     }
 
@@ -49,11 +47,4 @@ public class Motd {
         this.message = message;
     }
 
-    public boolean isPublic() {
-        return isPublic;
-    }
-
-    public void setPublic(boolean aPublic) {
-        isPublic = aPublic;
-    }
 }
