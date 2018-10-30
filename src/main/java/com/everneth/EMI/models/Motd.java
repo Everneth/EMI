@@ -5,6 +5,8 @@ public class Motd {
     private int playerId;
     private String message;
     private boolean isPublic;
+    public String name;
+
 
     public Motd(int id, int playerId, String message, boolean isPublic)
     {
@@ -12,6 +14,15 @@ public class Motd {
         this.playerId = playerId;
         this.message = message;
         this.isPublic = isPublic;
+    }
+
+    public Motd(int id, int playerId, String message, String name, boolean isPublic)
+    {
+        this.id = id;
+        this.playerId = playerId;
+        this.message = message;
+        this.isPublic = isPublic;
+        this.name = name;
     }
 
     public int getId() {

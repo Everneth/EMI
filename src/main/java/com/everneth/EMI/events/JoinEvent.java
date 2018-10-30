@@ -3,21 +3,30 @@ package com.everneth.EMI.events;
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.EMI.models.Motd;
-import me.botsko.prism.wands.InspectorWand;
+
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
+
+/**
+ *     Class: JoinEvent
+ *     Author: Faceman (@TptMike)
+ *     Purpose: Handle player joins and broadcast MOTDs set by the ministries
+ *
+ */
 
 public class JoinEvent implements Listener {
+
+
+    private final String INT_INTRO = ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "INT" + ChatColor.GRAY + "] ";
+    private final String COMP_INTRO = ChatColor.GRAY + "[" + ChatColor.RED + "COMP" + ChatColor.GRAY + "] ";
+    private final String COMM_INTRO = ChatColor.GRAY + "[" + ChatColor.BLUE + "COMM" + ChatColor.GRAY + "] ";
 
     private List<Motd> motdList;
     private CompletableFuture<List<DbRow>> futureList;
@@ -27,21 +36,31 @@ public class JoinEvent implements Listener {
     {
         rows = new ArrayList<DbRow>();
         motdList = new ArrayList<Motd>();
-        futureList = DB.getResultsAsync("SELECT * FROM motds").toCompletableFuture();
+        futureList = DB.getResultsAsync("SELECT message, ministry_name FROM motds\n" +
+                "INNER JOIN ministries ON motds.ministry_id = ministries.ministry_id").toCompletableFuture();
         futureList.complete(rows);
         buildMotdList(rows);
     }
-
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event)
     {
         Player p = event.getPlayer();
-        if(p.hasPermission("emi.mint.motd"))
+
+        for(Motd motd : motdList)
         {
-            List<Motd> result = motdList.stream().filter(motd -> Objects.equals(motd.getId(), 3)).collect(Collectors.toList());
-            if(result.get(0).getMessage() != null || !result.get(0).getMessage().equals(""))
-                p.sendMessage(result.get(0).getMessage());
+            if(motd.name.equals("interior") && !motd.getMessage().equals(""))
+            {
+                p.sendMessage(INT_INTRO + motd.getMessage());
+            }
+            else if(motd.name.equals("competition") && !motd.getMessage().equals(""))
+            {
+                p.sendMessage(COMP_INTRO + motd.getMessage());
+            }
+            else if(motd.name.equals("communications") && !motd.getMessage().equals(""))
+            {
+                p.sendMessage(COMM_INTRO + motd.getMessage());
+            }
         }
     }
 
@@ -53,6 +72,7 @@ public class JoinEvent implements Listener {
                     row.getInt("id"),
                     row.getInt("player_id"),
                     row.getString("message"),
+                    row.getString("ministry_name"),
                     row.get("isPublic")));
         }
     }
