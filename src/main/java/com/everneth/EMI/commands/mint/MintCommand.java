@@ -37,7 +37,7 @@ public class MintCommand extends BaseCommand {
 
         if(this.message != null)
         {
-            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.DARK_PURPLE + "INT" + ChatColor.GRAY + "] " + this.message);
+            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "INT" + ChatColor.GRAY + "] " + this.message);
         }
     }
 
