@@ -61,7 +61,7 @@ public class MintCommand extends BaseCommand {
 
         if(playerId != 0)
         {
-            DB.executeUpdateAsync("UPDATE motds SET message = ?, player_id = ?, WHERE ministry_id = 3", motd, playerId);
+            DB.executeUpdateAsync("UPDATE motds SET message = ?, player_id = ? WHERE ministry_id = 3", motd, playerId);
             sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "✓" + ChatColor.GRAY + "] INT MOTD updated successfully!");
         }
     }
