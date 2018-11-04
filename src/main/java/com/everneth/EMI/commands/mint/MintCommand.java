@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.sql.SQLException;
-@CommandPermission("emi.mint.motd")
+@CommandAlias("mint")
 public class MintCommand extends BaseCommand {
 
     @Dependency
@@ -22,6 +22,7 @@ public class MintCommand extends BaseCommand {
     private String message;
     private int playerId;
 
+    @Subcommand("motd")
     @CommandPermission("emi.mint.motd")
     public void onMotd(CommandSender sender)
     {
@@ -40,7 +41,8 @@ public class MintCommand extends BaseCommand {
         }
     }
 
-    @Subcommand("set")
+
+    @Subcommand("motd set")
     @CommandPermission("emi.mint.motd.set")
     public void onSet(CommandSender sender, String motd)
     {
