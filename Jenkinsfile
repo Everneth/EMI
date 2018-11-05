@@ -5,7 +5,7 @@ pipline {
         jdk 'jdk8'
     }
     stages {
-        stage('Build) {
+        stage('Build') {
             steps {
                 echo 'Building artifacts...'
                 sh 'mvn -Dmaven.test.failure.ignore=true'
