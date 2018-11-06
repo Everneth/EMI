@@ -5,6 +5,8 @@ import co.aikar.idb.DB;
 import co.aikar.idb.Database;
 import co.aikar.idb.DatabaseOptions;
 import co.aikar.idb.PooledDatabaseOptions;
+import com.everneth.EMI.commands.comm.CommCommand;
+import com.everneth.EMI.commands.comp.CompCommand;
 import com.everneth.EMI.events.JoinEvent;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -42,6 +44,8 @@ public class EMI extends JavaPlugin {
     {
         commandManager = new BukkitCommandManager(this);
         commandManager.registerCommand(new MintCommand());
+        commandManager.registerCommand(new CommCommand());
+        commandManager.registerCommand(new CompCommand());
     }
 
     private void loadConfig()
