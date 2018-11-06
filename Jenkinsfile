@@ -14,7 +14,7 @@ pipeline {
     }
     post {
         always {
-            archiveArtifacts artifacts: 'build/libs/**/*.jar', onlyIfSuccessful: true
+            archiveArtifacts artifacts: '**/*.jar', onlyIfSuccessful: true
         }
     }
 
