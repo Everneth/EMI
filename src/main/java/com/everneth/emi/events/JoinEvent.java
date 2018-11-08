@@ -7,8 +7,10 @@ import com.everneth.emi.models.Motd;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,17 +29,18 @@ public class JoinEvent implements Listener {
     private final String INT_INTRO = ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "INT" + ChatColor.GRAY + "] ";
     private final String COMP_INTRO = ChatColor.GRAY + "[" + ChatColor.RED + "COMP" + ChatColor.GRAY + "] ";
     private final String COMM_INTRO = ChatColor.GRAY + "[" + ChatColor.BLUE + "COMM" + ChatColor.GRAY + "] ";
+    private final Plugin plugin;
 
     private List<Motd> motdList;
     private CompletableFuture<List<DbRow>> futureList;
     private List<DbRow> rows;
 
-    public JoinEvent()
+    public JoinEvent(Plugin plugin)
     {
-
+        this.plugin = plugin;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent event)
     {
         Player p = event.getPlayer();
