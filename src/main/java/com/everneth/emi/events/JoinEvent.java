@@ -34,18 +34,21 @@ public class JoinEvent implements Listener {
 
     public JoinEvent()
     {
-        rows = new ArrayList<DbRow>();
-        motdList = new ArrayList<Motd>();
-        futureList = DB.getResultsAsync("SELECT message, ministry_name FROM motds\n" +
-                "INNER JOIN ministries ON motds.ministry_id = ministries.ministry_id").toCompletableFuture();
-        futureList.complete(rows);
-        buildMotdList(rows);
+
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event)
     {
         Player p = event.getPlayer();
+
+
+        rows = new ArrayList<DbRow>();
+        motdList = new ArrayList<Motd>();
+        futureList = DB.getResultsAsync("SELECT message, ministry_name FROM motds\n" +
+                "INNER JOIN ministries ON motds.ministry_id = ministries.ministry_id").toCompletableFuture();
+        futureList.complete(rows);
+        buildMotdList(rows);
 
         for(Motd motd : motdList)
         {
