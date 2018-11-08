@@ -35,7 +35,7 @@ public class CommCommand extends BaseCommand
 
         if(this.message != null)
         {
-            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "COMM" + ChatColor.GRAY + "] " + this.message);
+            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.BLUE + "COMM" + ChatColor.GRAY + "] " + this.message);
         }
     }
 
@@ -50,12 +50,12 @@ public class CommCommand extends BaseCommand
         // Ints compare faster than strings!
         try
         {
-            playerId = DB.getFirstColumn("SELECT player_id FROM players WHERE player_uuid = ?", player.getUniqueId());
+            this.playerId = DB.getFirstColumn("SELECT player_id FROM players WHERE player_uuid = ?", player.getUniqueId());
         }
         // ERROR 1
         catch (SQLException e)
         {
-            plugin.getLogger().severe("SQL Exception: SELECT player_id\n onSet() method\n" + e.getMessage());
+            this.plugin.getLogger().severe("SQL Exception: SELECT player_id\n onSet() method\n" + e.getMessage());
             sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + "✘" + ChatColor.GRAY + "] Error 1 - SQL Error - Contact Comms. :(");
         }
 
