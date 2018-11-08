@@ -51,7 +51,7 @@ public class CompCommand extends BaseCommand
         // Ints compare faster than strings!
         try
         {
-            this.playerId = DB.getFirstColumn("SELECT player_id FROM players WHERE player_uuid = ?", player.getUniqueId());
+            this.playerId = DB.getFirstColumn("SELECT player_id FROM players WHERE player_uuid = ?", player.getUniqueId().toString());
         }
         // ERROR 1
         catch (SQLException e)

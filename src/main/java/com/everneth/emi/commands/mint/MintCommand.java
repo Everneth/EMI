@@ -19,7 +19,7 @@ public class MintCommand extends BaseCommand {
 
     // TODO: Annotations & Calls
     private String message;
-    private UUID playerId;
+    private int playerId;
 
     @Subcommand("motd")
     @CommandPermission("emi.mint.motd")
@@ -51,7 +51,7 @@ public class MintCommand extends BaseCommand {
         // Ints compare faster than strings!
         try
         {
-            this.playerId = DB.getFirstColumn("SELECT player_id FROM players WHERE player_uuid = ?", player.getUniqueId());
+            this.playerId = DB.getFirstColumn("SELECT player_id FROM players WHERE player_uuid = ?", player.getUniqueId().toString());
         }
         // ERROR 1
         catch (SQLException e)
@@ -60,7 +60,7 @@ public class MintCommand extends BaseCommand {
             sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + "✘" + ChatColor.GRAY + "] Error 1 - SQL Error - Contact Comms. :(");
         }
 
-        if(playerId != null)
+        if(playerId != 0)
         {
             DB.executeUpdateAsync("UPDATE motds SET message = ?, player_id = ? WHERE ministry_id = 3", motd, playerId);
             sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "✓" + ChatColor.GRAY + "] INT MOTD updated successfully!");
