@@ -64,7 +64,7 @@
                     <relocations>
                         <relocation>
                             <pattern>co.aikar.idb</pattern>
-                            <shadedPattern>[PACKAGE].idb</shadedPattern>
+                            <shadedPattern>com.everneth.emi.idb</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
