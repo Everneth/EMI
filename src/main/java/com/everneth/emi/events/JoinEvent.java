@@ -52,7 +52,7 @@ public class JoinEvent implements Listener {
 
         for(Motd motd : motdList)
         {
-            if(motd.name.equals("interior") && !motd.getMessage().equals(""))
+            if(motd.name.equals("interior") && (!motd.getMessage().equals("") || !motd.getMessage().isEmpty()))
             {
                 p.sendMessage(INT_INTRO + motd.getMessage());
             }
