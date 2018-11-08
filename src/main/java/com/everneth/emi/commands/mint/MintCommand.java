@@ -1,11 +1,8 @@
-package com.everneth.EMI.commands.mint;
+package com.everneth.emi.commands.mint;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import co.aikar.idb.DB;
-import com.everneth.EMI.EMI;
-import org.apache.commons.lang.UnhandledException;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

@@ -1,11 +1,8 @@
-package com.everneth.EMI.commands.comp;
+package com.everneth.emi.commands.comm;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import co.aikar.idb.DB;
-import com.everneth.EMI.EMI;
-import org.apache.commons.lang.UnhandledException;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -13,10 +10,9 @@ import org.bukkit.plugin.Plugin;
 
 import java.sql.SQLException;
 
-@CommandAlias("comp")
-public class CompCommand extends BaseCommand
+@CommandAlias("comm")
+public class CommCommand extends BaseCommand
 {
-
     @Dependency
     private Plugin plugin;
 
@@ -25,12 +21,12 @@ public class CompCommand extends BaseCommand
     private int playerId;
 
     @Subcommand("motd")
-    @CommandPermission("emi.comp.motd")
+    @CommandPermission("emi.comm.motd")
     public void onMotd(CommandSender sender)
     {
         try
         {
-            this.message = DB.getFirstColumn("SELECT message FROM motds WHERE ministry_id = 1");
+            this.message = DB.getFirstColumn("SELECT message FROM motds WHERE ministry_id = 2");
         }
         catch (SQLException e)
         {
@@ -39,13 +35,13 @@ public class CompCommand extends BaseCommand
 
         if(this.message != null)
         {
-            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "COMP" + ChatColor.GRAY + "] " + this.message);
+            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "COMM" + ChatColor.GRAY + "] " + this.message);
         }
     }
 
 
     @Subcommand("motd set")
-    @CommandPermission("emi.comp.motd.set")
+    @CommandPermission("emi.comm.motd.set")
     public void onSet(CommandSender sender, String motd)
     {
         Player player = (Player)sender;
@@ -65,8 +61,8 @@ public class CompCommand extends BaseCommand
 
         if(playerId != 0)
         {
-            DB.executeUpdateAsync("UPDATE motds SET message = ?, player_id = ? WHERE ministry_id = 1", motd, playerId);
-            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "✓" + ChatColor.GRAY + "] COMP MOTD updated successfully!");
+            DB.executeUpdateAsync("UPDATE motds SET message = ?, player_id = ? WHERE ministry_id = 2", motd, playerId);
+            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "✓" + ChatColor.GRAY + "] COMM MOTD updated successfully!");
         }
     }
 }

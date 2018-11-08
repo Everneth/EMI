@@ -1,4 +1,4 @@
-package com.everneth.EMI.models;
+package com.everneth.emi.models;
 
 public class Motd {
     private int id;

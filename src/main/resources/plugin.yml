@@ -1,6 +1,6 @@
-name: EMI
+name: emi
 version: 0.1.0
-main: com.everneth.EMI.EMI
+main: com.everneth.emi.emi
 author: tptmike, sterling
 commands:
   emi:

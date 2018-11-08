@@ -1,17 +1,17 @@
-package com.everneth.EMI;
+package com.everneth.emi;
 
 import co.aikar.commands.BukkitCommandManager;
 import co.aikar.idb.DB;
 import co.aikar.idb.Database;
 import co.aikar.idb.DatabaseOptions;
 import co.aikar.idb.PooledDatabaseOptions;
-import com.everneth.EMI.commands.comm.CommCommand;
-import com.everneth.EMI.commands.comp.CompCommand;
-import com.everneth.EMI.events.JoinEvent;
+import com.everneth.emi.commands.comm.CommCommand;
+import com.everneth.emi.commands.comp.CompCommand;
+import com.everneth.emi.events.JoinEvent;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.everneth.EMI.commands.mint.MintCommand;
+import com.everneth.emi.commands.mint.MintCommand;
 
 public class EMI extends JavaPlugin {
 

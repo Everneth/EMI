@@ -1,8 +1,8 @@
-package com.everneth.EMI.events;
+package com.everneth.emi.events;
 
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
-import com.everneth.EMI.models.Motd;
+import com.everneth.emi.models.Motd;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
