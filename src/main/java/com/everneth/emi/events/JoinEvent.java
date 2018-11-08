@@ -26,7 +26,7 @@ import java.util.concurrent.CompletableFuture;
 public class JoinEvent implements Listener {
 
 
-    private final String INT_INTRO = ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "INT" + ChatColor.GRAY + "] ";
+    private final String INT_INTRO = ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "MINT" + ChatColor.GRAY + "] ";
     private final String COMP_INTRO = ChatColor.GRAY + "[" + ChatColor.RED + "COMP" + ChatColor.GRAY + "] ";
     private final String COMM_INTRO = ChatColor.GRAY + "[" + ChatColor.BLUE + "COMM" + ChatColor.GRAY + "] ";
     private final Plugin plugin;
@@ -45,17 +45,22 @@ public class JoinEvent implements Listener {
     {
         Player p = event.getPlayer();
 
-
         rows = new ArrayList<DbRow>();
         motdList = new ArrayList<Motd>();
         futureList = DB.getResultsAsync("SELECT motd_id, player_id, message, ministry_name FROM motds\n" +
-                "INNER JOIN ministries ON motds.ministry_id = ministries.ministry_id").toCompletableFuture();
-        futureList.complete(rows);
+                "INNER JOIN ministries ON motds.ministry_id = ministries.ministry_id");
+        try {
+            rows = futureList.get();
+        }
+        catch (Exception e)
+        {
+            System.out.print(e.getMessage());
+        }
         buildMotdList(rows);
 
         for(Motd motd : motdList)
         {
-            if(motd.name.equals("interior") && (!motd.getMessage().equals("") || !motd.getMessage().isEmpty()))
+            if(motd.name.equals("interior") && (!motd.getMessage().equals("")))
             {
                 p.sendMessage(INT_INTRO + motd.getMessage());
             }

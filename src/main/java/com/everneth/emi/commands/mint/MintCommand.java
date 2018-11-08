@@ -36,7 +36,7 @@ public class MintCommand extends BaseCommand {
 
         if(this.message != null)
         {
-            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "INT" + ChatColor.GRAY + "] " + this.message);
+            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "MINT" + ChatColor.GRAY + "] " + this.message);
         }
     }
 
@@ -63,7 +63,32 @@ public class MintCommand extends BaseCommand {
         if(playerId != 0)
         {
             DB.executeUpdateAsync("UPDATE motds SET message = ?, player_id = ? WHERE ministry_id = 3", motd, playerId);
-            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "✓" + ChatColor.GRAY + "] INT MOTD updated successfully!");
+            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "✓" + ChatColor.GRAY + "] MINT MOTD updated successfully!");
+        }
+    }
+    @Subcommand("motd clear")
+    @CommandPermission("emi.mint.motd.set")
+    public void onClear(CommandSender sender)
+    {
+        Player player = (Player)sender;
+        // Attempt to get the playerId from players table
+        // we're after the int ID not the UUID for speed reasons
+        // Ints compare faster than strings!
+        try
+        {
+            this.playerId = DB.getFirstColumn("SELECT player_id FROM players WHERE player_uuid = ?", player.getUniqueId().toString());
+        }
+        // ERROR 1
+        catch (SQLException e)
+        {
+            this.plugin.getLogger().severe("SQL Exception: SELECT player_id\n onSet() method\n" + e.getMessage());
+            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + "✘" + ChatColor.GRAY + "] Error 3 - SQL Error - Contact Comms. :(");
+        }
+
+        if(playerId != 0)
+        {
+            DB.executeUpdateAsync("UPDATE motds SET message = ?, player_id = ? WHERE ministry_id = 3", null, playerId);
+            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "✓" + ChatColor.GRAY + "] MINT MOTD updated successfully!");
         }
     }
 }

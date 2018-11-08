@@ -66,4 +66,29 @@ public class CompCommand extends BaseCommand
             sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "✓" + ChatColor.GRAY + "] COMP MOTD updated successfully!");
         }
     }
+    @Subcommand("motd clear")
+    @CommandPermission("emi.comp.motd.set")
+    public void onClear(CommandSender sender)
+    {
+        Player player = (Player)sender;
+        // Attempt to get the playerId from players table
+        // we're after the int ID not the UUID for speed reasons
+        // Ints compare faster than strings!
+        try
+        {
+            this.playerId = DB.getFirstColumn("SELECT player_id FROM players WHERE player_uuid = ?", player.getUniqueId().toString());
+        }
+        // ERROR 1
+        catch (SQLException e)
+        {
+            this.plugin.getLogger().severe("SQL Exception: SELECT player_id\n onSet() method\n" + e.getMessage());
+            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + "✘" + ChatColor.GRAY + "] Error 3 - SQL Error - Contact Comms. :(");
+        }
+
+        if(playerId != 0)
+        {
+            DB.executeUpdateAsync("UPDATE motds SET message = ?, player_id = ? WHERE ministry_id = 1", null, playerId);
+            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "✓" + ChatColor.GRAY + "] COMP MOTD updated successfully!");
+        }
+    }
 }
