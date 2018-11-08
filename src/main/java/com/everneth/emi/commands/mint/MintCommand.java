@@ -9,6 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.sql.SQLException;
+import java.util.UUID;
+
 @CommandAlias("mint")
 public class MintCommand extends BaseCommand {
 
@@ -17,7 +19,7 @@ public class MintCommand extends BaseCommand {
 
     // TODO: Annotations & Calls
     private String message;
-    private int playerId;
+    private UUID playerId;
 
     @Subcommand("motd")
     @CommandPermission("emi.mint.motd")
@@ -58,7 +60,7 @@ public class MintCommand extends BaseCommand {
             sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + "✘" + ChatColor.GRAY + "] Error 1 - SQL Error - Contact Comms. :(");
         }
 
-        if(playerId != 0)
+        if(playerId != null)
         {
             DB.executeUpdateAsync("UPDATE motds SET message = ?, player_id = ? WHERE ministry_id = 3", motd, playerId);
             sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "✓" + ChatColor.GRAY + "] INT MOTD updated successfully!");
