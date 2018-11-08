@@ -45,7 +45,7 @@ public class JoinEvent implements Listener {
 
         rows = new ArrayList<DbRow>();
         motdList = new ArrayList<Motd>();
-        futureList = DB.getResultsAsync("SELECT message, ministry_name FROM motds\n" +
+        futureList = DB.getResultsAsync("SELECT motd_id, player_id, message, ministry_name FROM motds\n" +
                 "INNER JOIN ministries ON motds.ministry_id = ministries.ministry_id").toCompletableFuture();
         futureList.complete(rows);
         buildMotdList(rows);
@@ -72,7 +72,7 @@ public class JoinEvent implements Listener {
         for(DbRow row : rows)
         {
             this.motdList.add(new Motd(
-                    row.getInt("id"),
+                    row.getInt("motd_id"),
                     row.getInt("player_id"),
                     row.getString("message"),
                     row.getString("ministry_name")));
