@@ -60,7 +60,7 @@ public class EMI extends JavaPlugin {
 
     private void registerListeners()
     {
-        getServer().getPluginManager().registerEvents(new JoinEvent(), this);
+        getServer().getPluginManager().registerEvents(new JoinEvent(this), this);
     }
 
 

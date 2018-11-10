@@ -7,8 +7,10 @@ import com.everneth.emi.models.Motd;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,32 +26,41 @@ import java.util.concurrent.CompletableFuture;
 public class JoinEvent implements Listener {
 
 
-    private final String INT_INTRO = ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "INT" + ChatColor.GRAY + "] ";
+    private final String INT_INTRO = ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "MINT" + ChatColor.GRAY + "] ";
     private final String COMP_INTRO = ChatColor.GRAY + "[" + ChatColor.RED + "COMP" + ChatColor.GRAY + "] ";
     private final String COMM_INTRO = ChatColor.GRAY + "[" + ChatColor.BLUE + "COMM" + ChatColor.GRAY + "] ";
+    private final Plugin plugin;
 
     private List<Motd> motdList;
     private CompletableFuture<List<DbRow>> futureList;
     private List<DbRow> rows;
 
-    public JoinEvent()
+    public JoinEvent(Plugin plugin)
     {
-        rows = new ArrayList<DbRow>();
-        motdList = new ArrayList<Motd>();
-        futureList = DB.getResultsAsync("SELECT message, ministry_name FROM motds\n" +
-                "INNER JOIN ministries ON motds.ministry_id = ministries.ministry_id").toCompletableFuture();
-        futureList.complete(rows);
-        buildMotdList(rows);
+        this.plugin = plugin;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent event)
     {
         Player p = event.getPlayer();
 
+        rows = new ArrayList<DbRow>();
+        motdList = new ArrayList<Motd>();
+        futureList = DB.getResultsAsync("SELECT motd_id, player_id, message, ministry_name FROM motds\n" +
+                "INNER JOIN ministries ON motds.ministry_id = ministries.ministry_id");
+        try {
+            rows = futureList.get();
+        }
+        catch (Exception e)
+        {
+            System.out.print(e.getMessage());
+        }
+        buildMotdList(rows);
+
         for(Motd motd : motdList)
         {
-            if(motd.name.equals("interior") && !motd.getMessage().equals(""))
+            if(motd.name.equals("interior") && (!motd.getMessage().equals("")))
             {
                 p.sendMessage(INT_INTRO + motd.getMessage());
             }
@@ -69,7 +80,7 @@ public class JoinEvent implements Listener {
         for(DbRow row : rows)
         {
             this.motdList.add(new Motd(
-                    row.getInt("id"),
+                    row.getInt("motd_id"),
                     row.getInt("player_id"),
                     row.getString("message"),
                     row.getString("ministry_name")));
