@@ -65,6 +65,7 @@ public class EMI extends JavaPlugin {
         config.addDefault("dbpass", "secret");
         config.addDefault("dbprefix", "ev_");
         config.addDefault("bot-token", "PASTE-TOKEN-HERE");
+        config.addDefault("report-channel", 0);
         config.options().copyDefaults(true);
     }
 
