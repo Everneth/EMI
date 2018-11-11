@@ -1,28 +1,32 @@
 package com.everneth.emi.commands;
 
 import co.aikar.commands.BaseCommand;
+import co.aikar.commands.annotation.CatchUnknown;
+import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Dependency;
+import com.everneth.emi.EMI;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+@CommandAlias("report")
 public class ReportCommand extends BaseCommand {
-    private JDA jda;
+    //private JDA jda;
 
     @Dependency
     private Plugin plugin;
 
-    public ReportCommand(JDA jda)
-    {
-        this.jda = jda;
-    }
-
     @Default
+    @CommandAlias("report")
+    @CatchUnknown
     public void onReport(CommandSender sender, String message)
     {
+
+
         Player player = (Player)sender;
 
         EmbedBuilder eb = new EmbedBuilder();
@@ -32,11 +36,14 @@ public class ReportCommand extends BaseCommand {
         eb.addField("X", Double.toString(player.getLocation().getX()), true);
         eb.addField("Y", Double.toString(player.getLocation().getY()), true);
         eb.addField("Z", Double.toString(player.getLocation().getZ()), true);
-        eb.addField("Dimension", player.getWorld().toString(), true);
+        eb.addField("Dimension", player.getWorld().getWorldType().getName(), true);
         eb.addField("Time", Long.toString(player.getPlayerTime()), true);
         eb.addField("Description", message, false);
         eb.setFooter("Help requested!", null);
 
-        this.jda.getTextChannelById(499654660248961027L).sendMessage(eb.build()).queue();
+        EMI.getJda().getTextChannelById(499654660248961027L).sendMessage(eb.build()).queue();
+        player.sendMessage(ChatColor.GREEN + "Report submitted to " + ChatColor.GOLD +
+                "#help " + ChatColor.GREEN + "!");
+
     }
 }

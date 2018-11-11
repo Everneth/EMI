@@ -54,7 +54,7 @@ public class EMI extends JavaPlugin {
         commandManager.registerCommand(new MintCommand());
         commandManager.registerCommand(new CommCommand());
         commandManager.registerCommand(new CompCommand());
-        commandManager.registerCommand(new ReportCommand(jda));
+        commandManager.registerCommand(new ReportCommand());
     }
 
     private void loadConfig()
@@ -93,5 +93,10 @@ public class EMI extends JavaPlugin {
     public static EMI getPlugin()
     {
         return plugin;
+    }
+
+    public static JDA getJda()
+    {
+        return jda;
     }
 }
