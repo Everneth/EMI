@@ -5,6 +5,7 @@ import co.aikar.idb.DB;
 import co.aikar.idb.Database;
 import co.aikar.idb.DatabaseOptions;
 import co.aikar.idb.PooledDatabaseOptions;
+import com.everneth.emi.commands.ReportCommand;
 import com.everneth.emi.commands.comm.CommCommand;
 import com.everneth.emi.commands.comp.CompCommand;
 import com.everneth.emi.events.JoinEvent;
@@ -21,6 +22,7 @@ public class EMI extends JavaPlugin {
 
     private static EMI plugin;
     private static BukkitCommandManager commandManager;
+    private static JDA jda;
     FileConfiguration config = getConfig();
 
 
@@ -52,6 +54,7 @@ public class EMI extends JavaPlugin {
         commandManager.registerCommand(new MintCommand());
         commandManager.registerCommand(new CommCommand());
         commandManager.registerCommand(new CompCommand());
+        commandManager.registerCommand(new ReportCommand(jda));
     }
 
     private void loadConfig()
@@ -65,9 +68,20 @@ public class EMI extends JavaPlugin {
         config.options().copyDefaults(true);
     }
 
-    private void initBot() throws LoginException
+    private void initBot()
     {
-        JDA api = new JDABuilder(config.getString("bot-token")).build();
+        try {
+            jda = new JDABuilder(config.getString("bot-token")).build();
+            jda.awaitReady();
+        }
+        catch(LoginException e)
+        {
+            e.printStackTrace();
+        }
+        catch(InterruptedException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     private void registerListeners()

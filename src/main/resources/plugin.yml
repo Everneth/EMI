@@ -1,5 +1,5 @@
-name: emi
-version: 0.1.0
+name: EMI
+version: 0.1.2
 main: com.everneth.emi.EMI
 author: tptmike, sterling
 commands:
@@ -8,7 +8,7 @@ commands:
     usage: /emi
   int:
     description: Ministry of the Interior Toolkit
-    usage: /int
+    usage: /mint
   comp:
     description: Ministry of Competition Toolkit
     usage: /comp
