@@ -8,10 +8,14 @@ import co.aikar.idb.PooledDatabaseOptions;
 import com.everneth.emi.commands.comm.CommCommand;
 import com.everneth.emi.commands.comp.CompCommand;
 import com.everneth.emi.events.JoinEvent;
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.JDABuilder;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.everneth.emi.commands.mint.MintCommand;
+
+import javax.security.auth.login.LoginException;
 
 public class EMI extends JavaPlugin {
 
@@ -23,6 +27,7 @@ public class EMI extends JavaPlugin {
     @Override
     public void onEnable() {
         plugin = this;
+
         getLogger().info("Ministry Interface started.");
         loadConfig();
         saveConfig();
@@ -33,6 +38,7 @@ public class EMI extends JavaPlugin {
 
         registerCommands();
         registerListeners();
+        initBot();
     }
     @Override
     public void onDisable() {
@@ -55,7 +61,13 @@ public class EMI extends JavaPlugin {
         config.addDefault("dbuser", "admin_emi");
         config.addDefault("dbpass", "secret");
         config.addDefault("dbprefix", "ev_");
+        config.addDefault("bot-token", "PASTE-TOKEN-HERE");
         config.options().copyDefaults(true);
+    }
+
+    private void initBot() throws LoginException
+    {
+        JDA api = new JDABuilder(config.getString("bot-token")).build();
     }
 
     private void registerListeners()
