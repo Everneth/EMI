@@ -45,7 +45,7 @@ public class ReportCommand extends BaseCommand {
         eb.addField("Server", player.getServer().getServerName(), true);
         eb.addField("Description", message, false);
         eb.setFooter("Help requested!", null);
-        
+
         EMI.getJda().getTextChannelById(EMI.getPlugin().getConfig().getString("report-channel")).sendMessage(eb.build()).queue();
         player.sendMessage(ChatColor.GREEN + "Report submitted to " + ChatColor.RED +
                 "#help" + ChatColor.GREEN + "!");
