@@ -71,6 +71,7 @@ public class EMI extends JavaPlugin {
         config.addDefault("bot-token", "PASTE-TOKEN-HERE");
         config.addDefault("report-channel", 0);
         config.addDefault("root-report-msg", 0);
+        config.addDefault("bot-owner-id", 0);
         config.options().copyDefaults(true);
     }
 
@@ -80,7 +81,7 @@ public class EMI extends JavaPlugin {
         builder.setPrefix("!!");
         builder.setGame(Game.playing("Nursing your ailments, love."));
         builder.addCommand(new HelpClearCommand());
-        builder.setOwnerId("153863968945995776");
+        builder.setOwnerId(this.getConfig().getString("bot-owner-id"));
 
         CommandClient client = builder.build();
 
