@@ -4,6 +4,7 @@ import com.everneth.emi.EMI;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageHistory;
 import net.dv8tion.jda.core.entities.Role;
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class HelpClearCommand extends Command {
             if(event.getChannel().getIdLong() == EMI.getPlugin().getConfig().getLong("report-channel"))
             {
                 // Got the role! Lets build a list of messages to clear.
-                List<Message> messageList = event.getChannel().getHistory().getRetrievedHistory();
+                List<Message> messageList = event.getTextChannel().getIterableHistory().complete();
                 if(messageList.size() == 2) {
                     // Hold up! Theres only the root message and the command! Delete the command, instruct the user
                     event.getChannel().deleteMessageById(event.getChannel().getLatestMessageIdLong()).queue();

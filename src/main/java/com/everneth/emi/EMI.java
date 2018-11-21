@@ -80,6 +80,7 @@ public class EMI extends JavaPlugin {
         builder.setPrefix("!!");
         builder.setGame(Game.playing("Nursing your ailments, love."));
         builder.addCommand(new HelpClearCommand());
+        builder.setOwnerId("153863968945995776");
 
         CommandClient client = builder.build();
 
