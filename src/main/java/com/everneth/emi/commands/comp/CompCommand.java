@@ -91,4 +91,13 @@ public class CompCommand extends BaseCommand
             sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "✓" + ChatColor.GRAY + "] COMP MOTD updated successfully!");
         }
     }
+
+//    @Subcommand("event create")
+//    @CommandPermission("emi.comp.event.create")
+//    public void onEventCreate(CommandSender sender, @Single String name, int type, @Optional @Single String date, @Optional int x, @Optional int y, @Optional int z, @Optional @Single String link, @Optional String description)
+//    {
+//        Player player = (Player) sender;
+//
+//
+//    }
 }
