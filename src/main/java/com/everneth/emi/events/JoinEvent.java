@@ -51,7 +51,7 @@ public class JoinEvent implements Listener {
 
         //Check if the player exists in the EMI database
         //Query the database and put it in a future
-        playerOjbectFuture = DB.getFirstRowAsync("SELECT player_uuid FROM players WHERE player_uuid = ?", p.getUniqueId());
+        playerOjbectFuture = DB.getFirstRowAsync("SELECT * FROM players WHERE player_uuid = ?", p.getUniqueId().toString());
         try {
             //Try to get the row from the future and put it into a DbRow object
             playerRow = playerOjbectFuture.get();
@@ -62,10 +62,10 @@ public class JoinEvent implements Listener {
             EMI.getPlugin().getLogger().warning(e.getMessage());
         }
         // Did we find anything?
-        if (playerRow.isEmpty()) {
+        if (playerRow == null) {
             //No records returned. Add player to database.
             try {
-                DB.executeInsert("INSERT INTO players VALUES(?,?)", p.getName(), p.getUniqueId());
+                DB.executeInsert("INSERT INTO players (player_name, player_uuid) VALUES(?,?)", p.getName(), p.getUniqueId().toString());
             } catch (SQLException e) {
                 EMI.getPlugin().getLogger().warning(e.getMessage());
             }
