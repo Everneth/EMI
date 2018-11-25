@@ -34,6 +34,8 @@ public class EMI extends JavaPlugin {
         loadConfig();
         saveConfig();
 
+        Utils.chatTag = config.getString("chat-tag");
+
         DatabaseOptions options = DatabaseOptions.builder().mysql(config.getString("dbuser"), config.getString("dbpass"), config.getString("dbname"), config.getString("dbhost")).build();
         Database db = PooledDatabaseOptions.builder().options(options).createHikariDatabase();
         DB.setGlobalDatabase(db);
@@ -66,6 +68,7 @@ public class EMI extends JavaPlugin {
         config.addDefault("dbprefix", "ev_");
         config.addDefault("bot-token", "PASTE-TOKEN-HERE");
         config.addDefault("report-channel", 0);
+        config.addDefault("chat-tag", "&7&6EMI&7]");
         config.options().copyDefaults(true);
     }
 

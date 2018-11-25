@@ -3,6 +3,7 @@ package com.everneth.emi.commands.comp;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import co.aikar.idb.DB;
+import com.everneth.emi.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -31,12 +32,12 @@ public class CompCommand extends BaseCommand
         }
         catch (SQLException e)
         {
-            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + "✘" + ChatColor.GRAY + "] Error 2 - SQL Error - Contact Comms. :(");
+            sender.sendMessage(Utils.color(Utils.chatTag + " &cError! commands-comp-1. Report to Comms!"));
         }
 
         if(this.message != null)
         {
-            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + "COMP" + ChatColor.GRAY + "] " + this.message);
+            sender.sendMessage(Utils.color("&7[&cCOMP&7] " + this.message));
         }
     }
 
@@ -57,13 +58,13 @@ public class CompCommand extends BaseCommand
         catch (SQLException e)
         {
             this.plugin.getLogger().severe("SQL Exception: SELECT player_id\n onSet() method\n" + e.getMessage());
-            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + "✘" + ChatColor.GRAY + "] Error 1 - SQL Error - Contact Comms. :(");
+            sender.sendMessage(Utils.color(Utils.chatTag + " &cError! commands-comp-2. Report to Comms!"));
         }
 
         if(playerId != 0)
         {
             DB.executeUpdateAsync("UPDATE motds SET message = ?, player_id = ? WHERE ministry_id = 1", motd, playerId);
-            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "✓" + ChatColor.GRAY + "] COMP MOTD updated successfully!");
+            sender.sendMessage(Utils.color(Utils.chatTag + " &aComp MOTD has been updated!"));
         }
     }
     @Subcommand("motd clear")
@@ -82,22 +83,13 @@ public class CompCommand extends BaseCommand
         catch (SQLException e)
         {
             this.plugin.getLogger().severe("SQL Exception: SELECT player_id\n onSet() method\n" + e.getMessage());
-            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + "✘" + ChatColor.GRAY + "] Error 3 - SQL Error - Contact Comms. :(");
+            sender.sendMessage(Utils.color(Utils.chatTag + " &cError! commands-comp-1. Report to Comms!"));
         }
 
         if(playerId != 0)
         {
             DB.executeUpdateAsync("UPDATE motds SET message = ?, player_id = ? WHERE ministry_id = 1", null, playerId);
-            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "✓" + ChatColor.GRAY + "] COMP MOTD updated successfully!");
+            sender.sendMessage(Utils.color(Utils.chatTag + " &aComp MOTD has been cleared!"));
         }
     }
-
-//    @Subcommand("event create")
-//    @CommandPermission("emi.comp.event.create")
-//    public void onEventCreate(CommandSender sender, @Single String name, int type, @Optional @Single String date, @Optional int x, @Optional int y, @Optional int z, @Optional @Single String link, @Optional String description)
-//    {
-//        Player player = (Player) sender;
-//
-//
-//    }
 }
