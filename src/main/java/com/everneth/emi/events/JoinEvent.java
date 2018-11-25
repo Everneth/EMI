@@ -2,6 +2,8 @@ package com.everneth.emi.events;
 
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
+
+import com.everneth.emi.Utils;
 import com.everneth.emi.EMI;
 import com.everneth.emi.models.Motd;
 
@@ -28,9 +30,9 @@ import java.util.concurrent.CompletableFuture;
 public class JoinEvent implements Listener {
 
 
-    private final String INT_INTRO = ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "MINT" + ChatColor.GRAY + "] ";
-    private final String COMP_INTRO = ChatColor.GRAY + "[" + ChatColor.RED + "COMP" + ChatColor.GRAY + "] ";
-    private final String COMM_INTRO = ChatColor.GRAY + "[" + ChatColor.BLUE + "COMM" + ChatColor.GRAY + "] ";
+    private final String INT_INTRO = "&7[&dMINT&7] ";
+    private final String COMP_INTRO = "&7[&cCOMP&7] ";
+    private final String COMM_INTRO = "&7[&9COMM&7] ";
     private final Plugin plugin;
 
     private List<Motd> motdList;
@@ -47,7 +49,7 @@ public class JoinEvent implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent event)
     {
-        Player p = event.getPlayer();
+        Player player = event.getPlayer();
 
         //Check if the player exists in the EMI database
         //Query the database and put it in a future
@@ -93,15 +95,15 @@ public class JoinEvent implements Listener {
         {
             if(motd.name.equals("interior") && (!motd.getMessage().equals("")))
             {
-                p.sendMessage(INT_INTRO + motd.getMessage());
+                player.sendMessage(Utils.color(INT_INTRO + motd.getMessage()));
             }
             else if(motd.name.equals("competition") && !motd.getMessage().equals(""))
             {
-                p.sendMessage(COMP_INTRO + motd.getMessage());
+                player.sendMessage(Utils.color(COMP_INTRO + motd.getMessage()));
             }
             else if(motd.name.equals("communications") && !motd.getMessage().equals(""))
             {
-                p.sendMessage(COMM_INTRO + motd.getMessage());
+                player.sendMessage(Utils.color(COMM_INTRO + motd.getMessage()));
             }
         }
     }
