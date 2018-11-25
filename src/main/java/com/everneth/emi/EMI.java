@@ -5,6 +5,8 @@ import co.aikar.idb.DB;
 import co.aikar.idb.Database;
 import co.aikar.idb.DatabaseOptions;
 import co.aikar.idb.PooledDatabaseOptions;
+import com.everneth.emi.api.Path;
+import com.everneth.emi.api.StatisticController;
 import com.everneth.emi.commands.ReportCommand;
 import com.everneth.emi.commands.bot.HelpClearCommand;
 import com.everneth.emi.commands.comm.CommCommand;
@@ -12,6 +14,7 @@ import com.everneth.emi.commands.comp.CompCommand;
 import com.everneth.emi.events.JoinEvent;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
+
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.Game;
@@ -19,8 +22,13 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.everneth.emi.commands.mint.MintCommand;
+import spark.Spark;
 
+import static spark.Spark.*;
 import javax.security.auth.login.LoginException;
+
+import static spark.Spark.get;
+import static spark.Spark.port;
 
 public class EMI extends JavaPlugin {
 
@@ -28,7 +36,6 @@ public class EMI extends JavaPlugin {
     private static BukkitCommandManager commandManager;
     private static JDA jda;
     FileConfiguration config = getConfig();
-
 
     @Override
     public void onEnable() {
@@ -45,6 +52,7 @@ public class EMI extends JavaPlugin {
         registerCommands();
         registerListeners();
         initBot();
+        initApi();
     }
     @Override
     public void onDisable() {
@@ -72,6 +80,7 @@ public class EMI extends JavaPlugin {
         config.addDefault("report-channel", 0);
         config.addDefault("root-report-msg", 0);
         config.addDefault("bot-owner-id", 0);
+        config.addDefault("world-folder", "world");
         config.options().copyDefaults(true);
     }
 
@@ -97,6 +106,13 @@ public class EMI extends JavaPlugin {
         {
             e.printStackTrace();
         }
+    }
+
+    private void initApi()
+    {
+        port(7598);
+        get(Path.Web.ONE_STATS, StatisticController.getPlayerStats);
+        get("*", (request, response) -> "404 not found!!");
     }
 
     private void registerListeners()
