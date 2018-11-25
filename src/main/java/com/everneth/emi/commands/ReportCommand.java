@@ -6,6 +6,7 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Dependency;
 import com.everneth.emi.EMI;
+import com.everneth.emi.Utils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -47,7 +48,6 @@ public class ReportCommand extends BaseCommand {
         eb.setFooter("Help requested!", null);
 
         EMI.getJda().getTextChannelById(EMI.getPlugin().getConfig().getString("report-channel")).sendMessage(eb.build()).queue();
-        player.sendMessage(ChatColor.GREEN + "Report submitted to " + ChatColor.YELLOW +
-                "#help" + ChatColor.GREEN + "!");
+        player.sendMessage(Utils.color("&aReport submitted to &6#help&a!"));
     }
 }
