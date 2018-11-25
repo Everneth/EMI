@@ -2,7 +2,9 @@ package com.everneth.emi.events;
 
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
+
 import com.everneth.emi.Utils;
+import com.everneth.emi.EMI;
 import com.everneth.emi.models.Motd;
 
 import org.bukkit.ChatColor;
@@ -13,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -34,6 +37,8 @@ public class JoinEvent implements Listener {
 
     private List<Motd> motdList;
     private CompletableFuture<List<DbRow>> futureList;
+    private CompletableFuture<DbRow> playerOjbectFuture;
+    private DbRow playerRow;
     private List<DbRow> rows;
 
     public JoinEvent(Plugin plugin)
@@ -45,6 +50,33 @@ public class JoinEvent implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event)
     {
         Player player = event.getPlayer();
+
+        //Check if the player exists in the EMI database
+        //Query the database and put it in a future
+        playerOjbectFuture = DB.getFirstRowAsync("SELECT * FROM players WHERE player_uuid = ?", p.getUniqueId().toString());
+        try {
+            //Try to get the row from the future and put it into a DbRow object
+            playerRow = playerOjbectFuture.get();
+        }
+        catch (Exception e)
+        {
+            //Something went wrong, record the error. This should never happen.
+            EMI.getPlugin().getLogger().warning(e.getMessage());
+        }
+        // Did we find anything?
+        if (playerRow == null) {
+            //No records returned. Add player to database.
+            try {
+                DB.executeInsert("INSERT INTO players (player_name, player_uuid) VALUES(?,?)", p.getName(), p.getUniqueId().toString());
+            } catch (SQLException e) {
+                EMI.getPlugin().getLogger().warning(e.getMessage());
+            }
+        }
+        else if(!playerRow.getString("player_name").equals(p.getName()) && playerRow.getString("player_uuid").equals(p.getUniqueId().toString()))
+        {
+          //Record found, name mismatch. Update the record with the players current name.
+          DB.executeUpdateAsync("UPDATE players SET player_name = ? WHERE player_uuid = ?", p.getUniqueId(), p.getUniqueId().toString());
+        }
 
         rows = new ArrayList<DbRow>();
         motdList = new ArrayList<Motd>();

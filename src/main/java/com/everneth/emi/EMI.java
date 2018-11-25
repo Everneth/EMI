@@ -6,11 +6,15 @@ import co.aikar.idb.Database;
 import co.aikar.idb.DatabaseOptions;
 import co.aikar.idb.PooledDatabaseOptions;
 import com.everneth.emi.commands.ReportCommand;
+import com.everneth.emi.commands.bot.HelpClearCommand;
 import com.everneth.emi.commands.comm.CommCommand;
 import com.everneth.emi.commands.comp.CompCommand;
 import com.everneth.emi.events.JoinEvent;
+import com.jagrosh.jdautilities.command.CommandClient;
+import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.entities.Game;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -69,13 +73,23 @@ public class EMI extends JavaPlugin {
         config.addDefault("bot-token", "PASTE-TOKEN-HERE");
         config.addDefault("report-channel", 0);
         config.addDefault("chat-tag", "&7&6EMI&7]");
+        config.addDefault("root-report-msg", 0);
+        config.addDefault("bot-owner-id", 0);
         config.options().copyDefaults(true);
     }
 
     private void initBot()
     {
+        CommandClientBuilder builder = new CommandClientBuilder();
+        builder.setPrefix("!!");
+        builder.setGame(Game.playing("Nursing your ailments, love."));
+        builder.addCommand(new HelpClearCommand());
+        builder.setOwnerId(this.getConfig().getString("bot-owner-id"));
+
+        CommandClient client = builder.build();
+
         try {
-            jda = new JDABuilder(config.getString("bot-token")).build();
+            jda = new JDABuilder(config.getString("bot-token")).addEventListener(client).build();
             jda.awaitReady();
         }
         catch(LoginException e)
@@ -84,7 +98,7 @@ public class EMI extends JavaPlugin {
         }
         catch(InterruptedException e)
         {
-            e.printStackTrace();
+            e.printStackTrace();onf,
         }
     }
 
