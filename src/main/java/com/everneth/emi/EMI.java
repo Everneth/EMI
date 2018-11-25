@@ -5,7 +5,9 @@ import co.aikar.idb.DB;
 import co.aikar.idb.Database;
 import co.aikar.idb.DatabaseOptions;
 import co.aikar.idb.PooledDatabaseOptions;
+import com.everneth.emi.api.AdvancementController;
 import com.everneth.emi.api.Path;
+import com.everneth.emi.api.PlayerdataController;
 import com.everneth.emi.api.StatisticController;
 import com.everneth.emi.commands.ReportCommand;
 import com.everneth.emi.commands.bot.HelpClearCommand;
@@ -112,6 +114,8 @@ public class EMI extends JavaPlugin {
     {
         port(7598);
         get(Path.Web.ONE_STATS, StatisticController.getPlayerStats);
+        get(Path.Web.ONE_DATA, PlayerdataController.getPlayerData);
+        get(Path.Web.ONE_ADV, AdvancementController.getPlayerAdvs);
         get("*", (request, response) -> "404 not found!!");
     }
 

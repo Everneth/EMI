@@ -100,6 +100,12 @@
             <version>1.18.4</version>
             <scope>provided</scope>
         </dependency>
+        <!--flow-NBT-->
+        <dependency>
+            <groupId>com.flowpowered</groupId>
+            <artifactId>flow-nbt</artifactId>
+            <version>1.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
