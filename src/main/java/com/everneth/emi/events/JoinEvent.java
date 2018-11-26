@@ -53,7 +53,7 @@ public class JoinEvent implements Listener {
 
         //Check if the player exists in the EMI database
         //Query the database and put it in a future
-        playerOjbectFuture = DB.getFirstRowAsync("SELECT * FROM players WHERE player_uuid = ?", p.getUniqueId().toString());
+        playerOjbectFuture = DB.getFirstRowAsync("SELECT * FROM players WHERE player_uuid = ?", player.getUniqueId().toString());
         try {
             //Try to get the row from the future and put it into a DbRow object
             playerRow = playerOjbectFuture.get();
@@ -67,15 +67,15 @@ public class JoinEvent implements Listener {
         if (playerRow == null) {
             //No records returned. Add player to database.
             try {
-                DB.executeInsert("INSERT INTO players (player_name, player_uuid) VALUES(?,?)", p.getName(), p.getUniqueId().toString());
+                DB.executeInsert("INSERT INTO players (player_name, player_uuid) VALUES(?,?)", player.getName(), player.getUniqueId().toString());
             } catch (SQLException e) {
                 EMI.getPlugin().getLogger().warning(e.getMessage());
             }
         }
-        else if(!playerRow.getString("player_name").equals(p.getName()) && playerRow.getString("player_uuid").equals(p.getUniqueId().toString()))
+        else if(!playerRow.getString("player_name").equals(player.getName()) && playerRow.getString("player_uuid").equals(player.getUniqueId().toString()))
         {
           //Record found, name mismatch. Update the record with the players current name.
-          DB.executeUpdateAsync("UPDATE players SET player_name = ? WHERE player_uuid = ?", p.getUniqueId(), p.getUniqueId().toString());
+          DB.executeUpdateAsync("UPDATE players SET player_name = ? WHERE player_uuid = ?", player.getUniqueId(), player.getUniqueId().toString());
         }
 
         rows = new ArrayList<DbRow>();

@@ -109,7 +109,7 @@ public class EMI extends JavaPlugin {
         }
         catch(InterruptedException e)
         {
-            e.printStackTrace();onf,
+            e.printStackTrace();
         }
     }
 
@@ -120,6 +120,8 @@ public class EMI extends JavaPlugin {
         get(Path.Web.ONE_DATA, PlayerdataController.getPlayerData);
         get(Path.Web.ONE_ADV, AdvancementController.getPlayerAdvs);
         get("*", (request, response) -> "404 not found!!");
+
+        Spark.exception(Exception.class, (exception, request, response) -> {exception.printStackTrace();});
     }
 
     private void registerListeners()

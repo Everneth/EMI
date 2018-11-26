@@ -12,6 +12,7 @@ public class FileUtils {
         Stream<String> dataIn = reader.lines();
         StringBuilder sb = new StringBuilder();
         dataIn.forEach(sb::append);
+        reader.close();
         return sb.toString();
     }
 }

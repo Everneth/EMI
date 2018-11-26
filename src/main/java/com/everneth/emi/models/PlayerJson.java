@@ -9,7 +9,15 @@ public class PlayerJson {
     private int level;
     private long lastPlayed;
     private long firstPlayed;
-    public PlayerJson() {}
+    public PlayerJson()
+    {
+        this.uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
+        this.name = "Steve";
+        this.health = 20;
+        this.level = 0;
+        this.lastPlayed = 0;
+        this.firstPlayed = 0;
+    }
 
     public UUID getUuid() {
         return uuid;
