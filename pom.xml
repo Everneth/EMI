@@ -6,7 +6,7 @@
 
     <groupId>com.everneth</groupId>
     <artifactId>EMI</artifactId>
-    <version>0.2.2</version>
+    <version>0.3.1</version>
 
     <repositories>
         <repository>
@@ -29,6 +29,11 @@
             <id>central</id>
             <name>bintray</name>
             <url>http://jcenter.bintray.com</url>
+        </repository>
+        <repository>
+            <id>jnbt</id>
+            <name>jnbt</name>
+            <url>file://${project.basedir}/target</url>
         </repository>
     </repositories>
 
@@ -80,6 +85,30 @@
             <version>2.1.4</version>
             <scope>compile</scope>
             <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.jnbt</groupId>
+            <artifactId>jnbt</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <!--Spark-->
+        <dependency>
+            <groupId>com.sparkjava</groupId>
+            <artifactId>spark-core</artifactId>
+            <version>2.5</version>
+        </dependency>
+        <!--Spark-debug-->
+        <dependency>
+            <groupId>com.sparkjava</groupId>
+            <artifactId>spark-debug-tools</artifactId>
+            <version>0.5</version>
+        </dependency>
+        <!--Lombok-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.4</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     <build>
