@@ -5,10 +5,7 @@ import co.aikar.idb.DB;
 import co.aikar.idb.Database;
 import co.aikar.idb.DatabaseOptions;
 import co.aikar.idb.PooledDatabaseOptions;
-import com.everneth.emi.api.AdvancementController;
-import com.everneth.emi.api.Path;
-import com.everneth.emi.api.PlayerdataController;
-import com.everneth.emi.api.StatisticController;
+import com.everneth.emi.api.*;
 import com.everneth.emi.commands.ReportCommand;
 import com.everneth.emi.commands.bot.HelpClearCommand;
 import com.everneth.emi.commands.comm.CommCommand;
@@ -86,14 +83,17 @@ public class EMI extends JavaPlugin {
         config.addDefault("root-report-msg", 0);
         config.addDefault("bot-owner-id", 0);
         config.addDefault("world-folder", "world");
+        config.addDefault("api-port", 7598);
+        config.addDefault("bot-game", "Nursing your ailments, love.");
+        config.addDefault("bot-prefix", "!!");
         config.options().copyDefaults(true);
     }
 
     private void initBot()
     {
         CommandClientBuilder builder = new CommandClientBuilder();
-        builder.setPrefix("!!");
-        builder.setGame(Game.playing("Nursing your ailments, love."));
+        builder.setPrefix(this.getConfig().getString("bot-prefix"));
+        builder.setGame(Game.playing(this.getConfig().getString("bot-game")));
         builder.addCommand(new HelpClearCommand());
         builder.setOwnerId(this.getConfig().getString("bot-owner-id"));
 
@@ -115,10 +115,11 @@ public class EMI extends JavaPlugin {
 
     private void initApi()
     {
-        port(7598);
+        port(this.getConfig().getInt("api-port"));
         get(Path.Web.ONE_STATS, StatisticController.getPlayerStats);
         get(Path.Web.ONE_DATA, PlayerdataController.getPlayerData);
         get(Path.Web.ONE_ADV, AdvancementController.getPlayerAdvs);
+        post(Path.Web.EXECUTE_COMMAND, CommandController.sendCommandPayload);
         get("*", (request, response) -> "404 not found!!");
 
         Spark.exception(Exception.class, (exception, request, response) -> {exception.printStackTrace();});
