@@ -26,6 +26,8 @@ import spark.Spark;
 import static spark.Spark.*;
 import javax.security.auth.login.LoginException;
 
+import java.io.File;
+
 import static spark.Spark.get;
 import static spark.Spark.port;
 
@@ -35,14 +37,17 @@ public class EMI extends JavaPlugin {
     private static BukkitCommandManager commandManager;
     private static JDA jda;
     FileConfiguration config = getConfig();
-
+    String configPath = getDataFolder() + System.getProperty("file.separator") + "config.yml";
+    File configFile = new File(configPath);
     @Override
     public void onEnable() {
         plugin = this;
 
         getLogger().info("Ministry Interface started.");
-        loadConfig();
-        saveConfig();
+        if(!configFile.exists())
+        {
+            loadConfig();
+        }
 
         Utils.chatTag = config.getString("chat-tag");
 
@@ -87,6 +92,7 @@ public class EMI extends JavaPlugin {
         config.addDefault("bot-game", "Nursing your ailments, love.");
         config.addDefault("bot-prefix", "!!");
         config.options().copyDefaults(true);
+        this.saveConfig();
     }
 
     private void initBot()
