@@ -10,6 +10,7 @@ import com.everneth.emi.commands.ReportCommand;
 import com.everneth.emi.commands.bot.HelpClearCommand;
 import com.everneth.emi.commands.comm.CommCommand;
 import com.everneth.emi.commands.comp.CompCommand;
+import com.everneth.emi.events.ChatEvents;
 import com.everneth.emi.events.JoinEvent;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -128,6 +129,7 @@ public class EMI extends JavaPlugin {
     private void registerListeners()
     {
         getServer().getPluginManager().registerEvents(new JoinEvent(this), this);
+        getServer().getPluginManager().registerEvents(new ChatEvents(this), this);
     }
 
 
