@@ -61,6 +61,7 @@ public class HelpClearCommand extends Command {
                             event.getChannel().deleteMessageById(msg.getIdLong()).queue();
                         }
                     }
+                    event.replyInDm("Channel cleared, dear. <3 ");
                 }
             }
             else
