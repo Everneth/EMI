@@ -16,6 +16,14 @@ import org.bukkit.plugin.Plugin;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ *     Class: ReportCommand
+ *     Author: Faceman (@TptMike)
+ *     Purpose: Generate an embed and post it in the designated Discord channel
+ *     using the JDA bot
+ *
+ */
+
 @CommandAlias("report")
 public class ReportCommand extends BaseCommand {
     //private JDA jda;
@@ -28,6 +36,8 @@ public class ReportCommand extends BaseCommand {
     @CatchUnknown
     public void onReport(CommandSender sender, String message)
     {
+        // Get the player and supply all potentially useful
+        // information to the embed builder
         Player player = (Player)sender;
 
         Date now = new Date();
@@ -47,6 +57,7 @@ public class ReportCommand extends BaseCommand {
         eb.addField("Description", message, false);
         eb.setFooter("Help requested!", null);
 
+        // Make the bot post the embed to the channel and notify the player
         EMI.getJda().getTextChannelById(EMI.getPlugin().getConfig().getString("report-channel")).sendMessage(eb.build()).queue();
         player.sendMessage(Utils.color("&aReport submitted to &6#help&a!"));
     }

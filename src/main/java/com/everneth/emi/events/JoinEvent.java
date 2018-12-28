@@ -90,10 +90,12 @@ public class JoinEvent implements Listener {
           );
         }
 
+        // Prepare for futures to be turned into a list of DbRows
         rows = new ArrayList<DbRow>();
         motdList = new ArrayList<Motd>();
         futureList = DB.getResultsAsync("SELECT motd_id, player_id, message, ministry_name FROM motds\n" +
                 "INNER JOIN ministries ON motds.ministry_id = ministries.ministry_id");
+        // get the results from the future
         try {
             rows = futureList.get();
         }
@@ -101,8 +103,10 @@ public class JoinEvent implements Listener {
         {
             System.out.print(e.getMessage());
         }
+        // process it into an iterable list.
         buildMotdList(rows);
 
+        // Send a message tot he player with all active MOTDs
         for(Motd motd : motdList)
         {
             if(motd.name.equals("interior") && (!motd.getMessage().equals("")))
@@ -122,6 +126,7 @@ public class JoinEvent implements Listener {
 
     private void buildMotdList(List<DbRow> rows)
     {
+        // get what we need and create an ArrayList of Motd objects
         for(DbRow row : rows)
         {
             this.motdList.add(new Motd(

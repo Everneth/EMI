@@ -8,6 +8,12 @@ import net.dv8tion.jda.core.entities.MessageHistory;
 import net.dv8tion.jda.core.entities.Role;
 import java.util.List;
 
+/**
+ *     Class: HelpCommand
+ *     Author: Faceman (@TptMike)
+ *     Purpose: The JDA bot !!help-clear command that removes all but the specified message by id
+ */
+
 public class HelpClearCommand extends Command {
 
     public HelpClearCommand()

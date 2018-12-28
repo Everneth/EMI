@@ -31,6 +31,13 @@ import java.io.File;
 import static spark.Spark.get;
 import static spark.Spark.port;
 
+/**
+ *     Class: EMI
+ *     Author: Faceman (@TptMike)
+ *     Purpose: Plugin main class launcher
+ *
+ */
+
 public class EMI extends JavaPlugin {
 
     private static EMI plugin;
