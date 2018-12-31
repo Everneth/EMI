@@ -5,7 +5,7 @@ import org.bukkit.ChatColor;
 
 /**
  *     Class: Utils
- *     Author: Redstpmejax (@SterlingHeaton)
+ *     Author: Redstonehax (@SterlingHeaton)
  *     Purpose: Debugger utility and chat color utility class
  *
  */
