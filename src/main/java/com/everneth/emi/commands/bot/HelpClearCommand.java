@@ -1,11 +1,17 @@
 package com.everneth.emi.commands.bot;
 
 import com.everneth.emi.EMI;
+import com.everneth.emi.utils.FileUtils;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageHistory;
 import net.dv8tion.jda.core.entities.Role;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -53,6 +59,12 @@ public class HelpClearCommand extends Command {
                     event.replyInDm("There is nothing to clear in #help, hun! Careful with this command!");
                 }
                 else {
+                    // Take our messages and build a string, we'll dump that string into a message file
+                    // and embed the file into a message
+                    File embedFile = transcribe(messageList);
+                    Message message = new MessageBuilder().append("Transcript from #help").build();
+                    event.getGuild().getTextChannelById(178247194862682112L).sendFile(embedFile, message).queue();
+
                     // We've got a history, lets clear out
                     for (Message msg : messageList) {
                         // Is message the root?
@@ -76,5 +88,24 @@ public class HelpClearCommand extends Command {
             // TODO: Mute member if attempts are made to use command to spam replies
             event.reply("Sorry dear, you do not have the required role to use this command. :heart: ");
         }
+    }
+    private File transcribe(List<Message> messageList)
+    {
+        StringBuilder sb = new StringBuilder();
+
+        for (Message msg : messageList)
+        {
+            String logMsg = msg.getMember().getNickname() + ": " + msg.getContentRaw() + "\n";
+            sb.append(logMsg);
+        }
+        try {
+            File fileToEmbed = FileUtils.writeFileFromString("transcript.txt", sb.toString());
+            return fileToEmbed;
+        }
+        catch (IOException e)
+        {
+            EMI.getPlugin().getLogger().warning(e.getMessage());
+        }
+        return null;
     }
 }
