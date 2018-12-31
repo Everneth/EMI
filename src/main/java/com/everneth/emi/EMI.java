@@ -53,7 +53,7 @@ public class EMI extends JavaPlugin {
         getLogger().info("Ministry Interface started.");
         if(!configFile.exists())
         {
-            loadConfig();
+            this.saveDefaultConfig();
         }
 
         Utils.chatTag = config.getString("chat-tag");
@@ -80,26 +80,6 @@ public class EMI extends JavaPlugin {
         commandManager.registerCommand(new CommCommand());
         commandManager.registerCommand(new CompCommand());
         commandManager.registerCommand(new ReportCommand());
-    }
-
-    private void loadConfig()
-    {
-        config.addDefault("dbhost", "localhost:3306");
-        config.addDefault("dbname", "emi");
-        config.addDefault("dbuser", "admin_emi");
-        config.addDefault("dbpass", "secret");
-        config.addDefault("dbprefix", "ev_");
-        config.addDefault("bot-token", "PASTE-TOKEN-HERE");
-        config.addDefault("report-channel", 0);
-        config.addDefault("chat-tag", "&7&6EMI&7]");
-        config.addDefault("root-report-msg", 0);
-        config.addDefault("bot-owner-id", 0);
-        config.addDefault("world-folder", "world");
-        config.addDefault("api-port", 7598);
-        config.addDefault("bot-game", "Nursing your ailments, love.");
-        config.addDefault("bot-prefix", "!!");
-        config.options().copyDefaults(true);
-        this.saveConfig();
     }
 
     private void initBot()
