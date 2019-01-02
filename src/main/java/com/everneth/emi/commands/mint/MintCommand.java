@@ -12,6 +12,13 @@ import org.bukkit.plugin.Plugin;
 import java.sql.SQLException;
 import java.util.UUID;
 
+/**
+ *     Class: MintCommand
+ *     Author: Faceman (@TptMike)
+ *     Purpose: The command structure of /mint and all subcommands
+ *     Notes: In future, see about making a MintBaseCommand parent class and move subcommands into their own classes
+ */
+
 @CommandAlias("mint")
 public class MintCommand extends BaseCommand {
 
@@ -52,7 +59,10 @@ public class MintCommand extends BaseCommand {
         // Ints compare faster than strings!
         try
         {
-            this.playerId = DB.getFirstColumn("SELECT player_id FROM players WHERE player_uuid = ?", player.getUniqueId().toString());
+            this.playerId = DB.getFirstColumn(
+                    "SELECT player_id FROM players WHERE player_uuid = ?",
+                    player.getUniqueId().toString()
+            );
         }
         // ERROR 1
         catch (SQLException e)
@@ -63,7 +73,11 @@ public class MintCommand extends BaseCommand {
 
         if(playerId != 0)
         {
-            DB.executeUpdateAsync("UPDATE motds SET message = ?, player_id = ? WHERE ministry_id = 3", motd, playerId);
+            DB.executeUpdateAsync(
+                    "UPDATE motds SET message = ?, player_id = ? WHERE ministry_id = 3",
+                    motd,
+                    playerId
+            );
             sender.sendMessage(Utils.color(Utils.chatTag + " &aMint MOTD has been updated!"));
         }
     }

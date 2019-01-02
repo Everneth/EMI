@@ -11,6 +11,13 @@ import org.bukkit.plugin.Plugin;
 
 import java.sql.SQLException;
 
+/**
+ *     Class: CommCommand
+ *     Author: Redstonehax (@SterlingHeaton)
+ *     Purpose: The command structure of /comm and all subcommands
+ *     Notes: In future, see about making a CommBaseCommand parent class and move subcommands into their own classes
+ */
+
 @CommandAlias("comm")
 public class CommCommand extends BaseCommand
 {
@@ -51,7 +58,10 @@ public class CommCommand extends BaseCommand
         // Ints compare faster than strings!
         try
         {
-            this.playerId = DB.getFirstColumn("SELECT player_id FROM players WHERE player_uuid = ?", player.getUniqueId().toString());
+            this.playerId = DB.getFirstColumn(
+                    "SELECT player_id FROM players WHERE player_uuid = ?",
+                    player.getUniqueId().toString()
+            );
         }
         // ERROR 1
         catch (SQLException e)
@@ -62,7 +72,11 @@ public class CommCommand extends BaseCommand
 
         if(playerId != 0)
         {
-            DB.executeUpdateAsync("UPDATE motds SET message = ?, player_id = ? WHERE ministry_id = 2", motd, playerId);
+            DB.executeUpdateAsync(
+                    "UPDATE motds SET message = ?, player_id = ? WHERE ministry_id = 2",
+                    motd,
+                    playerId
+            );
             sender.sendMessage(Utils.color(Utils.chatTag + " &aComm MOTD has been updated!"));
         }
     }
@@ -76,7 +90,10 @@ public class CommCommand extends BaseCommand
         // Ints compare faster than strings!
         try
         {
-            this.playerId = DB.getFirstColumn("SELECT player_id FROM players WHERE player_uuid = ?", player.getUniqueId().toString());
+            this.playerId = DB.getFirstColumn(
+                    "SELECT player_id FROM players WHERE player_uuid = ?",
+                    player.getUniqueId().toString()
+            );
         }
         // ERROR 1
         catch (SQLException e)
@@ -87,7 +104,11 @@ public class CommCommand extends BaseCommand
 
         if(playerId != 0)
         {
-            DB.executeUpdateAsync("UPDATE motds SET message = ?, player_id = ? WHERE ministry_id = 2", null, playerId);
+            DB.executeUpdateAsync(
+                    "UPDATE motds SET message = ?, player_id = ? WHERE ministry_id = 2",
+                    null,
+                    playerId
+            );
             sender.sendMessage(Utils.color(Utils.chatTag + " &aComm MOTD has been cleared!"));
         }
     }

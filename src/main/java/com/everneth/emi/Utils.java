@@ -3,6 +3,13 @@ package com.everneth.emi;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
+/**
+ *     Class: Utils
+ *     Author: Redstonehax (@SterlingHeaton)
+ *     Purpose: Debugger utility and chat color utility class
+ *
+ */
+
 public class Utils
 {
     public static String chatTag;
