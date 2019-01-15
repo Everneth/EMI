@@ -4,7 +4,7 @@ public class Motd {
     private int id;
     private int playerId;
     private String message;
-    public String name;
+    private String name;
 
 
     public Motd(int id, int playerId, String message)
@@ -44,6 +44,11 @@ public class Motd {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getName()
+    {
+        return name;
     }
 
 }

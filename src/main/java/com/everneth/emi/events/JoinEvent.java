@@ -109,15 +109,15 @@ public class JoinEvent implements Listener {
         // Send a message tot he player with all active MOTDs
         for(Motd motd : motdList)
         {
-            if(motd.name.equals("interior") && (!motd.getMessage().equals("")))
+            if(motd.getName().equals("interior") && (!motd.getMessage().equals("")))
             {
                 player.sendMessage(Utils.color(INT_INTRO + motd.getMessage()));
             }
-            else if(motd.name.equals("competition") && !motd.getMessage().equals(""))
+            else if(motd.getName().equals("competition") && !motd.getMessage().equals(""))
             {
                 player.sendMessage(Utils.color(COMP_INTRO + motd.getMessage()));
             }
-            else if(motd.name.equals("communications") && !motd.getMessage().equals(""))
+            else if(motd.getName().equals("communications") && !motd.getMessage().equals(""))
             {
                 player.sendMessage(Utils.color(COMM_INTRO + motd.getMessage()));
             }
