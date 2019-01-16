@@ -12,6 +12,7 @@ import net.dv8tion.jda.core.entities.Role;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -93,9 +94,15 @@ public class HelpClearCommand extends Command {
     {
         StringBuilder sb = new StringBuilder();
 
-        for (Message msg : messageList)
+        List<Message> reverse = reverseList(messageList);
+
+        for (Message msg : reverse)
         {
-            String logMsg = msg.getMember().getNickname() + ": " + msg.getContentRaw() + "\n";
+            if(msg.getIdLong() == EMI.getPlugin().getConfig().getLong("root-report-msg"))
+            {
+                continue;
+            }
+            String logMsg = msg.getMember().getEffectiveName() + ": " + msg.getContentRaw() + "\n";
             sb.append(logMsg);
         }
         try {
@@ -107,5 +114,11 @@ public class HelpClearCommand extends Command {
             EMI.getPlugin().getLogger().warning(e.getMessage());
         }
         return null;
+    }
+    public static<T> List<T> reverseList(List<T> list)
+    {
+        List<T> reverse = new ArrayList<>(list);
+        Collections.reverse(reverse);
+        return reverse;
     }
 }
