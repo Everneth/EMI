@@ -12,11 +12,19 @@ import org.bukkit.plugin.Plugin;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *     Class: DiscordsyncCommand
+ *     Author: Faceman (@TptMike)
+ *     Purpose: Initiate a request to sync minecraft and discord accounts together in the
+ *     EMI database.
+ */
+
 @CommandAlias("report")
 public class DiscordsyncCommand extends BaseCommand {
     Plugin plugin = EMI.getPlugin();
     public void onDiscordsync(CommandSender sender, String discordDetails)
     {
+        // Get the player, a list of guild members, and individual strings for the passed in member
         Player player = (Player)sender;
         List<Member> memberList = EMI.getJda().getGuildById(plugin.getConfig().getLong("guild-id")).getMembers();
         List<User> userList = new ArrayList<User>();
@@ -24,19 +32,25 @@ public class DiscordsyncCommand extends BaseCommand {
         String name = discordDetails.substring(0, poundIndex);
         String discriminator = discordDetails.substring(poundIndex + 1);
 
+        // Search the guild member list for all users with the same name
         for(Member member : memberList)
         {
+            // If a match is found, add it to the userlist for checking the discriminator
             if(member.getUser().getName().equals(name))
                 userList.add(member.getUser());
         }
 
+        // If no match was found, notify the user
         if(userList.isEmpty())
             sender.sendMessage("User not found! Please check your details and try again. If this is your second attempt, please contact Comms.");
         else
         {
+            // We've found at least 1 match
             if(userList.size() == 1)
             {
+                // check the discriminator for a match
                 if(userList.get(0).getDiscriminator().equals(discriminator)) {
+                    // Match found, start sync
                     sender.sendMessage("Please check your Discord DMs to verify your account.");
                     userList.get(0).openPrivateChannel().queue((channel) ->
                             {
@@ -44,18 +58,22 @@ public class DiscordsyncCommand extends BaseCommand {
                             }
                     );
                 }
+                // discriminator did not match, notify the user
                 else
                 {
                     sender.sendMessage("User not found! Please check your details and try again. If this is your second attempt, please contact Comms.");
                 }
             }
+            // We've found multiple users with the same name
             else
             {
                 boolean userFound = false;
+                // Loop through the list to check discriminators
                 for(User user : userList)
                 {
                     if(user.getName().equals(name) && user.getDiscriminator().equals(discriminator))
                     {
+                        // found our user, start sync
                         userFound = true;
                         user.openPrivateChannel().queue((channel) ->
                                 {
@@ -64,6 +82,7 @@ public class DiscordsyncCommand extends BaseCommand {
                         );
                     }
                 }
+                // If no user is found, notify the command sender
                 if(!userFound)
                 {
                     sender.sendMessage("User not found! Please check your details and try again. If this is your second attempt, please contact Comms.");
