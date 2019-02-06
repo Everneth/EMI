@@ -2,6 +2,7 @@ package com.everneth.emi.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
+import com.everneth.emi.DiscordSyncManager;
 import com.everneth.emi.EMI;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
@@ -19,7 +20,7 @@ import java.util.List;
  *     EMI database.
  */
 
-@CommandAlias("report")
+@CommandAlias("discordsync")
 public class DiscordsyncCommand extends BaseCommand {
     Plugin plugin = EMI.getPlugin();
     public void onDiscordsync(CommandSender sender, String discordDetails)
@@ -31,6 +32,7 @@ public class DiscordsyncCommand extends BaseCommand {
         int poundIndex = discordDetails.indexOf('#');
         String name = discordDetails.substring(0, poundIndex);
         String discriminator = discordDetails.substring(poundIndex + 1);
+        DiscordSyncManager dsm = DiscordSyncManager.getDSM();
 
         // Search the guild member list for all users with the same name
         for(Member member : memberList)
@@ -52,6 +54,7 @@ public class DiscordsyncCommand extends BaseCommand {
                 if(userList.get(0).getDiscriminator().equals(discriminator)) {
                     // Match found, start sync
                     sender.sendMessage("Please check your Discord DMs to verify your account.");
+                    dsm.addSyncRequest(player, userList.get(0));
                     userList.get(0).openPrivateChannel().queue((channel) ->
                             {
                                 channel.sendMessage(sender.getName() + " is attempting to their minecraft account with our Discord guild. if this is you, please use !!confirmsync to complete the account synchronization. If this is not done by you, please forward this message to staff immediately. Thank you!").queue();
@@ -75,6 +78,7 @@ public class DiscordsyncCommand extends BaseCommand {
                     {
                         // found our user, start sync
                         userFound = true;
+                        dsm.addSyncRequest(player, user);
                         user.openPrivateChannel().queue((channel) ->
                                 {
                                     channel.sendMessage(sender.getName() + " is attempting to their minecraft account with our Discord guild. if this is you, please use !!confirmsync to complete the account synchronization. If this is not done by you, please forward this message to staff immediately. Thank you!").queue();
