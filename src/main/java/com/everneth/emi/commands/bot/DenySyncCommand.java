@@ -32,7 +32,7 @@ public class DenySyncCommand extends Command {
         }
         else if (key == null && hasSyncRole(event))
         {
-            event.replyInDm("You're account is already synced and running this command did nothing.");
+            event.replyInDm("Your account is already synced and running this command did nothing.");
         }
         else if (key != null)
         {

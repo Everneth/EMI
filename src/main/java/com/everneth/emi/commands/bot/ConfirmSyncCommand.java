@@ -47,13 +47,15 @@ public class ConfirmSyncCommand extends Command {
                 int playerId = syncAccount(event.getAuthor());
                 if(playerId == 0)
                 {
-                    event.replyInDm("ERROR: Could not sync account.");
+                    event.replyInDm("ERROR: Could not sync account. No player record found.");
                 }
                 else
                 {
                     dsm.removeSyncRequest(this.getPlayerRow(playerId).getString("player_uuid"));
-                    event.getMember().getRoles().add(event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("synced-role-id")));
-                    event.replyInDm("You're account has successfully synced with our system!");
+                    event.getMember().getRoles().add(
+                            event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("synced-role-id"))
+                    );
+                    event.replyInDm("Your account has successfully synced with our system!");
                 }
             }
         }
