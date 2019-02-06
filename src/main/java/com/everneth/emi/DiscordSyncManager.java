@@ -29,9 +29,13 @@ public class DiscordSyncManager {
     {
         this.userMap.put(player.getUniqueId(), discordUser);
     }
-    public void removeSyncRequest(Player player, User discordUser)
+    public void removeSyncRequest(Player player)
     {
         this.userMap.remove(player.getUniqueId());
+    }
+    public void removeSyncRequest(String uuid)
+    {
+        this.userMap.remove(UUID.fromString(uuid));
     }
     public User findSyncRequest(User user)
     {

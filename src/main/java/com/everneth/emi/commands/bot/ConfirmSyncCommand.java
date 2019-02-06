@@ -3,6 +3,7 @@ package com.everneth.emi.commands.bot;
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.DiscordSyncManager;
+import com.everneth.emi.EMI;
 import com.everneth.emi.models.Motd;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -50,6 +51,7 @@ public class ConfirmSyncCommand extends Command {
                 }
                 else
                 {
+                    dsm.removeSyncRequest(this.getPlayerRow(playerId).getString("player_uuid"));
                     event.replyInDm("You're account has successfully synced with our system!");
                 }
             }
@@ -84,5 +86,19 @@ public class ConfirmSyncCommand extends Command {
             System.out.print(e.getMessage());
         }
         return playerId;
+    }
+    private DbRow getPlayerRow(int id)
+    {
+        CompletableFuture<DbRow> futurePlayer;
+        DbRow player = new DbRow();
+        futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE player_id = ?", id);
+        try {
+            player = futurePlayer.get();
+        }
+        catch (Exception e)
+        {
+            EMI.getPlugin().getLogger().info(e.getMessage());
+        }
+        return player;
     }
 }
