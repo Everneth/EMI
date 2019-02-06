@@ -52,6 +52,7 @@ public class ConfirmSyncCommand extends Command {
                 else
                 {
                     dsm.removeSyncRequest(this.getPlayerRow(playerId).getString("player_uuid"));
+                    event.getMember().getRoles().add(event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("synced-role-id")));
                     event.replyInDm("You're account has successfully synced with our system!");
                 }
             }
