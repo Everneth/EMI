@@ -25,6 +25,8 @@ root-report-msg: 0
 bot-owner-id: 0
 bot-game: 'EMI'
 bot-prefix: '!!'
+guild-id: 0
+synced-role-id: 0
 
 ###############################################################################################
 #########                              --EMI Settings--                               #########

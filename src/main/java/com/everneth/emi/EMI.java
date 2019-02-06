@@ -7,6 +7,8 @@ import co.aikar.idb.DatabaseOptions;
 import co.aikar.idb.PooledDatabaseOptions;
 import com.everneth.emi.api.*;
 import com.everneth.emi.commands.ReportCommand;
+import com.everneth.emi.commands.bot.ConfirmSyncCommand;
+import com.everneth.emi.commands.bot.DenySyncCommand;
 import com.everneth.emi.commands.bot.HelpClearCommand;
 import com.everneth.emi.commands.comm.CommCommand;
 import com.everneth.emi.commands.comp.CompCommand;
@@ -88,6 +90,8 @@ public class EMI extends JavaPlugin {
         builder.setPrefix(this.getConfig().getString("bot-prefix"));
         builder.setGame(Game.playing(this.getConfig().getString("bot-game")));
         builder.addCommand(new HelpClearCommand());
+        builder.addCommand(new ConfirmSyncCommand());
+        builder.addCommand(new DenySyncCommand());
         builder.setOwnerId(this.getConfig().getString("bot-owner-id"));
 
         CommandClient client = builder.build();
