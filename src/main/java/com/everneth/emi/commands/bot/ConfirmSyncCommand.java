@@ -7,6 +7,7 @@ import com.everneth.emi.EMI;
 import com.everneth.emi.models.Motd;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.User;
 
 import java.util.ArrayList;
@@ -38,13 +39,13 @@ public class ConfirmSyncCommand extends Command {
         }
         else
         {
-            if(syncExists(event.getAuthor()))
+            if(syncExists(toFind))
             {
                 event.replyInDm("You have already synced this account. If this is in error, please contact staff.");
             }
             else
             {
-                int playerId = syncAccount(event.getAuthor());
+                int playerId = syncAccount(toFind);
                 if(playerId == 0)
                 {
                     event.replyInDm("ERROR: Could not sync account. No player record found.");
@@ -55,7 +56,25 @@ public class ConfirmSyncCommand extends Command {
                     event.getMember().getRoles().add(
                             event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("synced-role-id"))
                     );
-                    event.replyInDm("Your account has successfully synced with our system!");
+                    Role memberRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("member-role-id"));
+                    if(EMI.getPlugin().getConfig().getBoolean("use-pending-role"))
+                    {
+                        Role pendingRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("pending-role-id"));
+                        if(event.getMember().getRoles().contains(pendingRole))
+                        {
+                            event.getMember().getRoles().remove(pendingRole);
+                            event.getMember().getRoles().add(memberRole);
+                            event.replyInDm("Your account has been synced and your roles updated!");
+                        }
+                        else
+                        {
+                            event.replyInDm("Your account has been synced!");
+                        }
+                    }
+                    else
+                    {
+                        event.replyInDm("Your account has been synced!");
+                    }
                 }
             }
         }

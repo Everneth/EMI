@@ -27,6 +27,9 @@ bot-game: 'EMI'
 bot-prefix: '!!'
 guild-id: 0
 synced-role-id: 0
+member-role-id: 0
+use-pending-role: true
+pending-role-id: 0
 
 ###############################################################################################
 #########                              --EMI Settings--                               #########
