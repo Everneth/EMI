@@ -30,6 +30,7 @@ synced-role-id: 0
 member-role-id: 0
 use-pending-role: true
 pending-role-id: 0
+staff-role-id: 0
 
 ###############################################################################################
 #########                              --EMI Settings--                               #########

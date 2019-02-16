@@ -14,15 +14,16 @@ import java.util.UUID;
  *     server restart. Any sync requests will need to be resent
  */
 
-public class DiscordSyncManager {
-    private static final DiscordSyncManager dsm = new DiscordSyncManager();
-    private HashMap<UUID, User> userMap;
-    private DiscordSyncManager()
-    {
-        userMap = new HashMap<UUID, User>();
-    }
+public final class DiscordSyncManager {
+    private static DiscordSyncManager dsm;
+    private HashMap<UUID, User> userMap = new HashMap<UUID, User>();;
+    private DiscordSyncManager() {}
     public static DiscordSyncManager getDSM()
     {
+        if(dsm == null)
+        {
+            dsm = new DiscordSyncManager();
+        }
         return dsm;
     }
     public void addSyncRequest(Player player, User discordUser)

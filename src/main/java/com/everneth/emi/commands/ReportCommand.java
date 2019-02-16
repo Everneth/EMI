@@ -5,9 +5,20 @@ import co.aikar.commands.annotation.CatchUnknown;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Dependency;
+import co.aikar.idb.DB;
+import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
+import com.everneth.emi.ReportManager;
 import com.everneth.emi.Utils;
+import com.everneth.emi.models.Report;
+import net.dv8tion.jda.client.entities.Application;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.managers.GuildManager;
+import net.dv8tion.jda.core.requests.restaction.ChannelAction;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -15,6 +26,8 @@ import org.bukkit.plugin.Plugin;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  *     Class: ReportCommand
@@ -26,7 +39,7 @@ import java.util.Date;
 
 @CommandAlias("report")
 public class ReportCommand extends BaseCommand {
-    //private JDA jda;
+    private JDA bot = EMI.getJda();
 
     @Dependency
     private Plugin plugin;
@@ -36,12 +49,15 @@ public class ReportCommand extends BaseCommand {
     @CatchUnknown
     public void onReport(CommandSender sender, String message)
     {
+        ReportManager rm = ReportManager.getReportManager();
         // Get the player and supply all potentially useful
         // information to the embed builder
         Player player = (Player)sender;
 
         Date now = new Date();
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+        long channelId = buildPrivateChannel(player);
 
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle(player.getName());
@@ -58,9 +74,63 @@ public class ReportCommand extends BaseCommand {
         eb.setFooter("Help requested!", null);
 
         // Make the bot post the embed to the channel and notify the player
-        EMI.getJda().getTextChannelById(EMI.getPlugin().getConfig().getString("report-channel")).sendMessage(eb.build()).queue();
+        EMI.getJda().getTextChannelById(EMI.getPlugin().getConfig().getString("report-channel")).sendMessage(eb.build()).queue(
+                (message) -> rm.findReportById()
+        );
         EMI.getJda().getTextChannelById(303912184944263169L).sendMessage(eb.build()).queue();
         player.sendMessage(Utils.color("<&6The Wench&f> Your report submitted to &6#help&f! A staff member " +
                 "will get back to you shortly. <3"));
     }
+
+    private long buildPrivateChannel(Player player)
+    {
+        GuildManager guildManager = bot.getGuildById(plugin.getConfig().getLong("guild-id")).getManager();
+        Role staffRole = guildManager.getGuild().getRoleById(plugin.getConfig().getLong("staff-role-id"));
+        Role botRole = guildManager.getGuild().getRolesByName(bot.getSelfUser().getName(), true).get(0);
+        ReportManager rm = ReportManager.getReportManager();
+
+        DbRow playerRow = getPlayerRow(player.getUniqueId());
+
+        ChannelAction channelAction = guildManager.getGuild().getController().createTextChannel(player.getName() + "_staff");
+        channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue()).queue();
+        channelAction.addPermissionOverride(staffRole, Permission.ALL_TEXT_PERMISSIONS, 0)
+                     .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0).queue(
+                             (channel) -> {
+                                 rm.addReport(player.getUniqueId(), new Report(channel.getIdLong()));
+                             });
+        if(hasSynced(playerRow))
+        {
+            Member discordMember = guildManager.getGuild().getMemberById(playerRow.getLong("discord_id"));
+            rm.findReportById(player.getUniqueId()).setDiscordUserId(discordMember.getUser().getIdLong());
+            channelAction.addPermissionOverride(discordMember, Permission.VIEW_CHANNEL.getRawValue(), 0).queue();
+        }
+        Report report = rm.findReportById(player.getUniqueId());
+        return report.getChannelId();
+    }
+    private DbRow getPlayerRow(UUID uuid)
+    {
+        CompletableFuture<DbRow> futurePlayer;
+        DbRow player = new DbRow();
+        futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE player_uiid = ?", uuid.toString());
+        try {
+            player = futurePlayer.get();
+        }
+        catch (Exception e)
+        {
+            EMI.getPlugin().getLogger().info(e.getMessage());
+        }
+        return player;
+    }
+    private boolean hasSynced(DbRow row)
+    {
+        if(row.getLong("discord_id") == null || row.getLong("discord_id") == 0)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
 }
+
