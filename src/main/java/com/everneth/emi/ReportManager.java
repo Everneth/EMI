@@ -49,7 +49,15 @@ public final class ReportManager {
         }
     }
 
-    
+    public void closeReport(UUID uuid)
+    {
+        DbRow playerRow = getPlayerRow(uuid);
+        DB.executeUpdateAsync(
+                "UPDATE reports SET active = 0 WHERE initiator_id = ?",
+                playerRow.getInt("player_id")
+        );
+        rm.removeReport(uuid);
+    }
 
     public void loadManager()
     {
@@ -75,5 +83,19 @@ public final class ReportManager {
                 );
             }
         }
+    }
+    private DbRow getPlayerRow(UUID uuid)
+    {
+        CompletableFuture<DbRow> futurePlayer;
+        DbRow player = new DbRow();
+        futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE player_uuid = ?", uuid.toString());
+        try {
+            player = futurePlayer.get();
+        }
+        catch (Exception e)
+        {
+            EMI.getPlugin().getLogger().info(e.getMessage());
+        }
+        return player;
     }
 }
