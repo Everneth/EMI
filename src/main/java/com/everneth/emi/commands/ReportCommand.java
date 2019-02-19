@@ -75,9 +75,11 @@ public class ReportCommand extends BaseCommand {
 
         // Make the bot post the embed to the channel and notify the player
         EMI.getJda().getTextChannelById(EMI.getPlugin().getConfig().getString("report-channel")).sendMessage(eb.build()).queue(
-                (message) -> rm.findReportById()
-        );
-        EMI.getJda().getTextChannelById(303912184944263169L).sendMessage(eb.build()).queue();
+                (message1) -> {
+                    Report report = rm.findReportById(player.getUniqueId());
+                    report.setMessageId(message1.getIdLong());
+                });
+        EMI.getJda().getTextChannelById(EMI.getPlugin().getConfig().getLong("report-channel")).sendMessage(eb.build()).queue();
         player.sendMessage(Utils.color("<&6The Wench&f> Your report submitted to &6#help&f! A staff member " +
                 "will get back to you shortly. <3"));
     }
@@ -105,13 +107,16 @@ public class ReportCommand extends BaseCommand {
             channelAction.addPermissionOverride(discordMember, Permission.VIEW_CHANNEL.getRawValue(), 0).queue();
         }
         Report report = rm.findReportById(player.getUniqueId());
+
+        rm.addReportRecord(report, playerRow.getInt("player_id"));
+
         return report.getChannelId();
     }
     private DbRow getPlayerRow(UUID uuid)
     {
         CompletableFuture<DbRow> futurePlayer;
         DbRow player = new DbRow();
-        futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE player_uiid = ?", uuid.toString());
+        futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE player_uuid = ?", uuid.toString());
         try {
             player = futurePlayer.get();
         }

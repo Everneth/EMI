@@ -51,12 +51,4 @@ public class Report {
         this.messageId = messageId;
     }
 
-    public static getReportRecord(UUID uuid)
-    {
-        
-    }
-    public static addReportRecord(Report report)
-    {
-
-    }
 }

@@ -1,9 +1,13 @@
 package com.everneth.emi;
 
+import co.aikar.idb.DB;
+import co.aikar.idb.DbRow;
 import com.everneth.emi.models.Report;
 
-import java.util.HashMap;
-import java.util.UUID;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public final class ReportManager {
     private static ReportManager rm;
@@ -28,5 +32,48 @@ public final class ReportManager {
     public Report findReportById(UUID uuid)
     {
         return this.reportMap.get(uuid);
+    }
+
+    public void addReportRecord(Report report, int playerId)
+    {
+        Date now = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+        try {
+            DB.executeInsert("INSERT INTO reports (initiator_id, channel_id, active, date_opened, date_closed, embed_message_id) " +
+                    "VALUES (?, ?, ?, ?, ?, ?)", playerId, report.getChannelId(), 1, format.format(now), null, report.getMessageId());
+        }
+        catch(SQLException e)
+        {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    
+
+    public void loadManager()
+    {
+        List<DbRow> results = new ArrayList<DbRow>();
+        try {
+            results = DB.getResultsAsync(
+                    "SELECT channel_id, player_uuid, discord_id FROM reports INNER JOIN players " +
+                            "ON reports.initiator_id = player.player_id WHERE active = ?",
+                    1).get();
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+        if(!results.isEmpty()) {
+            for (DbRow result : results) {
+                this.reportMap.put(UUID.fromString(result.getString("player_uuid")),
+                        new Report(
+                                result.getLong("channel_id"),
+                                result.getLong("embed_message_id"),
+                                result.getLong("discord_id")
+                        )
+                );
+            }
+        }
     }
 }

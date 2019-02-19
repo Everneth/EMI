@@ -64,6 +64,8 @@ public class EMI extends JavaPlugin {
         Database db = PooledDatabaseOptions.builder().options(options).createHikariDatabase();
         DB.setGlobalDatabase(db);
 
+        ReportManager.getReportManager().loadManager();
+
         registerCommands();
         registerListeners();
         initBot();
