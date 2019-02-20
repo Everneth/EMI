@@ -54,34 +54,42 @@ public class ReportCommand extends BaseCommand {
         // information to the embed builder
         Player player = (Player)sender;
 
-        Date now = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        if(rm.hasActiveReport(player.getUniqueId()))
+        {
+            player.sendMessage(Utils.color("<&6The Wench&f> You already have an active report in our system. Please use " +
+                    "your active report for new or existing issues in progress. <3"));
+        }
+        else {
+            Date now = new Date();
+            SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
-        long channelId = buildPrivateChannel(player);
+            long channelId = buildPrivateChannel(player);
 
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(player.getName());
-        eb.setDescription(player.getUniqueId().toString());
-        eb.setColor(0xffff00);
-        eb.setThumbnail("https://minotar.net/helm/" + player.getUniqueId() + "/100.png");
-        eb.addField("X", Double.toString(player.getLocation().getX()), true);
-        eb.addField("Y", Double.toString(player.getLocation().getY()), true);
-        eb.addField("Z", Double.toString(player.getLocation().getZ()), true);
-        eb.addField("Dimension", player.getWorld().getEnvironment().toString(), true);
-        eb.addField("Time Reported (EST)", format.format(now), true);
-        eb.addField("Server", player.getServer().getServerName(), true);
-        eb.addField("Description", message, false);
-        eb.setFooter("Help requested!", null);
+            EmbedBuilder eb = new EmbedBuilder();
+            eb.setTitle(player.getName());
+            eb.setDescription(player.getUniqueId().toString());
+            eb.setColor(0xffff00);
+            eb.setThumbnail("https://minotar.net/helm/" + player.getUniqueId() + "/100.png");
+            eb.addField("X", Double.toString(player.getLocation().getX()), true);
+            eb.addField("Y", Double.toString(player.getLocation().getY()), true);
+            eb.addField("Z", Double.toString(player.getLocation().getZ()), true);
+            eb.addField("Dimension", player.getWorld().getEnvironment().toString(), true);
+            eb.addField("Time Reported (EST)", format.format(now), true);
+            eb.addField("Server", player.getServer().getServerName(), true);
+            eb.addField("Description", message, false);
+            eb.setFooter("Help requested!", null);
 
-        // Make the bot post the embed to the channel and notify the player
-        EMI.getJda().getTextChannelById(EMI.getPlugin().getConfig().getString("report-channel")).sendMessage(eb.build()).queue(
-                (message1) -> {
-                    Report report = rm.findReportById(player.getUniqueId());
-                    report.setMessageId(message1.getIdLong());
-                });
-        EMI.getJda().getTextChannelById(EMI.getPlugin().getConfig().getLong("report-channel")).sendMessage(eb.build()).queue();
-        player.sendMessage(Utils.color("<&6The Wench&f> Your report submitted to &6#help&f! A staff member " +
-                "will get back to you shortly. <3"));
+
+            // Make the bot post the embed to the channel and notify the player
+            EMI.getJda().getTextChannelById(channelId).sendMessage(eb.build()).queue(
+                    (message1) -> {
+                        Report report = rm.findReportById(player.getUniqueId());
+                        report.setMessageId(message1.getIdLong());
+                    });
+            EMI.getJda().getTextChannelById(EMI.getPlugin().getConfig().getLong("report-channel")).sendMessage(eb.build()).queue();
+            player.sendMessage(Utils.color("<&6The Wench&f> Your report submitted to &6#help&f! A staff member " +
+                    "will get back to you shortly. <3"));
+        }
     }
 
     private long buildPrivateChannel(Player player)

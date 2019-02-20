@@ -71,8 +71,6 @@ public class CloseReportCommand extends Command {
             for (Message msg : messageList) {
                 event.getChannel().deleteMessageById(msg.getIdLong()).queue();
             }
-            
-            event.replyInDm("Channel cleared, dear. <3 ");
         } else {
             // You can;t even use this at all, we're not checking any further
             // TODO: Mute member if attempts are made to use command to spam replies
@@ -81,12 +79,12 @@ public class CloseReportCommand extends Command {
     }
 
     private int transcribeToPost(List<Message> messageList) {
-        final String url =
+        final String URL =
                 EMI.getPlugin().getConfig().getString("api-topic-post-url") + "api" +
                         EMI.getPlugin().getConfig().getString("api-topic-post-endpoint");
-        final String key = EMI.getPlugin().getConfig().getString("api-key");
-        final int poster = EMI.getPlugin().getConfig().getInt("system-user-id");
-        final int forumId = EMI.getPlugin().getConfig().getInt("report-log-forum-id");
+        final String KEY = EMI.getPlugin().getConfig().getString("api-key");
+        final int POSTER = EMI.getPlugin().getConfig().getInt("system-user-id");
+        final int FORUM_ID = EMI.getPlugin().getConfig().getInt("report-log-forum-id");
 
         StringBuilder sb = new StringBuilder();
 
@@ -112,9 +110,9 @@ public class CloseReportCommand extends Command {
         Gson gson = new Gson();
 
         CloseableHttpClient httpclient = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url + "?=" + key);
+        HttpPost httpPost = new HttpPost(URL + "?=" + KEY);
 
-        LogPost post = new LogPost(forumId, reverse.get(0).getEmbeds().get(0).getTitle(), sb.toString(), poster);
+        LogPost post = new LogPost(FORUM_ID, reverse.get(0).getEmbeds().get(0).getTitle(), sb.toString(), POSTER);
 
         HttpEntity stringEntity = new StringEntity(gson.toJson(post), ContentType.APPLICATION_JSON);
         httpPost.setEntity(stringEntity);
@@ -136,9 +134,6 @@ public class CloseReportCommand extends Command {
         List<Message> reverse = reverseList(messageList);
 
         for (Message msg : reverse) {
-            if (msg.getIdLong() == EMI.getPlugin().getConfig().getLong("root-report-msg")) {
-                continue;
-            }
             String logMsg = msg.getMember().getEffectiveName() + ": " + msg.getContentRaw() + "\n";
             sb.append(logMsg);
         }

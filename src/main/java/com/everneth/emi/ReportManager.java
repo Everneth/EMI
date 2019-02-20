@@ -49,6 +49,18 @@ public final class ReportManager {
         }
     }
 
+    public boolean hasActiveReport(UUID uuid)
+    {
+        Report report = findReportById(uuid);
+        if(report != null) {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     public void closeReport(UUID uuid)
     {
         DbRow playerRow = getPlayerRow(uuid);
