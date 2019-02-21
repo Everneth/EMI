@@ -3,6 +3,7 @@ package com.everneth.emi;
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.models.Report;
+import net.dv8tion.jda.core.entities.User;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -32,6 +33,22 @@ public final class ReportManager {
     public Report findReportById(UUID uuid)
     {
         return this.reportMap.get(uuid);
+    }
+    public UUID findReportByChannelId(Long channelId)
+    {
+        return getKeyFromChannelId(this.reportMap, channelId);
+    }
+
+    private UUID getKeyFromChannelId(Map hm, long channelId)
+    {
+        for (Object o : hm.keySet())
+        {
+            if(this.reportMap.get((UUID) o).getChannelId() == channelId)
+            {
+                return (UUID) o;
+            }
+        }
+        return null;
     }
 
     public void addReportRecord(Report report, int playerId)

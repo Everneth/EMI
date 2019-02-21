@@ -15,6 +15,7 @@ import com.everneth.emi.commands.bot.HelpClearCommand;
 import com.everneth.emi.commands.comm.CommCommand;
 import com.everneth.emi.commands.comp.CompCommand;
 import com.everneth.emi.events.JoinEvent;
+import com.everneth.emi.events.bot.MessageReceievedListener;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 
@@ -103,7 +104,10 @@ public class EMI extends JavaPlugin {
         CommandClient client = builder.build();
 
         try {
-            jda = new JDABuilder(config.getString("bot-token")).addEventListener(client).build();
+            jda = new JDABuilder(config.getString("bot-token"))
+                    .addEventListener(client)
+                    .addEventListener(new MessageReceievedListener())
+                    .build();
             jda.awaitReady();
         }
         catch(LoginException e)
