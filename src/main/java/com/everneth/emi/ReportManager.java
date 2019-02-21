@@ -3,6 +3,7 @@ package com.everneth.emi;
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.models.Report;
+import com.sun.xml.internal.ws.util.CompletedFuture;
 import net.dv8tion.jda.core.entities.User;
 
 import java.sql.SQLException;
@@ -50,6 +51,42 @@ public final class ReportManager {
         }
         return null;
     }
+    public int messagesMissed(UUID uuid)
+    {
+        Report report = rm.findReportById(uuid);
+        DbRow playerRecord = getPlayerRow(uuid);
+        EMI.getJda().getTextChannelById(report.getChannelId()).sendMessage("***" + playerRecord.getString("player_name") + "** has joined the game.*").queue();
+        try {
+            CompletableFuture<List<DbRow>> result = DB.getResultsAsync("SELECT * FROM report_messages WHERE initiator_id = ?", playerRecord.getInt("player_id"));
+            return result.get().size();
+
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+            return 0;
+        }
+    }
+
+
+
+    public void markReportMessagesRead()
+    {
+
+    }
+    public DbRow getReportRecord(UUID uuid)
+    {
+        DbRow playerRow = getPlayerRow(uuid);
+        try {
+            CompletableFuture<DbRow> result =  DB.getFirstRowAsync("SELECT * FROM reports WHERE initiator_id = ?", playerRow.getInt("player_id"));
+            return result.get();
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
 
     public void addReportRecord(Report report, int playerId)
     {
@@ -80,9 +117,12 @@ public final class ReportManager {
 
     public void closeReport(UUID uuid)
     {
+        Date now = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         DbRow playerRow = getPlayerRow(uuid);
         DB.executeUpdateAsync(
-                "UPDATE reports SET active = 0 WHERE initiator_id = ?",
+                "UPDATE reports SET active = 0, date_closed = ? WHERE initiator_id = ?",
+                format.format(now),
                 playerRow.getInt("player_id")
         );
         rm.removeReport(uuid);

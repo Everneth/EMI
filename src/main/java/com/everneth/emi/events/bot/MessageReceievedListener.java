@@ -1,5 +1,7 @@
 package com.everneth.emi.events.bot;
 
+import co.aikar.idb.DB;
+import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.ReportManager;
 import com.everneth.emi.Utils;
@@ -10,6 +12,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import java.sql.SQLException;
 import java.util.UUID;
 
 public class MessageReceievedListener extends ListenerAdapter {
@@ -17,7 +20,7 @@ public class MessageReceievedListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event)
     {
-        if(event.isFromType(ChannelType.TEXT))
+        if(event.isFromType(ChannelType.TEXT) && event.getChannel().getName().contains("_staff"))
         {
             ReportManager rm = ReportManager.getReportManager();
             String channelName = event.getChannel().getName();
@@ -33,7 +36,20 @@ public class MessageReceievedListener extends ListenerAdapter {
             }
             else
             {
-                //TODO: Add message to report_messages table
+                DbRow report = rm.getReportRecord(player_uuid);
+                try {
+                    DB.executeInsert("INSERT INTO report_messages (report_id, author, message, read, date_read) " +
+                                    "VALUES (?, ?, ?, ?, ?)",
+                            report.getInt("report_id"),
+                            event.getMember().getNickname(),
+                            event.getMessage().getContentRaw(),
+                            0,
+                            null);
+                }
+                catch(SQLException e)
+                {
+                    System.out.println(e.getMessage());
+                }
             }
         }
     }
