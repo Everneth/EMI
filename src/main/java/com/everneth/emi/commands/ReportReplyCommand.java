@@ -18,7 +18,7 @@ public class ReportReplyCommand extends BaseCommand {
     private JDA bot = EMI.getJda();
     private ReportManager rm = ReportManager.getReportManager();
     @Default
-    @CommandAlias("report")
+    @CommandAlias("report-reply|rr|rreply")
     @CatchUnknown
     public void onReportReply(CommandSender sender, String message) {
         Player player = (Player) sender;

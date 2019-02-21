@@ -57,7 +57,7 @@ public final class ReportManager {
         DbRow playerRecord = getPlayerRow(uuid);
         EMI.getJda().getTextChannelById(report.getChannelId()).sendMessage("***" + playerRecord.getString("player_name") + "** has joined the game.*").queue();
         try {
-            CompletableFuture<List<DbRow>> result = DB.getResultsAsync("SELECT * FROM report_messages WHERE initiator_id = ?", playerRecord.getInt("player_id"));
+            CompletableFuture<List<DbRow>> result = DB.getResultsAsync("SELECT * FROM report_messages WHERE initiator_id = ? AND read = 0", playerRecord.getInt("player_id"));
             return result.get().size();
 
         }
@@ -67,13 +67,30 @@ public final class ReportManager {
             return 0;
         }
     }
-
-
-
-    public void markReportMessagesRead()
+    public List<DbRow> getMissedMessages(UUID uuid)
     {
-
+        Report report = rm.findReportById(uuid);
+        DbRow playerRecord = getPlayerRow(uuid);
+        try
+        {
+            CompletableFuture<List<DbRow>> results = DB.getResultsAsync("SELECT author, message FROM report_messages WHERE initiator_id = ? AND read = 0",
+                    playerRecord.getInt("player_id"));
+            markReportMessagesRead(playerRecord);
+            return results.get();
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
+
+    private void markReportMessagesRead(DbRow player)
+    {
+        DB.executeUpdateAsync("UPDATE report_messages SET read = 1 WHERE initiator_id = ? AND read = 0",
+                player.getInt("player_id"));
+    }
+
     public DbRow getReportRecord(UUID uuid)
     {
         DbRow playerRow = getPlayerRow(uuid);
