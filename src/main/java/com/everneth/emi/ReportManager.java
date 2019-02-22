@@ -3,8 +3,6 @@ package com.everneth.emi;
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.models.Report;
-import com.sun.xml.internal.ws.util.CompletedFuture;
-import net.dv8tion.jda.core.entities.User;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
