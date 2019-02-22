@@ -51,6 +51,13 @@ public final class ReportManager {
         }
         return null;
     }
+
+    public boolean hasDiscord(UUID uuid)
+    {
+        Long discordId = rm.findReportById(uuid).getDiscordUserId();
+        return !discordId.equals(0L);
+    }
+
     public int messagesMissed(UUID uuid)
     {
         Report report = rm.findReportById(uuid);

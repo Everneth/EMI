@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 import java.sql.SQLException;
 import java.util.UUID;
 
-public class MessageReceievedListener extends ListenerAdapter {
+public class MessageReceivedListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event)
@@ -34,7 +34,7 @@ public class MessageReceievedListener extends ListenerAdapter {
             {
                 player.sendMessage(Utils.color("<&7 +"+ event.getMember().getNickname() +"&f> " + event.getMessage().getContentRaw()));
             }
-            else
+            else if (!player.isOnline() && !rm.hasDiscord(player.getUniqueId()))
             {
                 DbRow report = rm.getReportRecord(player_uuid);
                 try {
