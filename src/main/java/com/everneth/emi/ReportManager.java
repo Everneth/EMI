@@ -142,6 +142,7 @@ public final class ReportManager {
                 format.format(now),
                 playerRow.getInt("player_id")
         );
+        markReportMessagesRead(playerRow);
         rm.removeReport(uuid);
     }
 

@@ -86,7 +86,6 @@ public class ReportCommand extends BaseCommand {
                         Report report = rm.findReportById(player.getUniqueId());
                         report.setMessageId(message1.getIdLong());
                     });
-            EMI.getJda().getTextChannelById(EMI.getPlugin().getConfig().getLong("report-channel")).sendMessage(eb.build()).queue();
             player.sendMessage(Utils.color("<&6The Wench&f> Your report submitted to &6#help&f! A staff member " +
                     "will get back to you shortly. <3"));
         }
