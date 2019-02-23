@@ -42,7 +42,7 @@ public class ReportCommand extends BaseCommand {
     private JDA bot = EMI.getJda();
 
     @Dependency
-    private Plugin plugin;
+    private Plugin plugin = EMI.getPlugin();
 
     @Default
     @CommandAlias("report")

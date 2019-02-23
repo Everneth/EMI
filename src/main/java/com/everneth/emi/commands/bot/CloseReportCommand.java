@@ -67,10 +67,7 @@ public class CloseReportCommand extends Command {
                 event.getGuild().getTextChannelById(178247194862682112L).sendFile(embedFile, message).queue();
             }
 
-            // We've got a history, lets clear out
-            for (Message msg : messageList) {
-                event.getChannel().deleteMessageById(msg.getIdLong()).queue();
-            }
+            event.getTextChannel().delete().queue();
         } else {
             // You can;t even use this at all, we're not checking any further
             // TODO: Mute member if attempts are made to use command to spam replies
