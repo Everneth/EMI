@@ -23,6 +23,7 @@ import java.util.List;
 @CommandAlias("discordsync")
 public class DiscordsyncCommand extends BaseCommand {
     Plugin plugin = EMI.getPlugin();
+    @CommandAlias("discordsync")
     public void onDiscordsync(CommandSender sender, String discordDetails)
     {
         // Get the player, a list of guild members, and individual strings for the passed in member

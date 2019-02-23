@@ -117,7 +117,11 @@ public final class ReportManager {
 
         try {
             DB.executeInsert("INSERT INTO reports (initiator_id, channel_id, active, date_opened) " +
-                    "VALUES (?, ?, ?, ?)", playerId, report.getChannelId(), 1, format.format(now));
+                    "VALUES (?, ?, ?, ?)",
+                    playerId,
+                    report.getChannelId(),
+                    1,
+                    format.format(now));
         }
         catch(SQLException e)
         {
