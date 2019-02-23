@@ -60,7 +60,7 @@ public final class ReportManager {
     {
         Report report = rm.findReportById(uuid);
         DbRow playerRecord = getPlayerRow(uuid);
-        EMI.getJda().getTextChannelById(report.getChannelId()).sendMessage("***" + playerRecord.getString("player_name") + "** has joined the game.*").queue();
+        EMI.getJda().getTextChannelById(report.getChannelId()).sendMessage("**" + playerRecord.getString("player_name") + "* has joined the game.*").queue();
         try {
             CompletableFuture<List<DbRow>> result = DB.getResultsAsync("SELECT * FROM report_messages WHERE initiator_id = ? AND read = 0", playerRecord.getInt("player_id"));
             return result.get().size();

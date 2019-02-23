@@ -20,7 +20,7 @@ public class MessageReceivedListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event)
     {
-        if(event.isFromType(ChannelType.TEXT) && event.getChannel().getName().contains("_staff"))
+        if(event.isFromType(ChannelType.TEXT) && event.getChannel().getName().contains("_staff") && !event.getAuthor().isBot())
         {
             ReportManager rm = ReportManager.getReportManager();
             String channelName = event.getChannel().getName();

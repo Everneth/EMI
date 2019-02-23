@@ -101,8 +101,8 @@ public class ReportCommand extends BaseCommand {
         DbRow playerRow = getPlayerRow(player.getUniqueId());
 
         ChannelAction channelAction = guildManager.getGuild().getController().createTextChannel(player.getName() + "_staff");
-        channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue()).queue();
-        channelAction.addPermissionOverride(staffRole, Permission.ALL_TEXT_PERMISSIONS, 0)
+        channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
+                     .addPermissionOverride(staffRole, Permission.ALL_TEXT_PERMISSIONS, 0)
                      .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0).queue(
                              (channel) -> {
                                  rm.addReport(player.getUniqueId(), new Report(channel.getIdLong()));
