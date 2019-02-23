@@ -93,9 +93,9 @@ public class ReportCommand extends BaseCommand {
 
     private long buildPrivateChannel(Player player)
     {
-        GuildManager guildManager = bot.getGuildById(plugin.getConfig().getLong("guild-id")).getManager();
-        Role staffRole = guildManager.getGuild().getRoleById(plugin.getConfig().getLong("staff-role-id"));
-        Role botRole = guildManager.getGuild().getRolesByName(bot.getSelfUser().getName(), true).get(0);
+        GuildManager guildManager = EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getManager();
+        Role staffRole = guildManager.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("staff-role-id"));
+        Role botRole = guildManager.getGuild().getRolesByName(EMI.getJda().getSelfUser().getName(), true).get(0);
         ReportManager rm = ReportManager.getReportManager();
 
         DbRow playerRow = getPlayerRow(player.getUniqueId());
