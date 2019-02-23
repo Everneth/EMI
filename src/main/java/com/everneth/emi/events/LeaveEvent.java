@@ -26,7 +26,7 @@ public class LeaveEvent implements Listener {
         if(rm.hasActiveReport(player.getUniqueId()))
         {
             Report report = rm.findReportById(player.getUniqueId());
-            EMI.getJda().getTextChannelById(report.getChannelId()).sendMessage("**" + player.getName() + "* has left the game.*").queue();
+            EMI.getJda().getTextChannelById(report.getChannelId()).sendMessage("***" + player.getName() + "** has left the game.*").queue();
         }
     }
 }

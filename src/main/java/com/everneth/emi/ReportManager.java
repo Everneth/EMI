@@ -60,7 +60,7 @@ public final class ReportManager {
     {
         Report report = rm.findReportById(uuid);
         DbRow playerRecord = getPlayerRow(uuid);
-        EMI.getJda().getTextChannelById(report.getChannelId()).sendMessage("**" + playerRecord.getString("player_name") + "* has joined the game.*").queue();
+        EMI.getJda().getTextChannelById(report.getChannelId()).sendMessage("***" + playerRecord.getString("player_name") + "** has joined the game.*").queue();
         try {
             CompletableFuture<List<DbRow>> result = DB.getResultsAsync("SELECT * FROM report_messages WHERE initiator_id = ? AND read = 0", playerRecord.getInt("player_id"));
             return result.get().size();
@@ -116,8 +116,8 @@ public final class ReportManager {
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
         try {
-            DB.executeInsert("INSERT INTO reports (initiator_id, channel_id, active, date_opened, date_closed, embed_message_id) " +
-                    "VALUES (?, ?, ?, ?, ?, ?)", playerId, report.getChannelId(), 1, format.format(now), null, report.getMessageId());
+            DB.executeInsert("INSERT INTO reports (initiator_id, channel_id, active, date_opened, embed_message_id) " +
+                    "VALUES (?, ?, ?, ?, ?, ?)", playerId, report.getChannelId(), 1, format.format(now), report.getMessageId());
         }
         catch(SQLException e)
         {
