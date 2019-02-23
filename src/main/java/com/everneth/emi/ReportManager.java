@@ -116,8 +116,8 @@ public final class ReportManager {
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
         try {
-            DB.executeInsert("INSERT INTO reports (initiator_id, channel_id, active, date_opened, embed_message_id) " +
-                    "VALUES (?, ?, ?, ?, ?, ?)", playerId, report.getChannelId(), 1, format.format(now), report.getMessageId());
+            DB.executeInsert("INSERT INTO reports (initiator_id, channel_id, active, date_opened) " +
+                    "VALUES (?, ?, ?, ?)", playerId, report.getChannelId(), 1, format.format(now));
         }
         catch(SQLException e)
         {
