@@ -157,7 +157,7 @@ public final class ReportManager {
         try {
             results = DB.getResultsAsync(
                     "SELECT channel_id, player_uuid, discord_id FROM reports INNER JOIN players " +
-                            "ON reports.initiator_id = player.player_id WHERE active = ?",
+                            "ON reports.initiator_id = players.player_id WHERE active = ?",
                     1).get();
         }
         catch (Exception e)
