@@ -146,7 +146,7 @@ public final class ReportManager {
     public void closeReport(UUID uuid)
     {
         Date now = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         DbRow playerRow = getPlayerRow(uuid);
         DbRow reportRecord = getReportRecord(uuid);
         DB.executeUpdateAsync(

@@ -40,7 +40,7 @@ public class CloseReportCommand extends Command {
 
         // Get the roles from the member
         List<Role> roleList = event.getMember().getRoles();
-
+        String playerName = event.getTextChannel().getName().substring(0, event.getTextChannel().getName().indexOf('_'));
         // Lets check them
         for (Role role : roleList) {
             if (role.getName().equals("Staff")) {
@@ -57,12 +57,12 @@ public class CloseReportCommand extends Command {
             // and embed the file into a message
             int postResult = transcribeToPost(messageList);
             if(postResult == 200) {
-                String msg = "Log from " + event.getChannel().getName() + " successfully transmitted to the site.";
+                String msg = "Log from " + playerName + " successfully transmitted to the site.";
                 event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage(msg).queue();
             }
             else {
                 File embedFile = transcribeToFile(messageList);
-                String msg = "Log from " + event.getChannel().getName() + " could not be transmitted to the site. A txt file transcript has been attached.";
+                String msg = "Log from " + playerName + " could not be transmitted to the site. A txt file transcript has been attached.";
                 Message message = new MessageBuilder().append(msg).build();
                 event.getGuild().getTextChannelById(178247194862682112L).sendFile(embedFile, message).queue();
             }
