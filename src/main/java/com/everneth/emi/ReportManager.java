@@ -76,11 +76,12 @@ public final class ReportManager {
     {
         Report report = rm.findReportById(uuid);
         DbRow playerRecord = getPlayerRow(uuid);
+        DbRow reportRecord = getReportRecord(uuid);
         try
         {
-            CompletableFuture<List<DbRow>> results = DB.getResultsAsync("SELECT author, message FROM report_messages WHERE initiator_id = ? AND msg_read = 0",
-                    playerRecord.getInt("player_id"));
-            markReportMessagesRead(playerRecord);
+            CompletableFuture<List<DbRow>> results = DB.getResultsAsync("SELECT author, message FROM report_messages WHERE report_id = ? AND msg_read = 0",
+                    reportRecord.getInt("report_id"));
+            markReportMessagesRead(reportRecord);
             return results.get();
         }
         catch (Exception e)
@@ -90,10 +91,10 @@ public final class ReportManager {
         }
     }
 
-    private void markReportMessagesRead(DbRow player)
+    private void markReportMessagesRead(DbRow reportRecord)
     {
-        DB.executeUpdateAsync("UPDATE report_messages SET read = 1 WHERE initiator_id = ? AND msg_read = 0",
-                player.getInt("player_id"));
+        DB.executeUpdateAsync("UPDATE report_messages SET read = 1 WHERE reportId = ? AND msg_read = 0",
+                reportRecord.getInt("report_id"));
     }
 
     public DbRow getReportRecord(UUID uuid)
