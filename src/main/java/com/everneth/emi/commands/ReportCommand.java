@@ -62,40 +62,18 @@ public class ReportCommand extends BaseCommand {
                     "your active report for new or existing issues in progress. <3"));
         }
         else {
-            Date now = new Date();
-            SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
-            buildPrivateChannel(player);
-
-            EmbedBuilder eb = new EmbedBuilder();
-            eb.setTitle(player.getName());
-            eb.setDescription(player.getUniqueId().toString());
-            eb.setColor(0xffff00);
-            eb.setThumbnail("https://minotar.net/helm/" + player.getUniqueId() + "/100.png");
-            eb.addField("X", Double.toString(player.getLocation().getX()), true);
-            eb.addField("Y", Double.toString(player.getLocation().getY()), true);
-            eb.addField("Z", Double.toString(player.getLocation().getZ()), true);
-            eb.addField("Dimension", player.getWorld().getEnvironment().toString(), true);
-            eb.addField("Time Reported (EST)", format.format(now), true);
-            eb.addField("Server", player.getServer().getServerName(), true);
-            eb.addField("Description", message, false);
-            eb.setFooter("Help requested!", null);
-
-            String channelName = player.getName().toLowerCase() + "_staff";
-
-            long channelId = EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getTextChannelsByName(channelName, true).get(0).getIdLong();
-
+            buildPrivateChannel(player, message);
             // Make the bot post the embed to the channel and notify the player
-            EMI.getJda().getTextChannelById(channelId).sendMessage(eb.build()).queue();
-            Report report = rm.findReportById(player.getUniqueId());
-            report.setMessageId(EMI.getJda().getTextChannelById(channelId).getLatestMessageIdLong());
             player.sendMessage(Utils.color("<&6The Wench&f> Your report submitted to &6#help&f! A staff member " +
                     "will get back to you shortly. <3"));
         }
     }
 
-    private void buildPrivateChannel(Player player)
+    private void buildPrivateChannel(Player player, String message)
     {
+        Date now = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         Member discordMember;
         GuildManager guildManager = EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getManager();
         Role staffRole = guildManager.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("staff-role-id"));
@@ -103,6 +81,20 @@ public class ReportCommand extends BaseCommand {
         ReportManager rm = ReportManager.getReportManager();
 
         DbRow playerRow = getPlayerRow(player.getUniqueId());
+
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle(player.getName());
+        eb.setDescription(player.getUniqueId().toString());
+        eb.setColor(0xffff00);
+        eb.setThumbnail("https://minotar.net/helm/" + player.getUniqueId() + "/100.png");
+        eb.addField("X", Double.toString(player.getLocation().getX()), true);
+        eb.addField("Y", Double.toString(player.getLocation().getY()), true);
+        eb.addField("Z", Double.toString(player.getLocation().getZ()), true);
+        eb.addField("Dimension", player.getWorld().getEnvironment().toString(), true);
+        eb.addField("Time Reported (EST)", format.format(now), true);
+        eb.addField("Server", player.getServer().getServerName(), true);
+        eb.addField("Description", message, false);
+        eb.setFooter("Help requested!", null);
 
         if(hasSynced(playerRow)) {
             discordMember = guildManager.getGuild().getMemberById(playerRow.getLong("discord_id"));
@@ -116,6 +108,7 @@ public class ReportCommand extends BaseCommand {
                         reportToAdd.setDiscordUserId(discordMember.getUser().getIdLong());
                         rm.addReport(player.getUniqueId(), reportToAdd);
                         rm.addReportRecord(reportToAdd, playerRow.getInt("player_id"));
+                        channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessage(eb.build()).queue();
                     });
         }
         else
@@ -128,6 +121,7 @@ public class ReportCommand extends BaseCommand {
                         Report reportToAdd = new Report(channel.getIdLong());
                         rm.addReport(player.getUniqueId(), reportToAdd);
                         rm.addReportRecord(reportToAdd, playerRow.getInt("player_id"));
+                        channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessage(eb.build()).queue();
                     });
         }
     }

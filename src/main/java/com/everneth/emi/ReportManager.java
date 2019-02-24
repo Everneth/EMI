@@ -113,7 +113,7 @@ public final class ReportManager {
     public void addReportRecord(Report report, int playerId)
     {
         Date now = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         try {
             DB.executeInsert("INSERT INTO reports (initiator_id, channel_id, active, date_opened) " +
