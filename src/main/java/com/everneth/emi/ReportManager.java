@@ -148,12 +148,13 @@ public final class ReportManager {
         Date now = new Date();
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         DbRow playerRow = getPlayerRow(uuid);
+        DbRow reportRecord = getReportRecord(uuid);
         DB.executeUpdateAsync(
                 "UPDATE reports SET active = 0, date_closed = ? WHERE initiator_id = ?",
                 format.format(now),
                 playerRow.getInt("player_id")
         );
-        markReportMessagesRead(playerRow);
+        markReportMessagesRead(reportRecord);
         rm.removeReport(uuid);
     }
 
