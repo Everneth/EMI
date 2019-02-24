@@ -93,6 +93,7 @@ public class ReportCommand extends BaseCommand {
 
     private long buildPrivateChannel(Player player)
     {
+        Member discordMember;
         GuildManager guildManager = EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getManager();
         Role staffRole = guildManager.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("staff-role-id"));
         Role botRole = guildManager.getGuild().getRolesByName(EMI.getJda().getSelfUser().getName(), true).get(0);
@@ -105,16 +106,21 @@ public class ReportCommand extends BaseCommand {
                      .addPermissionOverride(staffRole, Permission.ALL_TEXT_PERMISSIONS, 0)
                      .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0).queue();
 
-        List<TextChannel> channelList = guildManager.getGuild().getTextChannelsByName(player.getName() + "_staff", true);
-        rm.addReport(player.getUniqueId(), new Report(channelList.get(0).getIdLong()));
         if(hasSynced(playerRow))
         {
-            Member discordMember = guildManager.getGuild().getMemberById(playerRow.getLong("discord_id"));
-            rm.findReportById(player.getUniqueId()).setDiscordUserId(discordMember.getUser().getIdLong());
+            discordMember = guildManager.getGuild().getMemberById(playerRow.getLong("discord_id"));
             channelAction.addPermissionOverride(discordMember, Permission.VIEW_CHANNEL.getRawValue(), 0).queue();
         }
+
+        List<TextChannel> channelList = guildManager.getGuild().getTextChannelsByName(player.getName() + "_staff", true);
+        rm.addReport(player.getUniqueId(), new Report(channelList.get(0).getIdLong()));
+
         Report report = rm.findReportById(player.getUniqueId());
 
+        if(hasSynced(playerRow))
+        {
+            rm.findReportById(player.getUniqueId()).setDiscordUserId(playerRow.getLong("discord_id"));
+        }
         rm.addReportRecord(report, playerRow.getInt("player_id"));
 
         return report.getChannelId();
