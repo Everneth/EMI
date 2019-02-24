@@ -102,23 +102,23 @@ public class ReportCommand extends BaseCommand {
         DbRow playerRow = getPlayerRow(player.getUniqueId());
 
         if(hasSynced(playerRow)) {
+
             discordMember = guildManager.getGuild().getMemberById(playerRow.getLong("discord_id"));
             ChannelAction channelAction = guildManager.getGuild().getController().createTextChannel(player.getName() + "_staff");
             channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
                     .addPermissionOverride(staffRole, Permission.ALL_TEXT_PERMISSIONS, 0)
                     .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0)
-                    .addPermissionOverride(discordMember, Permission.MESSAGE_WRITE.getRawValue(), 0).queue();
+                    .addPermissionOverride(discordMember, Permission.MESSAGE_WRITE.getRawValue(), 0).queue(
+                            (channel) -> rm.addReport(player.getUniqueId(), new Report(channel.getIdLong())));
         }
         else
         {
             ChannelAction channelAction = guildManager.getGuild().getController().createTextChannel(player.getName() + "_staff");
             channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
                     .addPermissionOverride(staffRole, Permission.ALL_TEXT_PERMISSIONS, 0)
-                    .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0).queue();
+                    .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0).queue(
+                    (channel) -> rm.addReport(player.getUniqueId(), new Report(channel.getIdLong())));
         }
-        
-        List<TextChannel> channelList = guildManager.getGuild().getTextChannelsByName(player.getName() + "_staff", true);
-        rm.addReport(player.getUniqueId(), new Report(channelList.get(0).getIdLong()));
 
         Report report = rm.findReportById(player.getUniqueId());
 

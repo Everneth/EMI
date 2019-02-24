@@ -61,9 +61,9 @@ public class ConfirmSyncCommand extends Command {
                 {
                     dsm.removeSyncRequest(this.getPlayerRow(playerId).getString("player_uuid"));
 
-                    EMI.getJda().getGuildById(guildId).getMember(event.getSelfUser()).getRoles().add(
-                            EMI.getJda().getGuildById(guildId).getRoleById(syncRoleId)
-                    );
+                    EMI.getJda().getGuildById(guildId).getController().addSingleRoleToMember(
+                            event.getMember(), EMI.getJda().getGuildById(guildId).getRoleById(syncRoleId)
+                    ).queue();
                     Role memberRole = EMI.getJda().getGuildById(guildId).getRoleById(memberRoleId);
                     if(EMI.getPlugin().getConfig().getBoolean("use-pending-role"))
                     {
