@@ -94,7 +94,7 @@ public final class ReportManager {
 
     private void markReportMessagesRead(DbRow reportRecord)
     {
-        DB.executeUpdateAsync("UPDATE report_messages SET read = 1 WHERE reportId = ? AND msg_read = 0",
+        DB.executeUpdateAsync("UPDATE report_messages SET read = 1 WHERE report_id = ? AND msg_read = 0",
                 reportRecord.getInt("report_id"));
     }
 

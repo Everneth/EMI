@@ -22,10 +22,10 @@ public class GetRepliesCommand extends BaseCommand {
 
             for(DbRow msg : messages)
             {
-                player.sendMessage("&d[REPORT]&f <&5" + msg.getString("author") + "&f>&d " +
-                        msg.getString("message"));
+                player.sendMessage(Utils.color("&d[REPORT]&f <&5" + msg.getString("author") + "&f>&d " +
+                        msg.getString("message")));
             }
-            player.sendMessage("&7Please use /report-reply or /rr to reply to staff.");
+            player.sendMessage(Utils.color("&7Please use /report-reply or /rr to reply to staff."));
         }
         else
         {
