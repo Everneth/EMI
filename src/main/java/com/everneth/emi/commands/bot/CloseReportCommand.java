@@ -99,7 +99,7 @@ public class CloseReportCommand extends Command {
                 rm.removeReport(UUID.fromString(msg.getEmbeds().get(0).getDescription()));
             }
             else {
-                logMsg = "<b>" + msg.getMember().getEffectiveName() + "</b> [" + format.format(msg.getCreationTime()) +"]: " + msg.getContentRaw() + "<br />";
+                logMsg = "<b>" + msg.getMember().getEffectiveName() + "</b> [" + msg.getCreationTime().toString() +"]: " + msg.getContentRaw() + "<br />";
             }
             sb.append(logMsg);
         }

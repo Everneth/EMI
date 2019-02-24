@@ -16,17 +16,16 @@ import org.bukkit.entity.Player;
 @CommandAlias("report-reply|rr|rreply")
 public class ReportReplyCommand extends BaseCommand {
     private JDA bot = EMI.getJda();
-    private ReportManager rm = ReportManager.getReportManager();
     @Default
     @CommandAlias("report-reply|rr|rreply")
     @CatchUnknown
     public void onReportReply(CommandSender sender, String message) {
         Player player = (Player) sender;
+        ReportManager rm = ReportManager.getReportManager();
         if(rm.hasActiveReport(player.getUniqueId()))
         {
             Report report = rm.findReportById(player.getUniqueId());
-            TextChannel chan = bot.getTextChannelById(report.getChannelId());
-            chan.sendMessage(player.getName() + ": " + message).queue();
+            EMI.getJda().getTextChannelById(report.getChannelId()).sendMessage(player.getName() + ": " + message).queue();
         }
         else
         {
