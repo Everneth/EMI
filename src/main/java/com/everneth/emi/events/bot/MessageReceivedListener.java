@@ -28,13 +28,15 @@ public class MessageReceivedListener extends ListenerAdapter {
 
             UUID player_uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
 
-            Player player = EMI.getPlugin().getServer().getPlayer(player_uuid);
+            OfflinePlayer offlinePlayer = EMI.getPlugin().getServer().getOfflinePlayer(player_uuid);
 
-            if(player.isOnline())
+
+            if(offlinePlayer.isOnline())
             {
+                Player player = offlinePlayer.getPlayer();
                 player.sendMessage(Utils.color("<&7 +"+ event.getMember().getNickname() +"&f> " + event.getMessage().getContentRaw()));
             }
-            else if (!player.isOnline() && !rm.hasDiscord(player.getUniqueId()))
+            else if (!offlinePlayer.isOnline() && !rm.hasDiscord(player_uuid))
             {
                 DbRow report = rm.getReportRecord(player_uuid);
                 try {
