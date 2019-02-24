@@ -65,7 +65,7 @@ public class ReportCommand extends BaseCommand {
             Date now = new Date();
             SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
-            long channelId = buildPrivateChannel(player);
+            buildPrivateChannel(player);
 
             EmbedBuilder eb = new EmbedBuilder();
             eb.setTitle(player.getName());
@@ -82,6 +82,10 @@ public class ReportCommand extends BaseCommand {
             eb.setFooter("Help requested!", null);
 
 
+            long channelId = EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getTextChannelsByName(player.getName() + "_staff", true).get(0).getIdLong();
+
+            rm.addReport(player.getUniqueId(), new Report(channelId));
+
             // Make the bot post the embed to the channel and notify the player
             EMI.getJda().getTextChannelById(channelId).sendMessage(eb.build()).queue();
             Report report = rm.findReportById(player.getUniqueId());
@@ -91,17 +95,15 @@ public class ReportCommand extends BaseCommand {
         }
     }
 
-    private long buildPrivateChannel(Player player)
+    private void buildPrivateChannel(Player player)
     {
         Member discordMember;
         GuildManager guildManager = EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getManager();
         Role staffRole = guildManager.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("staff-role-id"));
         Role botRole = guildManager.getGuild().getRolesByName(EMI.getJda().getSelfUser().getName(), true).get(0);
-        ReportManager rm = ReportManager.getReportManager();
+
 
         DbRow playerRow = getPlayerRow(player.getUniqueId());
-
-        final int playerId = playerRow.getInt("player_id");
 
         if(hasSynced(playerRow)) {
 
@@ -110,28 +112,15 @@ public class ReportCommand extends BaseCommand {
             channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
                     .addPermissionOverride(staffRole, Permission.ALL_TEXT_PERMISSIONS, 0)
                     .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0)
-                    .addPermissionOverride(discordMember, Permission.MESSAGE_WRITE.getRawValue(), 0).queue(
-                            (channel) -> {
-                                Report reportToAdd = new Report(channel.getIdLong());
-                                reportToAdd.setDiscordUserId(discordMember.getUser().getIdLong());
-                                rm.addReport(player.getUniqueId(), reportToAdd);
-                                rm.addReportRecord(reportToAdd, playerId);
-                            });
+                    .addPermissionOverride(discordMember, Permission.MESSAGE_WRITE.getRawValue(), 0).queue();
         }
         else
         {
             ChannelAction channelAction = guildManager.getGuild().getController().createTextChannel(player.getName() + "_staff");
             channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
                     .addPermissionOverride(staffRole, Permission.ALL_TEXT_PERMISSIONS, 0)
-                    .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0).queue(
-                    (channel) -> {
-                        Report reportToAdd = new Report(channel.getIdLong());
-                        rm.addReport(player.getUniqueId(), reportToAdd);
-                        rm.addReportRecord(reportToAdd, playerId);
-                    });
+                    .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0).queue();
         }
-        Report report = rm.findReportById(player.getUniqueId());
-        return report.getChannelId();
     }
     private DbRow getPlayerRow(UUID uuid)
     {
