@@ -10,6 +10,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.User;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,6 @@ public class ConfirmSyncCommand extends Command {
     private CompletableFuture<DbRow> playerObjectFuture;
     private DbRow playerRow;
     private CompletableFuture<Integer> futurePlayerId;
-    private DiscordSyncManager dsm = DiscordSyncManager.getDSM();
     public ConfirmSyncCommand()
     {
         this.name = "confirmsync";
@@ -34,6 +34,7 @@ public class ConfirmSyncCommand extends Command {
     @Override
     protected void execute(CommandEvent event)
     {
+        DiscordSyncManager dsm = DiscordSyncManager.getDSM();
         User toFind = dsm.findSyncRequest(event.getAuthor());
         long guildId = EMI.getPlugin().getConfig().getLong("guild-id");
         long syncRoleId = EMI.getPlugin().getConfig().getLong("sync-role-id");
@@ -46,7 +47,7 @@ public class ConfirmSyncCommand extends Command {
         }
         else
         {
-            if(!syncExists(toFind))
+            if(syncExists(toFind))
             {
                 event.replyInDm("You have already synced this account. If this is in error, please contact staff.");
             }
@@ -89,24 +90,33 @@ public class ConfirmSyncCommand extends Command {
     }
     private boolean syncExists(User user)
     {
-        playerRow = new DbRow();
+        DbRow playerRow;
+        Long discordId = 0L;
+        DiscordSyncManager dsm = DiscordSyncManager.getDSM();
         playerObjectFuture = DB.getFirstRowAsync("SELECT discord_id FROM players\n" +
-                "WHERE player_uuid = ?", this.dsm.findSyncRequestUUID(user).toString());
+                "WHERE player_uuid = ?", dsm.findSyncRequestUUID(user).toString());
         // get the results from the future
         try {
             playerRow = playerObjectFuture.get();
+            discordId = playerRow.getLong("discord_id");
         }
         catch (Exception e)
         {
             System.out.print(e.getMessage());
         }
-        return playerRow.isEmpty();
+        if(discordId == null || discordId == 0)
+            return false;
+        else
+        {
+            return true;
+        }
     }
     private int syncAccount(User user)
     {
+        DiscordSyncManager dsm = DiscordSyncManager.getDSM();
         int playerId = 0;
         futurePlayerId = DB.executeUpdateAsync("UPDATE players SET discord_id = ?\n" +
-                "WHERE player_uuid = ?", user.getIdLong(), this.dsm.findSyncRequestUUID(user).toString());
+                "WHERE player_uuid = ?", user.getIdLong(), dsm.findSyncRequestUUID(user).toString());
         // get the results from the future
         try {
              playerId = futurePlayerId.get();

@@ -101,17 +101,24 @@ public class DiscordsyncCommand extends BaseCommand {
     }
     private boolean syncExists(Player player)
     {
-        DbRow playerRow = new DbRow();
+        DbRow playerRow;
+        Long discordId = 0L;
         CompletableFuture<DbRow> playerObjectFuture = DB.getFirstRowAsync("SELECT discord_id FROM players\n" +
                 "WHERE player_uuid = ?", player.getUniqueId());
         // get the results from the future
         try {
             playerRow = playerObjectFuture.get();
+            discordId = playerRow.getLong("discord_id");
         }
         catch (Exception e)
         {
             System.out.print(e.getMessage());
         }
-        return playerRow.isEmpty();
+        if(discordId == null || discordId == 0)
+            return false;
+        else
+        {
+            return true;
+        }
     }
 }
