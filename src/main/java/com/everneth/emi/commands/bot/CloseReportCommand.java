@@ -55,7 +55,7 @@ public class CloseReportCommand extends Command {
             List<Message> messageList = event.getTextChannel().getIterableHistory().complete();
             // Take our messages and build a string, we'll dump that string into a message file
             // and embed the file into a message
-            int postResult = transcribeToPost(messageList);
+            int postResult = transcribeToPost(messageList, playerName);
             if(postResult == 200) {
                 String msg = "Log from " + playerName + " successfully transmitted to the site.";
                 event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage(msg).queue();
@@ -75,7 +75,7 @@ public class CloseReportCommand extends Command {
         }
     }
 
-    private int transcribeToPost(List<Message> messageList) {
+    private int transcribeToPost(List<Message> messageList, String playerName) {
         final String URL =
                 EMI.getPlugin().getConfig().getString("api-topic-post-url") + "api" +
                         EMI.getPlugin().getConfig().getString("api-topic-post-endpoint");
@@ -94,7 +94,7 @@ public class CloseReportCommand extends Command {
 
         for (Message msg : reverse) {
             if (msg.getAuthor().equals(EMI.getJda().getSelfUser())) {
-                 logMsg = "<font size=\"18pt\"><b>Report submitted by " + msg.getEmbeds().get(0).getTitle();
+                 logMsg = "<font size=\"18pt\"><b>Report submitted by " + playerName;
                 rm.closeReport(UUID.fromString(msg.getEmbeds().get(0).getDescription()));
                 rm.removeReport(UUID.fromString(msg.getEmbeds().get(0).getDescription()));
             }
