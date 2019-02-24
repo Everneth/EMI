@@ -109,7 +109,8 @@ public class CloseReportCommand extends Command {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(URL + "?=" + KEY);
 
-        LogPost post = new LogPost(FORUM_ID, reverse.get(0).getEmbeds().get(0).getTitle(), sb.toString(), POSTER);
+        String title = "Report submitted by " + playerName;
+        LogPost post = new LogPost(FORUM_ID, title, sb.toString(), POSTER);
 
         HttpEntity stringEntity = new StringEntity(gson.toJson(post), ContentType.APPLICATION_JSON);
         httpPost.setEntity(stringEntity);
