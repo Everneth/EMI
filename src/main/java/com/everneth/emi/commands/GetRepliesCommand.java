@@ -14,6 +14,7 @@ import java.util.List;
 public class GetRepliesCommand extends BaseCommand {
     private ReportManager rm = ReportManager.getReportManager();
 
+    @CommandAlias("getreplies|gr|get-replies")
     public void onReportReply(CommandSender sender) {
         Player player = (Player) sender;
         if(rm.hasActiveReport(player.getUniqueId())) {
