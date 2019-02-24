@@ -28,29 +28,26 @@ public class MessageReceivedListener extends ListenerAdapter {
 
             UUID player_uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
 
-            OfflinePlayer offlinePlayer = EMI.getPlugin().getServer().getOfflinePlayer(player_uuid);
+            if(player_uuid != null) {
+                OfflinePlayer offlinePlayer = EMI.getPlugin().getServer().getOfflinePlayer(player_uuid);
 
 
-            if(offlinePlayer.isOnline())
-            {
-                Player player = offlinePlayer.getPlayer();
-                player.sendMessage(Utils.color("<&7 +"+ event.getMember().getNickname() +"&f> " + event.getMessage().getContentRaw()));
-            }
-            else if (!offlinePlayer.isOnline() && !rm.hasDiscord(player_uuid))
-            {
-                DbRow report = rm.getReportRecord(player_uuid);
-                try {
-                    DB.executeInsert("INSERT INTO report_messages (report_id, author, message, msg_read, date_read) " +
-                                    "VALUES (?, ?, ?, ?, ?)",
-                            report.getInt("report_id"),
-                            event.getMember().getNickname(),
-                            event.getMessage().getContentRaw(),
-                            0,
-                            null);
-                }
-                catch(SQLException e)
-                {
-                    System.out.println(e.getMessage());
+                if (offlinePlayer.isOnline()) {
+                    Player player = offlinePlayer.getPlayer();
+                    player.sendMessage(Utils.color("<&7 +" + event.getMember().getNickname() + "&f> " + event.getMessage().getContentRaw()));
+                } else if (!offlinePlayer.isOnline() && !rm.hasDiscord(player_uuid)) {
+                    DbRow report = rm.getReportRecord(player_uuid);
+                    try {
+                        DB.executeInsert("INSERT INTO report_messages (report_id, author, message, msg_read, date_read) " +
+                                        "VALUES (?, ?, ?, ?, ?)",
+                                report.getInt("report_id"),
+                                event.getMember().getNickname(),
+                                event.getMessage().getContentRaw(),
+                                0,
+                                null);
+                    } catch (SQLException e) {
+                        System.out.println(e.getMessage());
+                    }
                 }
             }
         }
