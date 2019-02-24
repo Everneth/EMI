@@ -41,6 +41,9 @@ public class CloseReportCommand extends Command {
         // Get the roles from the member
         List<Role> roleList = event.getMember().getRoles();
         String playerName = event.getTextChannel().getName().substring(0, event.getTextChannel().getName().indexOf('_'));
+        ReportManager rm = ReportManager.getReportManager();
+
+        UUID uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
         // Lets check them
         for (Role role : roleList) {
             if (role.getName().equals("Staff")) {
@@ -55,7 +58,7 @@ public class CloseReportCommand extends Command {
             List<Message> messageList = event.getTextChannel().getIterableHistory().complete();
             // Take our messages and build a string, we'll dump that string into a message file
             // and embed the file into a message
-            int postResult = transcribeToPost(messageList, playerName);
+            int postResult = transcribeToPost(messageList, playerName, uuid);
             if(postResult == 200) {
                 String msg = "Log from " + playerName + " successfully transmitted to the site.";
                 event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage(msg).queue();
@@ -75,7 +78,7 @@ public class CloseReportCommand extends Command {
         }
     }
 
-    private int transcribeToPost(List<Message> messageList, String playerName) {
+    private int transcribeToPost(List<Message> messageList, String playerName, UUID uuid) {
         final String URL =
                 EMI.getPlugin().getConfig().getString("api-topic-post-url") + "api" +
                         EMI.getPlugin().getConfig().getString("api-topic-post-endpoint");
@@ -95,8 +98,8 @@ public class CloseReportCommand extends Command {
         for (Message msg : reverse) {
             if (msg.getAuthor().equals(EMI.getJda().getSelfUser())) {
                  logMsg = "<font size=\"18pt\"><b>Report submitted by " + playerName;
-                rm.closeReport(UUID.fromString(msg.getEmbeds().get(0).getDescription()));
-                rm.removeReport(UUID.fromString(msg.getEmbeds().get(0).getDescription()));
+                rm.closeReport(uuid);
+                rm.removeReport(uuid);
             }
             else {
                 logMsg = "<b>" + msg.getMember().getEffectiveName() + "</b> [" + msg.getCreationTime().toString() +"]: " + msg.getContentRaw() + "<br />";
