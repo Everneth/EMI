@@ -17,6 +17,7 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.managers.GuildManager;
 import net.dv8tion.jda.core.requests.restaction.ChannelAction;
 import org.bukkit.ChatColor;
@@ -26,6 +27,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -81,11 +83,9 @@ public class ReportCommand extends BaseCommand {
 
 
             // Make the bot post the embed to the channel and notify the player
-            EMI.getJda().getTextChannelById(channelId).sendMessage(eb.build()).queue(
-                    (message1) -> {
-                        Report report = rm.findReportById(player.getUniqueId());
-                        report.setMessageId(message1.getIdLong());
-                    });
+            EMI.getJda().getTextChannelById(channelId).sendMessage(eb.build()).queue();
+            Report report = rm.findReportById(player.getUniqueId());
+            report.setMessageId(EMI.getJda().getTextChannelById(channelId).getLatestMessageIdLong());
             player.sendMessage(Utils.color("<&6The Wench&f> Your report submitted to &6#help&f! A staff member " +
                     "will get back to you shortly. <3"));
         }
@@ -103,10 +103,10 @@ public class ReportCommand extends BaseCommand {
         ChannelAction channelAction = guildManager.getGuild().getController().createTextChannel(player.getName() + "_staff");
         channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
                      .addPermissionOverride(staffRole, Permission.ALL_TEXT_PERMISSIONS, 0)
-                     .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0).queue(
-                             (channel) -> {
-                                 rm.addReport(player.getUniqueId(), new Report(channel.getIdLong()));
-                             });
+                     .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0).queue();
+
+        List<TextChannel> channelList = guildManager.getGuild().getTextChannelsByName(player.getName() + "_staff", true);
+        rm.addReport(player.getUniqueId(), new Report(channelList.get(0).getIdLong()));
         if(hasSynced(playerRow))
         {
             Member discordMember = guildManager.getGuild().getMemberById(playerRow.getLong("discord_id"));

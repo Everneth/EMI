@@ -28,6 +28,7 @@ public class ConfirmSyncCommand extends Command {
     public ConfirmSyncCommand()
     {
         this.name = "confirmsync";
+        this.guildOnly = false;
     }
     @Override
     protected void execute(CommandEvent event)

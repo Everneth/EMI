@@ -20,6 +20,7 @@ public class DenySyncCommand extends Command {
     public DenySyncCommand()
     {
         this.name = "denysync";
+        this.guildOnly = false;
     }
     @Override
     public void execute(CommandEvent event)
