@@ -2,6 +2,8 @@ package com.everneth.emi.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.idb.DB;
+import co.aikar.idb.DbRow;
 import com.everneth.emi.DiscordSyncManager;
 import com.everneth.emi.EMI;
 import net.dv8tion.jda.core.entities.Member;
@@ -12,6 +14,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  *     Class: DiscordsyncCommand
@@ -26,6 +29,7 @@ public class DiscordsyncCommand extends BaseCommand {
     @CommandAlias("discordsync")
     public void onDiscordsync(CommandSender sender, String discordDetails)
     {
+
         // Get the player, a list of guild members, and individual strings for the passed in member
         Player player = (Player)sender;
         List<Member> memberList = EMI.getJda().getGuildById(plugin.getConfig().getLong("guild-id")).getMembers();
@@ -35,6 +39,8 @@ public class DiscordsyncCommand extends BaseCommand {
         String discriminator = discordDetails.substring(poundIndex + 1);
         DiscordSyncManager dsm = DiscordSyncManager.getDSM();
 
+        if(!syncExists(player))
+        {
         // Search the guild member list for all users with the same name
         for(Member member : memberList)
         {
@@ -46,13 +52,11 @@ public class DiscordsyncCommand extends BaseCommand {
         // If no match was found, notify the user
         if(userList.isEmpty())
             sender.sendMessage("User not found! Please check your details and try again. If this is your second attempt, please contact Comms.");
-        else
-        {
+        else {
             // We've found at least 1 match
-            if(userList.size() == 1)
-            {
+            if (userList.size() == 1) {
                 // check the discriminator for a match
-                if(userList.get(0).getDiscriminator().equals(discriminator)) {
+                if (userList.get(0).getDiscriminator().equals(discriminator)) {
                     // Match found, start sync
                     sender.sendMessage("Please check your Discord DMs to verify your account.");
                     dsm.addSyncRequest(player, userList.get(0));
@@ -63,20 +67,16 @@ public class DiscordsyncCommand extends BaseCommand {
                     );
                 }
                 // discriminator did not match, notify the user
-                else
-                {
+                else {
                     sender.sendMessage("User not found! Please check your details and try again. If this is your second attempt, please contact Comms.");
                 }
             }
             // We've found multiple users with the same name
-            else
-            {
+            else {
                 boolean userFound = false;
                 // Loop through the list to check discriminators
-                for(User user : userList)
-                {
-                    if(user.getName().equals(name) && user.getDiscriminator().equals(discriminator))
-                    {
+                for (User user : userList) {
+                    if (user.getName().equals(name) && user.getDiscriminator().equals(discriminator)) {
                         // found our user, start sync
                         userFound = true;
                         dsm.addSyncRequest(player, user);
@@ -88,11 +88,30 @@ public class DiscordsyncCommand extends BaseCommand {
                     }
                 }
                 // If no user is found, notify the command sender
-                if(!userFound)
-                {
+                if (!userFound) {
                     sender.sendMessage("User not found! Please check your details and try again. If this is your second attempt, please contact Comms.");
                 }
             }
         }
+        }
+        else
+        {
+            sender.sendMessage("You have already synced this account. If this is in error, please contact staff.");
+        }
+    }
+    private boolean syncExists(Player player)
+    {
+        DbRow playerRow = new DbRow();
+        CompletableFuture<DbRow> playerObjectFuture = DB.getFirstRowAsync("SELECT discord_id FROM players\n" +
+                "WHERE player_uuid = ?", player.getUniqueId());
+        // get the results from the future
+        try {
+            playerRow = playerObjectFuture.get();
+        }
+        catch (Exception e)
+        {
+            System.out.print(e.getMessage());
+        }
+        return playerRow.isEmpty();
     }
 }

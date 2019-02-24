@@ -22,7 +22,7 @@ import java.util.concurrent.CompletableFuture;
  */
 
 public class ConfirmSyncCommand extends Command {
-    private CompletableFuture<DbRow> playerOjbectFuture;
+    private CompletableFuture<DbRow> playerObjectFuture;
     private DbRow playerRow;
     private CompletableFuture<Integer> futurePlayerId;
     private DiscordSyncManager dsm = DiscordSyncManager.getDSM();
@@ -46,7 +46,7 @@ public class ConfirmSyncCommand extends Command {
         }
         else
         {
-            if(syncExists(toFind))
+            if(!syncExists(toFind))
             {
                 event.replyInDm("You have already synced this account. If this is in error, please contact staff.");
             }
@@ -60,9 +60,8 @@ public class ConfirmSyncCommand extends Command {
                 else
                 {
                     dsm.removeSyncRequest(this.getPlayerRow(playerId).getString("player_uuid"));
-                    
                     EMI.getJda().getGuildById(guildId).getController().addSingleRoleToMember(
-                            EMI.getJda().getGuildById(guildId).getMemberById(event.getMember().getUser().getIdLong()), EMI.getJda().getGuildById(guildId).getRoleById(syncRoleId)
+                            EMI.getJda().getGuildById(guildId).getMemberById(event.getAuthor().getIdLong()), EMI.getJda().getGuildById(guildId).getRoleById(syncRoleId)
                     ).queue();
                     Role memberRole = EMI.getJda().getGuildById(guildId).getRoleById(memberRoleId);
                     if(EMI.getPlugin().getConfig().getBoolean("use-pending-role"))
@@ -91,11 +90,11 @@ public class ConfirmSyncCommand extends Command {
     private boolean syncExists(User user)
     {
         playerRow = new DbRow();
-        playerOjbectFuture = DB.getFirstRowAsync("SELECT * FROM players\n" +
+        playerObjectFuture = DB.getFirstRowAsync("SELECT discord_id FROM players\n" +
                 "WHERE player_uuid = ?", this.dsm.findSyncRequestUUID(user).toString());
         // get the results from the future
         try {
-            playerRow = playerOjbectFuture.get();
+            playerRow = playerObjectFuture.get();
         }
         catch (Exception e)
         {
