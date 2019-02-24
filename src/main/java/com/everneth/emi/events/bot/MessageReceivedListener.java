@@ -40,7 +40,7 @@ public class MessageReceivedListener extends ListenerAdapter {
             {
                 DbRow report = rm.getReportRecord(player_uuid);
                 try {
-                    DB.executeInsert("INSERT INTO report_messages (report_id, author, message, read, date_read) " +
+                    DB.executeInsert("INSERT INTO report_messages (report_id, author, message, msg_read, date_read) " +
                                     "VALUES (?, ?, ?, ?, ?)",
                             report.getInt("report_id"),
                             event.getMember().getNickname(),
