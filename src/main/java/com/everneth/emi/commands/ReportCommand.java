@@ -62,11 +62,10 @@ public class ReportCommand extends BaseCommand {
                     "your active report for new or existing issues in progress. <3"));
         }
         else {
-
             buildPrivateChannel(player, message);
             // Make the bot post the embed to the channel and notify the player
-            player.sendMessage(Utils.color("<&6The Wench&f> Your report submitted to &6#help&f! A staff member " +
-                    "will get back to you shortly. <3"));
+            player.sendMessage(Utils.color("<&6The Wench&f> I have created a direct channel with staff. Please use &6/rr <message>&f to message staff directly! A staff member " +
+                    "will get back to you shortly. If you miss any replies, you will be notified the next time you join the server. &c&lIf your Discord is linked, please use that to reply and get missed messages. &d<3"));
         }
     }
 

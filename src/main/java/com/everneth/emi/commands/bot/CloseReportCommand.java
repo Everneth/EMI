@@ -60,12 +60,12 @@ public class CloseReportCommand extends Command {
             // and embed the file into a message
             int postResult = transcribeToPost(messageList, playerName, uuid);
             if(postResult == 200) {
-                String msg = "Log from " + playerName + " successfully transmitted to the site.";
+                String msg = "Log from " + playerName + "'s report successfully transmitted to the site.";
                 event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage(msg).queue();
             }
             else {
                 File embedFile = transcribeToFile(messageList);
-                String msg = "Log from " + playerName + " could not be transmitted to the site. A txt file transcript has been attached.";
+                String msg = "Log from " + playerName + "'s report could not be transmitted to the site. A txt file transcript has been attached.";
                 Message message = new MessageBuilder().append(msg).build();
                 event.getGuild().getTextChannelById(178247194862682112L).sendFile(embedFile, message).queue();
             }
@@ -97,7 +97,7 @@ public class CloseReportCommand extends Command {
 
         for (Message msg : reverse) {
             if (msg.getAuthor().equals(EMI.getJda().getSelfUser())) {
-                 logMsg = "<font size=\"18pt\"><b>Report submitted by " + playerName;
+                 logMsg = "<font size=\"18pt\"><b>Report submitted by " + playerName + "</b></font><br />";
                 rm.closeReport(uuid);
                 rm.removeReport(uuid);
             }
@@ -115,7 +115,7 @@ public class CloseReportCommand extends Command {
         String title = "Report submitted by " + playerName;
         LogPost post = new LogPost(FORUM_ID, title, sb.toString(), POSTER);
 
-        HttpEntity stringEntity = new StringEntity(gson.toJson(post), ContentType.APPLICATION_JSON);
+        HttpEntity stringEntity = new StringEntity(gson.toJson(post), ContentType.APPLICATION_FORM_URLENCODED);
         httpPost.setEntity(stringEntity);
 
         try {

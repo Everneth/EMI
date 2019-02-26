@@ -26,6 +26,7 @@ public class ReportReplyCommand extends BaseCommand {
         {
             Report report = rm.findReportById(player.getUniqueId());
             EMI.getJda().getTextChannelById(report.getChannelId()).sendMessage(player.getName() + ": " + message).queue();
+            player.sendMessage(Utils.color("&o&5["+ player.getName() +"] -> &d" + message ));
         }
         else
         {

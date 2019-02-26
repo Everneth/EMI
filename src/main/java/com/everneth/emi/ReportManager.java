@@ -174,11 +174,18 @@ public final class ReportManager {
         if(!results.isEmpty()) {
             for (DbRow result : results) {
 
-                this.reportMap.put(UUID.fromString(result.getString("player_uuid")),
-                            new Report(
-                                    result.getLong("channel_id")
-                            )
-                );
+                if(result.getLong("discord_id") != null || result.getLong("discord_id") != 0)
+                {
+                    this.reportMap.put(UUID.fromString(result.getString("player_uuid")),
+                            new Report (result.getLong("channel_id"),
+                            result.getLong("discord_id"))
+                            );
+                }
+                else {
+                    this.reportMap.put(UUID.fromString(result.getString("player_uuid")),
+                            new Report (result.getLong("channel_id"))
+                    );
+                }
             }
         }
     }

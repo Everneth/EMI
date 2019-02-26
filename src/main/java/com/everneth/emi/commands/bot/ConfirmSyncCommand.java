@@ -115,7 +115,7 @@ public class ConfirmSyncCommand extends Command {
     {
         DiscordSyncManager dsm = DiscordSyncManager.getDSM();
         int playerId = 0;
-        futurePlayerId = DB.executeUpdateAsync("UPDATE players SET discord_id = ?\n" +
+        futurePlayerId = DB.executeUpdateAsync("UPDATE players SET discord_id = ? " +
                 "WHERE player_uuid = ?", user.getIdLong(), dsm.findSyncRequestUUID(user).toString());
         // get the results from the future
         try {
