@@ -17,7 +17,6 @@ import org.bukkit.entity.Player;
 public class ReportReplyCommand extends BaseCommand {
     private JDA bot = EMI.getJda();
     @Default
-    @CommandAlias("report-reply|rr|rreply")
     public void onReportReply(CommandSender sender, String message) {
         Player player = (Player) sender;
         ReportManager rm = ReportManager.getReportManager();

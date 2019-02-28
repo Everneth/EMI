@@ -34,7 +34,17 @@ public class MessageReceivedListener extends ListenerAdapter {
 
                 if (offlinePlayer.isOnline()) {
                     Player player = offlinePlayer.getPlayer();
-                    player.sendMessage(Utils.color("&o&d[REPORT]&f<&8 +" + event.getMember().getNickname() + "&f>&7 " + event.getMessage().getContentRaw()));
+                    String name;
+
+                    if(event.getMember().getNickname() == null)
+                    {
+                        name = event.getMember().getEffectiveName();
+                    }
+                    else
+                    {
+                        name = event.getMember().getNickname();
+                    }
+                    player.sendMessage(Utils.color("&o&d[REPORT]&f<&8 +" + name + "&f>&7 " + event.getMessage().getContentRaw()));
                 } else if (!offlinePlayer.isOnline() && !rm.hasDiscord(player_uuid)) {
                     DbRow report = rm.getReportRecord(player_uuid);
                     try {

@@ -47,7 +47,6 @@ public class ReportCommand extends BaseCommand {
     private Plugin plugin = EMI.getPlugin();
 
     @Default
-    @CommandAlias("report")
     public void onReport(CommandSender sender, String message)
     {
         ReportManager rm = ReportManager.getReportManager();

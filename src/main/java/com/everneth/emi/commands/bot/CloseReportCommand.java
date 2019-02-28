@@ -12,6 +12,7 @@ import freemarker.template.Template;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.Role;
+import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -118,7 +119,7 @@ public class CloseReportCommand extends Command {
             sb.append(logMsg);
         }
 
-        CloseableHttpClient httpclient = HttpClientBuilder.create().build();
+        CloseableHttpClient httpclient = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(URL + "?=" + KEY);
         List<NameValuePair> params = new ArrayList<NameValuePair>();
 
@@ -130,15 +131,18 @@ public class CloseReportCommand extends Command {
         params.add(new BasicNameValuePair("post", sb.toString()));
         params.add(new BasicNameValuePair("author", String.valueOf(POSTER)));
 
-        httpPost.setEntity(new UrlEncodedFormEntity(params));
+        httpPost.setEntity(new UrlEncodedFormEntity(params, Consts.UTF_8));
+
+        EMI.getPlugin().getLogger().info("Attempting to post: " + httpPost.getRequestLine());
 
         try {
             CloseableHttpResponse response2 = httpclient.execute(httpPost);
+            EMI.getPlugin().getLogger().info("Reponse from POST: " + response2.getStatusLine().getStatusCode());
             return response2.getStatusLine().getStatusCode();
         }
         catch (Exception e)
         {
-            System.out.println(e.getMessage());
+            EMI.getPlugin().getLogger().info("Something broke: " + e.getMessage());
             return 0;
         }
         finally
