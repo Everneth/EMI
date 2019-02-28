@@ -8,22 +8,26 @@ import com.everneth.emi.utils.FileUtils;
 import com.google.gson.Gson;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import freemarker.template.Template;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.Role;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -58,7 +62,14 @@ public class CloseReportCommand extends Command {
             List<Message> messageList = event.getTextChannel().getIterableHistory().complete();
             // Take our messages and build a string, we'll dump that string into a message file
             // and embed the file into a message
-            int postResult = transcribeToPost(messageList, playerName, uuid);
+            int postResult = 0;
+            try {
+                 postResult = transcribeToPost(messageList, playerName, uuid);
+            }
+            catch(IOException e)
+            {
+                System.out.println(e.getMessage());
+            }
             if(postResult == 200) {
                 String msg = "Log from " + playerName + "'s report successfully transmitted to the site.";
                 event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage(msg).queue();
@@ -78,7 +89,7 @@ public class CloseReportCommand extends Command {
         }
     }
 
-    private int transcribeToPost(List<Message> messageList, String playerName, UUID uuid) {
+    private int transcribeToPost(List<Message> messageList, String playerName, UUID uuid) throws IOException {
         final String URL =
                 EMI.getPlugin().getConfig().getString("api-topic-post-url") + "api" +
                         EMI.getPlugin().getConfig().getString("api-topic-post-endpoint");
@@ -107,16 +118,19 @@ public class CloseReportCommand extends Command {
             sb.append(logMsg);
         }
 
-        Gson gson = new Gson();
-
-        CloseableHttpClient httpclient = HttpClients.createDefault();
+        CloseableHttpClient httpclient = HttpClientBuilder.create().build();
         HttpPost httpPost = new HttpPost(URL + "?=" + KEY);
+        List<NameValuePair> params = new ArrayList<NameValuePair>();
 
         String title = "Report submitted by " + playerName;
         LogPost post = new LogPost(FORUM_ID, title, sb.toString(), POSTER);
 
-        HttpEntity stringEntity = new StringEntity(gson.toJson(post), ContentType.APPLICATION_FORM_URLENCODED);
-        httpPost.setEntity(stringEntity);
+        params.add(new BasicNameValuePair("forum", String.valueOf(FORUM_ID)));
+        params.add(new BasicNameValuePair("title", title));
+        params.add(new BasicNameValuePair("post", sb.toString()));
+        params.add(new BasicNameValuePair("author", String.valueOf(POSTER)));
+
+        httpPost.setEntity(new UrlEncodedFormEntity(params));
 
         try {
             CloseableHttpResponse response2 = httpclient.execute(httpPost);
@@ -126,6 +140,10 @@ public class CloseReportCommand extends Command {
         {
             System.out.println(e.getMessage());
             return 0;
+        }
+        finally
+        {
+            httpclient.close();
         }
     }
 

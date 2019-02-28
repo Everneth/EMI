@@ -48,7 +48,6 @@ public class ReportCommand extends BaseCommand {
 
     @Default
     @CommandAlias("report")
-    @CatchUnknown
     public void onReport(CommandSender sender, String message)
     {
         ReportManager rm = ReportManager.getReportManager();

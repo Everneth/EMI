@@ -32,7 +32,6 @@ public class MinorHelpCommand extends BaseCommand {
 
     @Default
     @CommandAlias("minorhelp|mhelp")
-    @CatchUnknown
     public void onMinorHelp(CommandSender sender, String message)
     {
         // Get the player and supply all potentially useful
