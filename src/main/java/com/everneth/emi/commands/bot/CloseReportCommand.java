@@ -99,17 +99,21 @@ public class CloseReportCommand extends Command {
 
         String logMsg;
 
+
+        String postHeader = "<font size=\"14pt\"><b>Report submitted by " + playerName + "</b></font><br />";
+        sb.append(postHeader);
         for (Message msg : reverse) {
             if (msg.getAuthor().equals(EMI.getJda().getSelfUser())) {
-                 logMsg = "<font size=\"18pt\"><b>Report submitted by " + playerName + "</b></font><br />";
-                rm.closeReport(uuid);
-                rm.removeReport(uuid);
+                 logMsg = msg.getContentRaw();
             }
             else {
-                logMsg = "<b>" + msg.getMember().getEffectiveName() + "</b> [" + msg.getCreationTime().toString() +"]: " + msg.getContentRaw() + "<br />";
+                logMsg = "<b>" + msg.getMember().getEffectiveName() + "</b>: " + msg.getContentRaw() + "<br />";
             }
             sb.append(logMsg);
         }
+
+        rm.closeReport(uuid);
+        rm.removeReport(uuid);
 
         CloseableHttpClient httpclient = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(URL);
