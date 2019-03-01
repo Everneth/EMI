@@ -2,27 +2,19 @@ package com.everneth.emi.commands.bot;
 
 import com.everneth.emi.EMI;
 import com.everneth.emi.ReportManager;
-import com.everneth.emi.models.LogPost;
-import com.everneth.emi.models.Report;
 import com.everneth.emi.utils.FileUtils;
-import com.google.gson.Gson;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import freemarker.template.Template;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.Role;
 import org.apache.http.Consts;
-import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -71,7 +63,7 @@ public class CloseReportCommand extends Command {
             {
                 System.out.println(e.getMessage());
             }
-            if(postResult == 200) {
+            if(postResult == 200 || postResult == 201) {
                 String msg = "Log from " + playerName + "'s report successfully transmitted to the site.";
                 event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage(msg).queue();
             }
@@ -120,12 +112,12 @@ public class CloseReportCommand extends Command {
         }
 
         CloseableHttpClient httpclient = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(URL + "?=" + KEY);
+        HttpPost httpPost = new HttpPost(URL);
         List<NameValuePair> params = new ArrayList<NameValuePair>();
 
         String title = "Report submitted by " + playerName;
-        LogPost post = new LogPost(FORUM_ID, title, sb.toString(), POSTER);
 
+        params.add(new BasicNameValuePair("key", KEY));
         params.add(new BasicNameValuePair("forum", String.valueOf(FORUM_ID)));
         params.add(new BasicNameValuePair("title", title));
         params.add(new BasicNameValuePair("post", sb.toString()));
@@ -133,11 +125,8 @@ public class CloseReportCommand extends Command {
 
         httpPost.setEntity(new UrlEncodedFormEntity(params, Consts.UTF_8));
 
-        EMI.getPlugin().getLogger().info("Attempting to post: " + httpPost.getRequestLine());
-
         try {
             CloseableHttpResponse response2 = httpclient.execute(httpPost);
-            EMI.getPlugin().getLogger().info("Reponse from POST: " + response2.getStatusLine().getStatusCode());
             return response2.getStatusLine().getStatusCode();
         }
         catch (Exception e)
