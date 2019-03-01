@@ -6,13 +6,16 @@ import co.aikar.idb.Database;
 import co.aikar.idb.DatabaseOptions;
 import co.aikar.idb.PooledDatabaseOptions;
 import com.everneth.emi.api.*;
-import com.everneth.emi.commands.ReportCommand;
+import com.everneth.emi.commands.*;
+import com.everneth.emi.commands.bot.CloseReportCommand;
 import com.everneth.emi.commands.bot.ConfirmSyncCommand;
 import com.everneth.emi.commands.bot.DenySyncCommand;
 import com.everneth.emi.commands.bot.HelpClearCommand;
 import com.everneth.emi.commands.comm.CommCommand;
 import com.everneth.emi.commands.comp.CompCommand;
 import com.everneth.emi.events.JoinEvent;
+import com.everneth.emi.events.LeaveEvent;
+import com.everneth.emi.events.bot.MessageReceivedListener;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 
@@ -64,6 +67,8 @@ public class EMI extends JavaPlugin {
         Database db = PooledDatabaseOptions.builder().options(options).createHikariDatabase();
         DB.setGlobalDatabase(db);
 
+        ReportManager.getReportManager().loadManager();
+
         registerCommands();
         registerListeners();
         initBot();
@@ -82,6 +87,10 @@ public class EMI extends JavaPlugin {
         commandManager.registerCommand(new CommCommand());
         commandManager.registerCommand(new CompCommand());
         commandManager.registerCommand(new ReportCommand());
+        commandManager.registerCommand(new ReportReplyCommand());
+        commandManager.registerCommand(new GetRepliesCommand());
+        commandManager.registerCommand(new MinorHelpCommand());
+        commandManager.registerCommand(new DiscordsyncCommand());
     }
 
     private void initBot()
@@ -92,12 +101,16 @@ public class EMI extends JavaPlugin {
         builder.addCommand(new HelpClearCommand());
         builder.addCommand(new ConfirmSyncCommand());
         builder.addCommand(new DenySyncCommand());
+        builder.addCommand(new CloseReportCommand());
         builder.setOwnerId(this.getConfig().getString("bot-owner-id"));
 
         CommandClient client = builder.build();
 
         try {
-            jda = new JDABuilder(config.getString("bot-token")).addEventListener(client).build();
+            jda = new JDABuilder(config.getString("bot-token"))
+                    .addEventListener(client)
+                    .addEventListener(new MessageReceivedListener())
+                    .build();
             jda.awaitReady();
         }
         catch(LoginException e)
@@ -125,6 +138,7 @@ public class EMI extends JavaPlugin {
     private void registerListeners()
     {
         getServer().getPluginManager().registerEvents(new JoinEvent(this), this);
+        getServer().getPluginManager().registerEvents(new LeaveEvent(this), this);
     }
 
 

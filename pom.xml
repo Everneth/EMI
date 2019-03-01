@@ -6,7 +6,7 @@
 
     <groupId>com.everneth</groupId>
     <artifactId>EMI</artifactId>
-    <version>0.4.3</version>
+    <version>0.6.1</version>
 
     <repositories>
         <repository>
@@ -109,6 +109,12 @@
             <artifactId>lombok</artifactId>
             <version>1.18.4</version>
             <scope>provided</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.7</version>
         </dependency>
     </dependencies>
     <build>

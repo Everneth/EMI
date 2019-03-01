@@ -3,6 +3,7 @@ package com.everneth.emi.events;
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 
+import com.everneth.emi.ReportManager;
 import com.everneth.emi.Utils;
 import com.everneth.emi.EMI;
 import com.everneth.emi.models.Motd;
@@ -120,6 +121,15 @@ public class JoinEvent implements Listener {
             else if(motd.getName().equals("communications") && !motd.getMessage().equals(""))
             {
                 player.sendMessage(Utils.color(COMM_INTRO + motd.getMessage()));
+            }
+        }
+        ReportManager rm = ReportManager.getReportManager();
+        if(rm.hasActiveReport(player.getUniqueId()))
+        {
+            int numMissed = rm.messagesMissed(player.getUniqueId());
+            if(numMissed > 0)
+            {
+                player.sendMessage(Utils.color("&c[!]&f You have &6" + numMissed + " &fmissed messages on your report. Please use &c/getreplies&f to view them."));
             }
         }
     }

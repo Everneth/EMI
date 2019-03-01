@@ -7,8 +7,10 @@ import com.everneth.emi.EMI;
 import com.everneth.emi.models.Motd;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.User;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,18 +23,24 @@ import java.util.concurrent.CompletableFuture;
  */
 
 public class ConfirmSyncCommand extends Command {
-    private CompletableFuture<DbRow> playerOjbectFuture;
+    private CompletableFuture<DbRow> playerObjectFuture;
     private DbRow playerRow;
     private CompletableFuture<Integer> futurePlayerId;
-    private DiscordSyncManager dsm = DiscordSyncManager.getDSM();
     public ConfirmSyncCommand()
     {
         this.name = "confirmsync";
+        this.guildOnly = false;
     }
     @Override
     protected void execute(CommandEvent event)
     {
+        DiscordSyncManager dsm = DiscordSyncManager.getDSM();
         User toFind = dsm.findSyncRequest(event.getAuthor());
+        long guildId = EMI.getPlugin().getConfig().getLong("guild-id");
+        long syncRoleId = EMI.getPlugin().getConfig().getLong("sync-role-id");
+        long pendingRoleId = EMI.getPlugin().getConfig().getLong("pending-role-id");
+        long memberRoleId = EMI.getPlugin().getConfig().getLong("member-role-id");
+
         if(toFind == null)
         {
             event.replyInDm("No sync request exists for your account.");
@@ -53,17 +61,18 @@ public class ConfirmSyncCommand extends Command {
                 else
                 {
                     dsm.removeSyncRequest(this.getPlayerRow(playerId).getString("player_uuid"));
-                    event.getMember().getRoles().add(
-                            event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("synced-role-id"))
-                    );
-                    Role memberRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("member-role-id"));
+                    EMI.getJda().getGuildById(guildId).getController().addSingleRoleToMember(
+                            EMI.getJda().getGuildById(guildId).getMemberById(event.getAuthor().getIdLong()), EMI.getJda().getGuildById(guildId).getRoleById(syncRoleId)
+                    ).queue();
+                    Role memberRole = EMI.getJda().getGuildById(guildId).getRoleById(memberRoleId);
                     if(EMI.getPlugin().getConfig().getBoolean("use-pending-role"))
                     {
-                        Role pendingRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("pending-role-id"));
-                        if(event.getMember().getRoles().contains(pendingRole))
+                        Role pendingRole = EMI.getJda().getGuildById(guildId).getRoleById(pendingRoleId);
+                        Member member = EMI.getJda().getGuildById(guildId).getMember(event.getSelfUser());
+                        if(member.getRoles().contains(pendingRole))
                         {
-                            event.getMember().getRoles().remove(pendingRole);
-                            event.getMember().getRoles().add(memberRole);
+                            member.getRoles().remove(pendingRole);
+                            member.getRoles().add(memberRole);
                             event.replyInDm("Your account has been synced and your roles updated!");
                         }
                         else
@@ -81,24 +90,33 @@ public class ConfirmSyncCommand extends Command {
     }
     private boolean syncExists(User user)
     {
-        playerRow = new DbRow();
-        playerOjbectFuture = DB.getFirstRowAsync("SELECT * FROM players\n" +
-                "WHERE player_uuid = ?", this.dsm.findSyncRequestUUID(user).toString());
+        DbRow playerRow;
+        Long discordId = 0L;
+        DiscordSyncManager dsm = DiscordSyncManager.getDSM();
+        playerObjectFuture = DB.getFirstRowAsync("SELECT discord_id FROM players\n" +
+                "WHERE player_uuid = ?", dsm.findSyncRequestUUID(user).toString());
         // get the results from the future
         try {
-            playerRow = playerOjbectFuture.get();
+            playerRow = playerObjectFuture.get();
+            discordId = playerRow.getLong("discord_id");
         }
         catch (Exception e)
         {
             System.out.print(e.getMessage());
         }
-        return playerRow.isEmpty();
+        if(discordId == null || discordId == 0)
+            return false;
+        else
+        {
+            return true;
+        }
     }
     private int syncAccount(User user)
     {
+        DiscordSyncManager dsm = DiscordSyncManager.getDSM();
         int playerId = 0;
-        futurePlayerId = DB.executeUpdateAsync("UPDATE players SET discord_id = ?\n" +
-                "WHERE player_uuid = ?", user.getIdLong(), this.dsm.findSyncRequestUUID(user).toString());
+        futurePlayerId = DB.executeUpdateAsync("UPDATE players SET discord_id = ? " +
+                "WHERE player_uuid = ?", user.getIdLong(), dsm.findSyncRequestUUID(user).toString());
         // get the results from the future
         try {
              playerId = futurePlayerId.get();

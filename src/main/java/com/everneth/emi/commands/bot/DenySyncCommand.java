@@ -20,6 +20,7 @@ public class DenySyncCommand extends Command {
     public DenySyncCommand()
     {
         this.name = "denysync";
+        this.guildOnly = false;
     }
     @Override
     public void execute(CommandEvent event)
@@ -42,7 +43,9 @@ public class DenySyncCommand extends Command {
     }
     private boolean hasSyncRole(CommandEvent event)
     {
-        Role syncRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("sync-role-id"));
-        return event.getMember().getRoles().contains(syncRole);
+        long guildId = EMI.getPlugin().getConfig().getLong("guild-id");
+        long syncRoleId = EMI.getPlugin().getConfig().getLong("sync-role-id");
+        Role syncRole = EMI.getJda().getGuildById(guildId).getRoleById(syncRoleId);
+        return EMI.getJda().getGuildById(guildId).getMember(event.getSelfUser()).getRoles().contains(syncRole);
     }
 }
