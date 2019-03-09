@@ -2,6 +2,7 @@ package com.everneth.emi.commands.bot;
 
 import com.everneth.emi.EMI;
 import com.everneth.emi.ReportManager;
+import com.everneth.emi.models.PostResponse;
 import com.everneth.emi.utils.FileUtils;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -17,10 +18,11 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -55,16 +57,21 @@ public class CloseReportCommand extends Command {
             List<Message> messageList = event.getTextChannel().getIterableHistory().complete();
             // Take our messages and build a string, we'll dump that string into a message file
             // and embed the file into a message
-            int postResult = 0;
+            PostResponse postResponse;
+            int statusCode = 0;
+            String url = "";
             try {
-                 postResult = transcribeToPost(messageList, playerName, uuid);
+                 postResponse = transcribeToPost(messageList, playerName, uuid);
+                 statusCode = postResponse.getStatusCode();
+                 url = postResponse.getUrl();
             }
             catch(IOException e)
             {
                 System.out.println(e.getMessage());
             }
-            if(postResult == 200 || postResult == 201) {
-                String msg = "Log from " + playerName + "'s report successfully transmitted to the site.";
+            if(statusCode == 200 || statusCode == 201) {
+                String msg = "Log from " + playerName + "'s report successfully transmitted to the site.\n\n" +
+                        url;
                 event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage(msg).queue();
             }
             else {
@@ -82,7 +89,7 @@ public class CloseReportCommand extends Command {
         }
     }
 
-    private int transcribeToPost(List<Message> messageList, String playerName, UUID uuid) throws IOException {
+    private PostResponse transcribeToPost(List<Message> messageList, String playerName, UUID uuid) throws IOException {
         final String URL =
                 EMI.getPlugin().getConfig().getString("api-topic-post-url") + "api" +
                         EMI.getPlugin().getConfig().getString("api-topic-post-endpoint");
@@ -99,12 +106,11 @@ public class CloseReportCommand extends Command {
 
         String logMsg;
 
-
-        String postHeader = "<font size=\"14pt\"><b>Report submitted by " + playerName + "</b></font><br />";
+        String postHeader = "<font size=\"10pt\"><b>Report submitted by " + playerName + "</b></font><br />";
         sb.append(postHeader);
         for (Message msg : reverse) {
             if (msg.getAuthor().equals(EMI.getJda().getSelfUser())) {
-                 logMsg = msg.getContentRaw();
+                 logMsg = msg.getContentRaw() + "</br>";
             }
             else {
                 logMsg = "<b>" + msg.getMember().getEffectiveName() + "</b>: " + msg.getContentRaw() + "<br />";
@@ -131,12 +137,14 @@ public class CloseReportCommand extends Command {
 
         try {
             CloseableHttpResponse response2 = httpclient.execute(httpPost);
-            return response2.getStatusLine().getStatusCode();
+            JSONObject obj = new JSONObject(EntityUtils.toString(response2.getEntity()));
+
+            return new PostResponse(response2.getStatusLine().getStatusCode(), obj.getString("url"));
         }
         catch (Exception e)
         {
             EMI.getPlugin().getLogger().info("Something broke: " + e.getMessage());
-            return 0;
+            return new PostResponse(0, "");
         }
         finally
         {
