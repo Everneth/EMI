@@ -102,7 +102,6 @@ public class CloseReportCommand extends Command {
         List<Message> reverse = reverseList(messageList);
 
         ReportManager rm = ReportManager.getReportManager();
-        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 
         String logMsg;
 

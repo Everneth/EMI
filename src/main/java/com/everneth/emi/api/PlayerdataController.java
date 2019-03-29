@@ -2,14 +2,10 @@ package com.everneth.emi.api;
 
 import com.everneth.emi.EMI;
 import com.everneth.emi.models.PlayerJson;
-import com.everneth.emi.utils.FileUtils;
-
-
 
 import com.google.gson.Gson;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.jnbt.CompoundTag;
 import org.jnbt.NBTInputStream;
 import org.jnbt.Tag;

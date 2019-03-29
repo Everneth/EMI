@@ -1,9 +1,5 @@
 package com.everneth.emi.models;
 
-import co.aikar.idb.DB;
-
-import java.util.UUID;
-
 public class Report {
     private long discordUserId;
     private long channelId;

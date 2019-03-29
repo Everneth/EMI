@@ -1,7 +1,6 @@
 package com.everneth.emi.commands;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CatchUnknown;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Dependency;
@@ -11,23 +10,19 @@ import com.everneth.emi.EMI;
 import com.everneth.emi.ReportManager;
 import com.everneth.emi.Utils;
 import com.everneth.emi.models.Report;
-import net.dv8tion.jda.client.entities.Application;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.managers.GuildManager;
 import net.dv8tion.jda.core.requests.restaction.ChannelAction;
-import org.bukkit.ChatColor;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -41,7 +36,6 @@ import java.util.concurrent.CompletableFuture;
 
 @CommandAlias("report")
 public class ReportCommand extends BaseCommand {
-    private JDA bot = EMI.getJda();
 
     @Dependency
     private Plugin plugin = EMI.getPlugin();
@@ -99,6 +93,8 @@ public class ReportCommand extends BaseCommand {
             channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
                     .addPermissionOverride(staffRole, Permission.ALL_TEXT_PERMISSIONS, 0)
                     .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0)
+                    .addPermissionOverride(discordMember, Permission.MESSAGE_READ.getRawValue(), 0)
+                    .addPermissionOverride(discordMember, Permission.MESSAGE_HISTORY.getRawValue(), 0)
                     .addPermissionOverride(discordMember, Permission.MESSAGE_WRITE.getRawValue(), 0).queue(
                     (channel) -> {
                         Report reportToAdd = new Report(channel.getIdLong());

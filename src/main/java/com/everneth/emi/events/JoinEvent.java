@@ -8,7 +8,6 @@ import com.everneth.emi.Utils;
 import com.everneth.emi.EMI;
 import com.everneth.emi.models.Motd;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
