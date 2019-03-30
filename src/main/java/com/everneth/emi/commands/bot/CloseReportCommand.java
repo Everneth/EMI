@@ -105,7 +105,7 @@ public class CloseReportCommand extends Command {
 
         String logMsg;
 
-        String postHeader = "<font size=\"10pt\"><b>Report submitted by " + playerName + "</b></font><br />";
+        String postHeader = "<font size=\"16px\"><b>Report submitted by " + playerName + "</b></font><br />";
         sb.append(postHeader);
         for (Message msg : reverse) {
             if (msg.getAuthor().equals(EMI.getJda().getSelfUser())) {

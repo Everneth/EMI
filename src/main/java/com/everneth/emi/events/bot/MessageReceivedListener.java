@@ -43,14 +43,23 @@ public class MessageReceivedListener extends ListenerAdapter {
                     {
                         name = event.getMember().getNickname();
                     }
-                    player.sendMessage(Utils.color("&o&d[REPORT]&f<&8 +" + name + "&f>&7 " + event.getMessage().getContentRaw()));
+                    player.sendMessage(Utils.color("&o&d[REPORT]&f<&8" + name + "&f>&7 " + event.getMessage().getContentRaw()));
                 } else if (!offlinePlayer.isOnline() && !rm.hasDiscord(player_uuid)) {
                     DbRow report = rm.getReportRecord(player_uuid);
+                    String author;
+                    if(event.getMember().getNickname().equals("") || event.getMember().getNickname() == null)
+                    {
+                        author = event.getMember().getEffectiveName();
+                    }
+                    else
+                    {
+                        author = event.getMember().getNickname();
+                    }
                     try {
                         DB.executeInsert("INSERT INTO report_messages (report_id, author, message, msg_read, date_read) " +
                                         "VALUES (?, ?, ?, ?, ?)",
                                 report.getInt("report_id"),
-                                event.getMember().getNickname(),
+                                author,
                                 event.getMessage().getContentRaw(),
                                 0,
                                 null);
