@@ -111,6 +111,37 @@ public class CharterPoint {
         return pointsList;
     }
 
+    public void enforceCharter(UUID uuid)
+    {
+        List<CharterPoint> pointsList = getAllPoints(Bukkit.getOfflinePlayer(uuid).getName());
+        int points = 0;
+        for(CharterPoint point : pointsList)
+        {
+            points += point.getAmount();
+        }
+        switch(points)
+        {
+            case(1):
+                //TODO: notification to discord/private message from "system" user
+                break;
+            case(2):
+                //TODO: change player location to jail
+                break;
+            case(3):
+                //TODO: ban command with message and expiry date and time-24
+                break;
+            case(4):
+                //TODO: ban command with message and expiry date and time-72
+                break;
+            case(5):
+                //TODO: permanent ban with generic perma ban message
+                break;
+            default:
+                //TODO: no match to previous cases, must be higher than 5 points and permaban
+                break;
+        }
+    }
+
     public DbRow getCharterPoint()
     {
 
