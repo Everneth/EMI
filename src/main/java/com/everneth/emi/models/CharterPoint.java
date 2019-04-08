@@ -3,17 +3,19 @@ package com.everneth.emi.models;
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
-import com.sun.xml.internal.ws.util.CompletedFuture;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.jnbt.Tag;
+import org.jnbt.ListTag;
+import org.jnbt.CompoundTag;
+import org.jnbt.NBTInputStream;
+import org.jnbt.NBTOutputStream;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class CharterPoint {
@@ -119,6 +121,8 @@ public class CharterPoint {
         {
             points += point.getAmount();
         }
+
+        Player player = pointsList.get(0).getRecipient();
         switch(points)
         {
             case(1):
@@ -126,6 +130,14 @@ public class CharterPoint {
                 break;
             case(2):
                 //TODO: change player location to jail
+                if(player.isOnline())
+                {
+                    moveToJail(player);
+                }
+                else
+                {
+                    flagPlayer(player);
+                }
                 break;
             case(3):
                 //TODO: ban command with message and expiry date and time-24
@@ -144,7 +156,24 @@ public class CharterPoint {
 
     public DbRow getCharterPoint()
     {
+        return null;
+    }
 
+    private void moveToJail(Player player)
+    {
+        World world = EMI.getPlugin().getServer().getWorld(EMI.getPlugin().getConfig().getString("world_folder"));
+        Location location = new Location(
+                world,
+                EMI.getPlugin().getConfig().getDouble("jail-x"),
+                EMI.getPlugin().getConfig().getDouble("jail-y"),
+                EMI.getPlugin().getConfig().getDouble("jail-z"));
+        player.teleport(location);
+        player.setGameMode(GameMode.ADVENTURE);
+    }
+
+    private void flagPlayer(Player player)
+    {
+        DB.executeUpdateAsync("UPDATE players SET flagged = 1 WHERE player_uuid = ?", player.getUniqueId());
     }
 
     private DbRow getPlayerRow(UUID uuid)
