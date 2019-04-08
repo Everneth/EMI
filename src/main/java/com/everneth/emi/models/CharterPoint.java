@@ -123,13 +123,14 @@ public class CharterPoint {
         }
 
         Player player = pointsList.get(0).getRecipient();
+        Calendar cal = Calendar.getInstance();
         switch(points)
         {
             case(1):
                 //TODO: notification to discord/private message from "system" user
                 break;
             case(2):
-                //TODO: change player location to jail
+                // Move or flag player for jail
                 if(player.isOnline())
                 {
                     moveToJail(player);
@@ -140,10 +141,22 @@ public class CharterPoint {
                 }
                 break;
             case(3):
-                //TODO: ban command with message and expiry date and time-24
+                // 24 hour ban
+                cal.add(Calendar.DAY_OF_MONTH, 1);
+                Bukkit.getBanList(BanList.Type.NAME).addBan(
+                        player.getName(),
+                        pointsList.get(pointsList.size()-1).getReason(),
+                        cal.getTime(),
+                        null);
                 break;
             case(4):
-                //TODO: ban command with message and expiry date and time-72
+                // 72 hour ban
+                cal.add(Calendar.DAY_OF_MONTH, 3);
+                Bukkit.getBanList(BanList.Type.NAME).addBan(
+                        player.getName(),
+                        pointsList.get(pointsList.size()-1).getReason(),
+                        cal.getTime(),
+                        null);
                 break;
             case(5):
                 //TODO: permanent ban with generic perma ban message
