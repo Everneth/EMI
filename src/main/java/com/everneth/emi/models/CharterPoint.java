@@ -159,10 +159,21 @@ public class CharterPoint {
                         null);
                 break;
             case(5):
-                //TODO: permanent ban with generic perma ban message
+                // Permanent ban
+                Bukkit.getBanList(BanList.Type.NAME).addBan(
+                        player.getName(),
+                        pointsList.get(pointsList.size()-1).getReason(),
+                        null,
+                        null);
                 break;
             default:
-                //TODO: no match to previous cases, must be higher than 5 points and permaban
+                // Permanent ban
+                Bukkit.getBanList(BanList.Type.NAME).addBan(
+                        player.getName(),
+                        "You have exceeded 5 charter points. You have been permanently banned. " +
+                        "Please submit an appeal on everneth.com if you want to review your ban and get it lifted.",
+                        null,
+                        null);
                 break;
         }
     }
