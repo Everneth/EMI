@@ -47,7 +47,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                 } else if (!offlinePlayer.isOnline() && !rm.hasDiscord(player_uuid)) {
                     DbRow report = rm.getReportRecord(player_uuid);
                     String author;
-                    if(event.getMember().getNickname().equals("") || event.getMember().getNickname() == null)
+                    if(event.getMember().getNickname() == null)
                     {
                         author = event.getMember().getEffectiveName();
                     }

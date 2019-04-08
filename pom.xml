@@ -6,7 +6,7 @@
 
     <groupId>com.everneth</groupId>
     <artifactId>EMI</artifactId>
-    <version>0.6.4</version>
+    <version>0.6.6</version>
 
     <repositories>
         <repository>
@@ -74,9 +74,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>3.8.1_439</version>
-            <type>jar</type>
-            <scope>compile</scope>
+            <version>3.8.3_462</version>
         </dependency>
         <!--JDA-Utilities-->
         <dependency>

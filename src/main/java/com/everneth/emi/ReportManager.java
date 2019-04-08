@@ -160,12 +160,14 @@ public final class ReportManager {
 
     public void loadManager()
     {
+        CompletableFuture<List<DbRow>> futureResults = new CompletableFuture<>();
         List<DbRow> results = new ArrayList<DbRow>();
         try {
-            results = DB.getResultsAsync(
+            futureResults = DB.getResultsAsync(
                     "SELECT channel_id, player_uuid, discord_id FROM reports INNER JOIN players " +
                             "ON reports.initiator_id = players.player_id WHERE active = ?",
-                    1).get();
+                    1);
+            results = futureResults.get();
         }
         catch (Exception e)
         {
@@ -174,17 +176,21 @@ public final class ReportManager {
         if(!results.isEmpty()) {
             for (DbRow result : results) {
 
-                if(result.getLong("discord_id") != null || result.getLong("discord_id") != 0)
-                {
-                    this.reportMap.put(UUID.fromString(result.getString("player_uuid")),
-                            new Report (result.getLong("channel_id"),
-                            result.getLong("discord_id"))
-                            );
+                if(result != null) {
+                    if (result.getLong("discord_id") != null || result.getLong("discord_id") != 0) {
+                        this.reportMap.put(UUID.fromString(result.getString("player_uuid")),
+                                new Report(result.getLong("channel_id"),
+                                        result.getLong("discord_id"))
+                        );
+                    } else {
+                        this.reportMap.put(UUID.fromString(result.getString("player_uuid")),
+                                new Report(result.getLong("channel_id"))
+                        );
+                    }
                 }
-                else {
-                    this.reportMap.put(UUID.fromString(result.getString("player_uuid")),
-                            new Report (result.getLong("channel_id"))
-                    );
+                else
+                {
+                    EMI.getPlugin().getLogger().severe("Error loading report manager service. Null results returned.");
                 }
             }
         }
