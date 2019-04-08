@@ -13,6 +13,7 @@ import com.everneth.emi.commands.bot.DenySyncCommand;
 import com.everneth.emi.commands.bot.HelpClearCommand;
 import com.everneth.emi.commands.comm.CommCommand;
 import com.everneth.emi.commands.comp.CompCommand;
+import com.everneth.emi.commands.par.CharterCommand;
 import com.everneth.emi.events.JoinEvent;
 import com.everneth.emi.events.LeaveEvent;
 import com.everneth.emi.events.bot.MessageReceivedListener;
@@ -91,6 +92,7 @@ public class EMI extends JavaPlugin {
         commandManager.registerCommand(new GetRepliesCommand());
         commandManager.registerCommand(new MinorHelpCommand());
         commandManager.registerCommand(new DiscordsyncCommand());
+        commandManager.registerCommand(new CharterCommand());
     }
 
     private void initBot()

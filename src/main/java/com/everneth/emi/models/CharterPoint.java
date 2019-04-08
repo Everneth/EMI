@@ -5,14 +5,7 @@ import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
-import org.jnbt.Tag;
-import org.jnbt.ListTag;
-import org.jnbt.CompoundTag;
-import org.jnbt.NBTInputStream;
-import org.jnbt.NBTOutputStream;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -113,9 +106,9 @@ public class CharterPoint {
         return pointsList;
     }
 
-    public void enforceCharter(UUID uuid)
+    public void enforceCharter()
     {
-        List<CharterPoint> pointsList = getAllPoints(Bukkit.getOfflinePlayer(uuid).getName());
+        List<CharterPoint> pointsList = getAllPoints(this.recipient.getPlayer().getName());
         int points = 0;
         for(CharterPoint point : pointsList)
         {
