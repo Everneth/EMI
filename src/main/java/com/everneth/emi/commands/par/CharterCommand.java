@@ -22,6 +22,7 @@ public class CharterCommand extends BaseCommand {
     {
         Player issuer = (Player) sender;
         DbRow recipientRecord = PlayerUtils.getPlayerRow(player);
+        long pointRecordId = 0;
 
         if(recipientRecord == null)
         {
@@ -31,6 +32,7 @@ public class CharterCommand extends BaseCommand {
         {
             Player recipient = Bukkit.getServer().getOfflinePlayer(UUID.fromString(recipientRecord.getString("player_uuid"))).getPlayer();
             CharterPoint point = new CharterPoint(issuer, recipient, reason, amount);
+            pointRecordId = point.issuePoint();
             point.enforceCharter();
         }
     }

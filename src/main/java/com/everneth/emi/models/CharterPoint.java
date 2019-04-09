@@ -3,6 +3,7 @@ package com.everneth.emi.models;
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
+import com.everneth.emi.Utils;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 
@@ -57,21 +58,27 @@ public class CharterPoint {
         this.amount = amount;
     }
 
-    public long IssuePoint(CharterPoint charterPoint)
+    public long issuePoint()
     {
-        DbRow issuer = getPlayerRow(charterPoint.getIssuer().getUniqueId());
-        DbRow recipient = getPlayerRow(charterPoint.getRecipient().getUniqueId());
+        DbRow issuer = getPlayerRow(this.getIssuer().getUniqueId());
+        DbRow recipient = getPlayerRow(this.getRecipient().getUniqueId());
         Date now = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+        Calendar cal = Calendar.getInstance();
+
+        cal.add(Calendar.DAY_OF_MONTH, 30);
+
         try {
-            return DB.executeInsert("INSERT INTO charter_points (issued_to, reason, amount, issued_by, date_issued) " +
+            return DB.executeInsert("INSERT INTO charter_points " +
+                            "(issued_to, reason, amount, issued_by, date_issued, date_expired) " +
                     "VALUES (?,?,?,?,?)",
                     recipient.getInt("player_id"),
-                    charterPoint.getReason(),
-                    charterPoint.getAmount(),
+                    this.getReason(),
+                    this.getAmount(),
                     issuer.getInt("player_id"),
-                    format.format(now));
+                    format.format(now),
+                    format.format(cal.getTime()));
         }
         catch (SQLException e)
         {
@@ -87,9 +94,8 @@ public class CharterPoint {
         List<DbRow> recordsList = new ArrayList<DbRow>();
 
         try {
-            recordsList = DB.getResultsAsync("SELECT * FROM charter_points WHERE issued_to = ? AND date_expired = ?",
-                    recipient.getInt("player_id"),
-                    null).get();
+            recordsList = DB.getResultsAsync("SELECT * FROM charter_points WHERE issued_to = ? AND date_expired > CURDATE()",
+                    recipient.getInt("player_id")).get();
         }
         catch (Exception e)
         {
@@ -132,6 +138,8 @@ public class CharterPoint {
                 {
                     flagPlayer(player);
                 }
+                this.getIssuer().sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 2 points " +
+                        "and has been teleported to the jail for 12 hours."));
                 break;
             case(3):
                 // 24 hour ban
@@ -141,6 +149,8 @@ public class CharterPoint {
                         pointsList.get(pointsList.size()-1).getReason(),
                         cal.getTime(),
                         null);
+                this.getIssuer().sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 3 points " +
+                        "and has been banned for 24 hours."));
                 break;
             case(4):
                 // 72 hour ban
@@ -150,6 +160,8 @@ public class CharterPoint {
                         pointsList.get(pointsList.size()-1).getReason(),
                         cal.getTime(),
                         null);
+                this.getIssuer().sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 4 points " +
+                        "and has been banned for 72 hours."));
                 break;
             case(5):
                 // Permanent ban
@@ -158,6 +170,8 @@ public class CharterPoint {
                         pointsList.get(pointsList.size()-1).getReason(),
                         null,
                         null);
+                this.getIssuer().sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 5 points " +
+                        "and has been banned permanently."));
                 break;
             default:
                 // Permanent ban
@@ -167,6 +181,8 @@ public class CharterPoint {
                         "Please submit an appeal on everneth.com if you want to review your ban and get it lifted.",
                         null,
                         null);
+                this.getIssuer().sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated more than 5 points " +
+                        "and has been banned permanently."));
                 break;
         }
     }
