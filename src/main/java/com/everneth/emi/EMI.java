@@ -6,12 +6,17 @@ import co.aikar.idb.Database;
 import co.aikar.idb.DatabaseOptions;
 import co.aikar.idb.PooledDatabaseOptions;
 import com.everneth.emi.api.*;
-import com.everneth.emi.commands.ReportCommand;
+import com.everneth.emi.commands.*;
+import com.everneth.emi.commands.bot.CloseReportCommand;
+import com.everneth.emi.commands.bot.ConfirmSyncCommand;
+import com.everneth.emi.commands.bot.DenySyncCommand;
 import com.everneth.emi.commands.bot.HelpClearCommand;
 import com.everneth.emi.commands.comm.CommCommand;
 import com.everneth.emi.commands.comp.CompCommand;
 import com.everneth.emi.events.ChatEvents;
 import com.everneth.emi.events.JoinEvent;
+import com.everneth.emi.events.LeaveEvent;
+import com.everneth.emi.events.bot.MessageReceivedListener;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 
@@ -27,8 +32,17 @@ import spark.Spark;
 import static spark.Spark.*;
 import javax.security.auth.login.LoginException;
 
+import java.io.File;
+
 import static spark.Spark.get;
 import static spark.Spark.port;
+
+/**
+ *     Class: EMI
+ *     Author: Faceman (@TptMike)
+ *     Purpose: Plugin main class launcher
+ *
+ */
 
 public class EMI extends JavaPlugin {
 
@@ -36,20 +50,25 @@ public class EMI extends JavaPlugin {
     private static BukkitCommandManager commandManager;
     private static JDA jda;
     FileConfiguration config = getConfig();
-
+    String configPath = getDataFolder() + System.getProperty("file.separator") + "config.yml";
+    File configFile = new File(configPath);
     @Override
     public void onEnable() {
         plugin = this;
 
         getLogger().info("Ministry Interface started.");
-        loadConfig();
-        saveConfig();
+        if(!configFile.exists())
+        {
+            this.saveDefaultConfig();
+        }
 
         Utils.chatTag = config.getString("chat-tag");
 
         DatabaseOptions options = DatabaseOptions.builder().mysql(config.getString("dbuser"), config.getString("dbpass"), config.getString("dbname"), config.getString("dbhost")).build();
         Database db = PooledDatabaseOptions.builder().options(options).createHikariDatabase();
         DB.setGlobalDatabase(db);
+
+        ReportManager.getReportManager().loadManager();
 
         registerCommands();
         registerListeners();
@@ -69,25 +88,10 @@ public class EMI extends JavaPlugin {
         commandManager.registerCommand(new CommCommand());
         commandManager.registerCommand(new CompCommand());
         commandManager.registerCommand(new ReportCommand());
-    }
-
-    private void loadConfig()
-    {
-        config.addDefault("dbhost", "localhost:3306");
-        config.addDefault("dbname", "emi");
-        config.addDefault("dbuser", "admin_emi");
-        config.addDefault("dbpass", "secret");
-        config.addDefault("dbprefix", "ev_");
-        config.addDefault("bot-token", "PASTE-TOKEN-HERE");
-        config.addDefault("report-channel", 0);
-        config.addDefault("chat-tag", "&7&6EMI&7]");
-        config.addDefault("root-report-msg", 0);
-        config.addDefault("bot-owner-id", 0);
-        config.addDefault("world-folder", "world");
-        config.addDefault("api-port", 7598);
-        config.addDefault("bot-game", "Nursing your ailments, love.");
-        config.addDefault("bot-prefix", "!!");
-        config.options().copyDefaults(true);
+        commandManager.registerCommand(new ReportReplyCommand());
+        commandManager.registerCommand(new GetRepliesCommand());
+        commandManager.registerCommand(new MinorHelpCommand());
+        commandManager.registerCommand(new DiscordsyncCommand());
     }
 
     private void initBot()
@@ -96,12 +100,18 @@ public class EMI extends JavaPlugin {
         builder.setPrefix(this.getConfig().getString("bot-prefix"));
         builder.setGame(Game.playing(this.getConfig().getString("bot-game")));
         builder.addCommand(new HelpClearCommand());
+        builder.addCommand(new ConfirmSyncCommand());
+        builder.addCommand(new DenySyncCommand());
+        builder.addCommand(new CloseReportCommand());
         builder.setOwnerId(this.getConfig().getString("bot-owner-id"));
 
         CommandClient client = builder.build();
 
         try {
-            jda = new JDABuilder(config.getString("bot-token")).addEventListener(client).build();
+            jda = new JDABuilder(config.getString("bot-token"))
+                    .addEventListener(client)
+                    .addEventListener(new MessageReceivedListener())
+                    .build();
             jda.awaitReady();
         }
         catch(LoginException e)
@@ -130,6 +140,7 @@ public class EMI extends JavaPlugin {
     {
         getServer().getPluginManager().registerEvents(new JoinEvent(this), this);
         getServer().getPluginManager().registerEvents(new ChatEvents(this), this);
+        getServer().getPluginManager().registerEvents(new LeaveEvent(this), this);
     }
 
 

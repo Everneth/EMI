@@ -6,11 +6,6 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.stream.Stream;
-
 public class StatisticController {
     public static final String STATS_PATH = EMI.getPlugin().getServer().getWorld(
             EMI.getPlugin().getConfig().getString("world-folder")).getWorldFolder().getPath() + "/stats/";

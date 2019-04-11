@@ -1,0 +1,54 @@
+###############################################################################################
+#########                           --Database Settings--                             #########
+###############################################################################################
+# dbprefix is currently unused
+dbhost: 127.0.0.1:3306
+dbname: emi
+dbuser: emi
+dbpass: 'secret'
+dbprefix: 'ev_'
+
+###############################################################################################
+#########                             --Forum Settings--                              #########
+###############################################################################################
+api-key: ''
+report-log-forum-id: 0
+system-user-id: 0
+api-topic-post-url: ''
+api-topic-post-endpoint: ''
+
+###############################################################################################
+#########                              --Bot Settings--                               #########
+###############################################################################################
+### DEFAULTS ###
+# ============ #
+# bot-token: 'BOT-TOKEN-HERE' - replace this with your bot token from the developers portal
+# report-channel: 0 - Channel ID where reports are sent
+# root-report-msg: 0 - Message to preserve in report channel (IE: rules/info message at start of channel)
+# bot-owner-id: 0 - Should belong to the owner of the guild or bot creator (if not owner of guild)
+# bot-game: 'EMI' - Change the "game" the bot is playing
+# bot-prefix: '!!' - Command prefix for all bot commands
+bot-token: 'BOT-TOKEN-HERE'
+report-channel: 0
+root-report-msg: 0
+bot-owner-id: 0
+bot-game: 'EMI'
+bot-prefix: '!!'
+guild-id: 0
+synced-role-id: 0
+member-role-id: 0
+use-pending-role: true
+pending-role-id: 0
+staff-role-id: 0
+staff-channel-id: 0
+
+###############################################################################################
+#########                              --EMI Settings--                               #########
+###############################################################################################
+chat-tag: '&7[&6EMI&7]'
+world-folder: 'WORLD-FOLDER-NAME'
+
+###############################################################################################
+#########                              --API Settings--                               #########
+###############################################################################################
+api-port: 7598

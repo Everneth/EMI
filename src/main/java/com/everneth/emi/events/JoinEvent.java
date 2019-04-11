@@ -3,11 +3,11 @@ package com.everneth.emi.events;
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 
+import com.everneth.emi.ReportManager;
 import com.everneth.emi.Utils;
 import com.everneth.emi.EMI;
 import com.everneth.emi.models.Motd;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -53,7 +53,10 @@ public class JoinEvent implements Listener {
 
         //Check if the player exists in the EMI database
         //Query the database and put it in a future
-        playerOjbectFuture = DB.getFirstRowAsync("SELECT * FROM players WHERE player_uuid = ?", player.getUniqueId().toString());
+        playerOjbectFuture = DB.getFirstRowAsync(
+                "SELECT * FROM players WHERE player_uuid = ?",
+                player.getUniqueId().toString()
+        );
         try {
             //Try to get the row from the future and put it into a DbRow object
             playerRow = playerOjbectFuture.get();
@@ -67,21 +70,32 @@ public class JoinEvent implements Listener {
         if (playerRow == null) {
             //No records returned. Add player to database.
             try {
-                DB.executeInsert("INSERT INTO players (player_name, player_uuid) VALUES(?,?)", player.getName(), player.getUniqueId().toString());
+                DB.executeInsert(
+                        "INSERT INTO players (player_name, player_uuid) VALUES(?,?)",
+                        player.getName(),
+                        player.getUniqueId().toString()
+                );
             } catch (SQLException e) {
                 EMI.getPlugin().getLogger().warning(e.getMessage());
             }
         }
-        else if(!playerRow.getString("player_name").equals(player.getName()) && playerRow.getString("player_uuid").equals(player.getUniqueId().toString()))
+        else if(!playerRow.getString("player_name").equals(player.getName())
+                && playerRow.getString("player_uuid").equals(player.getUniqueId().toString()))
         {
           //Record found, name mismatch. Update the record with the players current name.
-          DB.executeUpdateAsync("UPDATE players SET player_name = ? WHERE player_uuid = ?", player.getUniqueId(), player.getUniqueId().toString());
+          DB.executeUpdateAsync(
+                  "UPDATE players SET player_name = ? WHERE player_uuid = ?",
+                  player.getName(),
+                  player.getUniqueId().toString()
+          );
         }
 
+        // Prepare for futures to be turned into a list of DbRows
         rows = new ArrayList<DbRow>();
         motdList = new ArrayList<Motd>();
         futureList = DB.getResultsAsync("SELECT motd_id, player_id, message, ministry_name FROM motds\n" +
                 "INNER JOIN ministries ON motds.ministry_id = ministries.ministry_id");
+        // get the results from the future
         try {
             rows = futureList.get();
         }
@@ -89,27 +103,39 @@ public class JoinEvent implements Listener {
         {
             System.out.print(e.getMessage());
         }
+        // process it into an iterable list.
         buildMotdList(rows);
 
+        // Send a message tot he player with all active MOTDs
         for(Motd motd : motdList)
         {
-            if(motd.name.equals("interior") && (!motd.getMessage().equals("")))
+            if(motd.getName().equals("interior") && (!motd.getMessage().equals("")))
             {
                 player.sendMessage(Utils.color(INT_INTRO + motd.getMessage()));
             }
-            else if(motd.name.equals("competition") && !motd.getMessage().equals(""))
+            else if(motd.getName().equals("competition") && !motd.getMessage().equals(""))
             {
                 player.sendMessage(Utils.color(COMP_INTRO + motd.getMessage()));
             }
-            else if(motd.name.equals("communications") && !motd.getMessage().equals(""))
+            else if(motd.getName().equals("communications") && !motd.getMessage().equals(""))
             {
                 player.sendMessage(Utils.color(COMM_INTRO + motd.getMessage()));
+            }
+        }
+        ReportManager rm = ReportManager.getReportManager();
+        if(rm.hasActiveReport(player.getUniqueId()))
+        {
+            int numMissed = rm.messagesMissed(player.getUniqueId());
+            if(numMissed > 0)
+            {
+                player.sendMessage(Utils.color("&c[!]&f You have &6" + numMissed + " &fmissed messages on your report. Please use &c/getreplies&f to view them."));
             }
         }
     }
 
     private void buildMotdList(List<DbRow> rows)
     {
+        // get what we need and create an ArrayList of Motd objects
         for(DbRow row : rows)
         {
             this.motdList.add(new Motd(
