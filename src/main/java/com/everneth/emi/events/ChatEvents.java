@@ -1,5 +1,6 @@
 package com.everneth.emi.events;
 
+import co.aikar.idb.DB;
 import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
 import com.everneth.emi.models.EventCreation;
@@ -9,8 +10,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import java.sql.SQLException;
 import java.util.Set;
-import java.util.UUID;
 
 public class ChatEvents implements Listener
 {
@@ -41,64 +42,82 @@ public class ChatEvents implements Listener
     // Name -> Type -> Description -> Forum Link -> DATE -> Location
     public void chatProcessing(Player player, String message)
     {
-        Utils.bugTest(message);
-        int step = TournamentData.getInstance().getNewEvents().get(player).getStep();
+        EventCreation potentialEvent = TournamentData.getInstance().getNewEvents().get(player);
+        int step = potentialEvent.getStep();
 
         switch(step)
         {
+            default:
             case 0:
-                TournamentData.getInstance().getNewEvents().get(player).setName(message);
-                player.sendMessage(Utils.color(TournamentData.getInstance().getNewEvents().get(player).getTYPEMESSAGE()));
-                break;
             case 1:
-                TournamentData.getInstance().getNewEvents().get(player).setType(Integer.parseInt(message));
-                player.sendMessage(Utils.color(TournamentData.getInstance().getNewEvents().get(player).getDESCRIPTIONMESSAGE()));
-                break;
             case 2:
-                TournamentData.getInstance().getNewEvents().get(player).setDescription(message);
-                player.sendMessage(Utils.color(TournamentData.getInstance().getNewEvents().get(player).getLINKMESSAGE()));
-                break;
             case 3:
-                TournamentData.getInstance().getNewEvents().get(player).setLink(message);
-                player.sendMessage(Utils.color(TournamentData.getInstance().getNewEvents().get(player).getDATEMESSAGE()));
-                break;
             case 4:
-                TournamentData.getInstance().getNewEvents().get(player).setDate(message);
-                player.sendMessage(Utils.color(TournamentData.getInstance().getNewEvents().get(player).getLOCATIONMESSAGE()));
-                break;
             case 5:
-                int[] location = parseLocation(message);
-                TournamentData.getInstance().getNewEvents().get(player).setX(location[0]);
-                TournamentData.getInstance().getNewEvents().get(player).setY(location[1]);
-                TournamentData.getInstance().getNewEvents().get(player).setZ(location[2]);
-                break;
-            case 6:
-                EventCreation potentialEvent = TournamentData.getInstance().getNewEvents().get(player);
-                player.sendMessage(Utils.color(Utils.chatTag + " &f "
-                                                + potentialEvent.getName() + " "
-                                                + potentialEvent.getType() + " "
-                                                + potentialEvent.getDescription() + " "
-                                                + potentialEvent.getLink() + " "
-                                                + potentialEvent.getDate() + " "
-                                                + potentialEvent.getX() + " "
-                                                + potentialEvent.getY() + " "
-                                                + potentialEvent.getZ()));
         }
 
-        step++;
-        TournamentData.getInstance().getNewEvents().get(player).setStep(step);
-    }
-
-    private int[] parseLocation(String message)
-    {
-        int[] location = new int[3];
-        String[] splitMessage = message.split(" ");
-
-        for(int i = 0; i < location.length; i++)
+        if(potentialEvent.isReplaceVar())
         {
-            location[i] = Integer.parseInt(splitMessage[i]);
+            potentialEvent.setReplaceVar(false);
         }
-
-        return location;
+//        Utils.bugTest(message);
+//        int step = TournamentData.getInstance().getNewEvents().get(player).getStep();
+//
+//        switch(step)
+//        {
+//            case 0:
+//                TournamentData.getInstance().getNewEvents().get(player).setName(message);
+//                player.sendMessage(Utils.color(TournamentData.getInstance().getNewEvents().get(player).getTYPEMESSAGE()));
+//                break;
+//            case 1:
+//                TournamentData.getInstance().getNewEvents().get(player).setType(Integer.parseInt(message));
+//                player.sendMessage(Utils.color(TournamentData.getInstance().getNewEvents().get(player).getDESCRIPTIONMESSAGE()));
+//                break;
+//            case 2:
+//                TournamentData.getInstance().getNewEvents().get(player).setDescription(message);
+//                player.sendMessage(Utils.color(TournamentData.getInstance().getNewEvents().get(player).getLINKMESSAGE()));
+//                break;
+//            case 3:
+//                TournamentData.getInstance().getNewEvents().get(player).setLink(message);
+//                player.sendMessage(Utils.color(TournamentData.getInstance().getNewEvents().get(player).getDATEMESSAGE()));
+//                break;
+//            case 4:
+//                TournamentData.getInstance().getNewEvents().get(player).setDate(message);
+//                player.sendMessage(Utils.color(TournamentData.getInstance().getNewEvents().get(player).getLOCATIONMESSAGE()));
+//                break;
+//            case 5:
+//                int[] location = parseLocation(message);
+//                TournamentData.getInstance().getNewEvents().get(player).setX(location[0]);
+//                TournamentData.getInstance().getNewEvents().get(player).setY(location[1]);
+//                TournamentData.getInstance().getNewEvents().get(player).setZ(location[2]);
+//
+//                EventCreation potentialEvent = TournamentData.getInstance().getNewEvents().get(player);
+//                player.sendMessage(Utils.color(Utils.chatTag + " &f "
+//                        + potentialEvent.getName() + " "
+//                        + potentialEvent.getType() + " "
+//                        + potentialEvent.getDescription() + " "
+//                        + potentialEvent.getLink() + " "
+//                        + potentialEvent.getDate() + " "
+//                        + potentialEvent.getX() + " "
+//                        + potentialEvent.getY() + " "
+//                        + potentialEvent.getZ()));
+//
+//                try
+//                {
+//                    DB.executeInsert("INSERT INTO events (event_name, event_date, created_by, description, x, y, z, forum_link)" +
+//                            "VALUES(?, ?, ?, ?, ?, ?, ?, ?)", potentialEvent.getName(), potentialEvent.getDate(), potentialEvent.getPlayerId(), potentialEvent.getDescription(), potentialEvent.getX(), potentialEvent.getY(), potentialEvent.getZ(), potentialEvent.getLink());
+//                    TournamentData.getInstance().getNewEvents().remove(player);
+//                }
+//                catch(SQLException e)
+//                {
+//                    this.plugin.getLogger().severe("SQL Exception: INSERT INTO events. \n" + e.getMessage());
+//                    player.sendMessage(Utils.color(Utils.chatTag + " &cError! events-CE-1. Report to Comms!"));
+//                }
+//
+//                break;
+//        }
+//
+//        step++;
+//        TournamentData.getInstance().getNewEvents().get(player).setStep(step);
     }
 }
