@@ -4,6 +4,7 @@ import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
+import com.everneth.emi.utils.PlayerUtils;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 
@@ -87,34 +88,9 @@ public class CharterPoint {
         }
     }
 
-    public List<CharterPoint> getAllPoints(String name)
-    {
-        DbRow recipient = getPlayerRow(name);
-
-        List<DbRow> recordsList = new ArrayList<DbRow>();
-
-        try {
-            recordsList = DB.getResultsAsync("SELECT * FROM charter_points WHERE issued_to = ? AND date_expired > CURDATE()",
-                    recipient.getInt("player_id")).get();
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }
-
-        List<CharterPoint> pointsList = new ArrayList<CharterPoint>();
-        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(recipient.getString("player_uuid")));
-
-        for(DbRow record : recordsList)
-        {
-            pointsList.add(new CharterPoint(null, offlinePlayer.getPlayer(), record.getString("reason"), record.getInt("amount")));
-        }
-        return pointsList;
-    }
-
     public void enforceCharter()
     {
-        List<CharterPoint> pointsList = getAllPoints(this.recipient.getPlayer().getName());
+        List<CharterPoint> pointsList = PlayerUtils.getAllPoints(this.recipient.getPlayer().getName(), false);
         int points = 0;
         for(CharterPoint point : pointsList)
         {
@@ -130,16 +106,14 @@ public class CharterPoint {
                 break;
             case(2):
                 // Move or flag player for jail
-                if(player.isOnline())
-                {
-                    moveToJail(player);
-                }
-                else
-                {
-                    flagPlayer(player);
-                }
+                cal.add(Calendar.HOUR_OF_DAY, 12);
+                Bukkit.getBanList(BanList.Type.NAME).addBan(
+                        player.getName(),
+                        pointsList.get(pointsList.size()-1).getReason(),
+                        cal.getTime(),
+                        null);
                 this.getIssuer().sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 2 points " +
-                        "and has been teleported to the jail for 12 hours."));
+                        "and has been banned for 12 hours."));
                 break;
             case(3):
                 // 24 hour ban
@@ -170,19 +144,15 @@ public class CharterPoint {
                         pointsList.get(pointsList.size()-1).getReason(),
                         null,
                         null);
-                this.getIssuer().sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 5 points " +
-                        "and has been banned permanently."));
+                this.getIssuer().sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 5 points! " +
+                        "If this was not in error, please proceed with /charter ban <player> <reason>."));
+                flagPlayer(player);
                 break;
             default:
                 // Permanent ban
-                Bukkit.getBanList(BanList.Type.NAME).addBan(
-                        player.getName(),
-                        "You have exceeded 5 charter points. You have been permanently banned. " +
-                        "Please submit an appeal on everneth.com if you want to review your ban and get it lifted.",
-                        null,
-                        null);
-                this.getIssuer().sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated more than 5 points " +
-                        "and has been banned permanently."));
+                this.getIssuer().sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated more than 5 points! " +
+                        "If this was not in error, please proceed with /charter ban <player> <reason>."));
+                flagPlayer(player);
                 break;
         }
     }
@@ -190,18 +160,6 @@ public class CharterPoint {
     public DbRow getCharterPoint()
     {
         return null;
-    }
-
-    private void moveToJail(Player player)
-    {
-        World world = EMI.getPlugin().getServer().getWorld(EMI.getPlugin().getConfig().getString("world_folder"));
-        Location location = new Location(
-                world,
-                EMI.getPlugin().getConfig().getDouble("jail-x"),
-                EMI.getPlugin().getConfig().getDouble("jail-y"),
-                EMI.getPlugin().getConfig().getDouble("jail-z"));
-        player.teleport(location);
-        player.setGameMode(GameMode.ADVENTURE);
     }
 
     private void flagPlayer(Player player)

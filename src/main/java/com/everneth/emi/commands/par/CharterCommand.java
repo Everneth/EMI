@@ -2,6 +2,7 @@ package com.everneth.emi.commands.par;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.annotation.Subcommand;
 import co.aikar.idb.DbRow;
@@ -9,9 +10,12 @@ import com.everneth.emi.Utils;
 import com.everneth.emi.models.CharterPoint;
 import com.everneth.emi.utils.PlayerUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @CommandAlias("charter")
@@ -55,6 +59,28 @@ public class CharterCommand extends BaseCommand {
             Player recipient = Bukkit.getServer().getOfflinePlayer(UUID.fromString(recipientRecord.getString("player_uuid"))).getPlayer();
             CharterPoint point = new CharterPoint(issuer, recipient, reason, 5);
             point.enforceCharter();
+        }
+    }
+    @CommandPermission("emi.par.history")
+    @Subcommand("history")
+    @CommandAlias("h")
+    public void onHistoryCommand(CommandSender sender, String name, @Optional boolean includeExpired)
+    {
+        List<CharterPoint> points;
+        if(includeExpired) {
+            points = PlayerUtils.getAllPoints(name, true);
+        }
+        else
+        {
+            points = PlayerUtils.getAllPoints(name, false);
+        }
+        if(points.isEmpty())
+        {
+            sender.sendMessage("No charter point history found. Excellent citizenship!");
+        }
+        else
+        {
+            // TODO: Pagination of histories
         }
     }
 }
