@@ -5,6 +5,7 @@ import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
 import com.everneth.emi.utils.PlayerUtils;
+import com.sun.xml.internal.ws.util.CompletedFuture;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 
@@ -105,7 +106,6 @@ public class CharterPoint {
                 //TODO: notification to discord/private message from "system" user
                 break;
             case(2):
-                // Move or flag player for jail
                 cal.add(Calendar.HOUR_OF_DAY, 12);
                 Bukkit.getBanList(BanList.Type.NAME).addBan(
                         player.getName(),
@@ -157,14 +157,68 @@ public class CharterPoint {
         }
     }
 
-    public DbRow getCharterPoint()
+    public static CharterPoint getCharterPoint(int id)
     {
-        return null;
+        return PlayerUtils.getOnePoint(id);
+    }
+
+    public static long pardonPlayer(String name, Player sender, boolean removeFlag)
+    {
+        int retVal = 0;
+        DbRow playerRecord = PlayerUtils.getPlayerRow(name);
+        Date now = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        try {
+            retVal = DB.executeUpdateAsync("UPDATE charter_points SET date_expired = ? WHERE issued_to = ? AND date_expired = NULL",
+                    format.format(now),
+                    playerRecord.getInt("player_id")).get();
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+            return 0;
+        }
+        if(removeFlag)
+        {
+            DB.executeUpdateAsync("UPDATE players SET flagged = 0 WHERE player_id = ?", playerRecord.getInt("player_id"));
+        }
+
+        Player recipient = Bukkit.getOfflinePlayer(UUID.fromString(playerRecord.getString("player_uuid"))).getPlayer();
+        // build point to issue after pardon is complete
+        if(retVal != 0) {
+            CharterPoint charterPoint = new CharterPoint(sender, recipient, "You have been issued 1 point as part of the pardon process.", 1);
+            long pointRecord = charterPoint.issuePoint();
+            charterPoint.enforceCharter();
+            return pointRecord;
+        }
+        else
+            return 0;
     }
 
     private void flagPlayer(Player player)
     {
         DB.executeUpdateAsync("UPDATE players SET flagged = 1 WHERE player_uuid = ?", player.getUniqueId());
+    }
+
+    public boolean updateCharterPoint(CharterPoint charterPoint, int id)
+    {
+        int retVal = 0;
+        try {
+            retVal = DB.executeUpdateAsync("UPDATE charter_points SET reason = ?, amount = ? WHERE charter_point_id = ?",
+                    charterPoint.getReason(),
+                    charterPoint.getAmount(),
+                    id
+            ).get();
+        } catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+            return false;
+        }
+        if(retVal != 0)
+            return true;
+        else
+            return false;
     }
 
     private DbRow getPlayerRow(UUID uuid)

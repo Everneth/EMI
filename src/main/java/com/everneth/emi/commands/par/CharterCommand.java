@@ -1,10 +1,7 @@
 package com.everneth.emi.commands.par;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandPermission;
-import co.aikar.commands.annotation.Optional;
-import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.*;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.Utils;
 import com.everneth.emi.models.CharterPoint;
@@ -20,6 +17,7 @@ import java.util.UUID;
 
 @CommandAlias("charter")
 public class CharterCommand extends BaseCommand {
+    @CommandPermission("emi.par.charter.issue")
     @Subcommand("issue")
     @CommandAlias("i")
     public void onIssueCommand(CommandSender sender, String player, int amount, String reason)
@@ -40,6 +38,7 @@ public class CharterCommand extends BaseCommand {
             point.enforceCharter();
         }
     }
+    @CommandPermission("emi.par.charter.ban")
     @Subcommand("ban")
     @CommandAlias("b")
     public void onBanCommand(CommandSender sender, String player, @Optional String reason)
@@ -61,10 +60,10 @@ public class CharterCommand extends BaseCommand {
             point.enforceCharter();
         }
     }
-    @CommandPermission("emi.par.history")
+    @CommandPermission("emi.par.charter.history")
     @Subcommand("history")
     @CommandAlias("h")
-    public void onHistoryCommand(CommandSender sender, String name, @Optional boolean includeExpired)
+    public void onHistoryCommand(CommandSender sender, String name, @Default("false") boolean includeExpired)
     {
         List<CharterPoint> points;
         if(includeExpired) {
@@ -81,6 +80,58 @@ public class CharterCommand extends BaseCommand {
         else
         {
             // TODO: Pagination of histories
+        }
+    }
+    @CommandPermission("emi.par.charter.edit")
+    @Subcommand("edit")
+    @CommandAlias("e")
+    public void onEditCommand(CommandSender sender, int pointId, int newPointAmt, @Optional String newReason)
+    {
+        CharterPoint charterPoint = CharterPoint.getCharterPoint(pointId);
+        if(charterPoint == null)
+        {
+            sender.sendMessage("ERROR: No record found. Did you enter the right ID number?");
+        }
+        else
+        {
+            int oldAmt = charterPoint.getAmount();
+            charterPoint.setAmount(newPointAmt);
+            if(newReason == null || newReason.equals(""))
+            {
+                charterPoint.setReason(newReason);
+            }
+            if(charterPoint.updateCharterPoint(charterPoint, pointId))
+            {
+                sender.sendMessage("Success: [ " + oldAmt + " -> " + charterPoint.getAmount() + " ]" );
+            }
+            else
+            {
+                sender.sendMessage("ERROR: Please report the following to Comms..." );
+                sender.sendMessage("RECORD [" + pointId + "] UPDATE TABLE FAIL. CC-onEdit()");
+            }
+        }
+    }
+    @CommandPermission("emi.par.charter.remove")
+    @Subcommand("remove")
+    @CommandAlias("r")
+    public void onRemoveCommand(CommandSender sender, int pointId)
+    {
+
+    }
+    @CommandPermission("emi.par.charter.pardon")
+    @Subcommand("pardon")
+    @CommandAlias("p")
+    public void onPardonCommand(CommandSender sender, String name, @Default("true") boolean removeFlag)
+    {
+        Player player = (Player) sender;
+        long pardonPoint = CharterPoint.pardonPlayer(name, player, removeFlag);
+        if(pardonPoint == 0)
+        {
+            sender.sendMessage("Could not pardon " + name + ". Either there is no player by this name, it has changed, or its misspelled.");
+        }
+        else
+        {
+            sender.sendMessage(name + " has been pardoned and points set to 1.");
         }
     }
 }

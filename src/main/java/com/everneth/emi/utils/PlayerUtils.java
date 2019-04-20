@@ -7,6 +7,7 @@ import com.everneth.emi.models.CharterPoint;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -60,4 +61,46 @@ public class PlayerUtils {
         return pointsList;
     }
 
+    public static CharterPoint getOnePoint(int id)
+    {
+
+        DbRow record = new DbRow();
+        try {
+            record = DB.getFirstRowAsync("SELECT * FROM charter_points WHERE charter_point_id = ?", id).get();
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+        if(record.isEmpty())
+        {
+            return null;
+        }
+        else
+        {
+            DbRow issuer = getPlayerRow(record.getInt("issued_by"));
+            DbRow recipient = getPlayerRow(record.getInt("issued_to"));
+
+            return new CharterPoint(
+                    Bukkit.getOfflinePlayer(UUID.fromString(issuer.getString("player_uuid"))).getPlayer(),
+                    Bukkit.getOfflinePlayer(UUID.fromString(recipient.getString("player_uuid"))).getPlayer(),
+                    record.getString("reason"),
+                    record.getInt("amount")
+            );
+        }
+    }
+    public static DbRow getPlayerRow(int id)
+    {
+        CompletableFuture<DbRow> futurePlayer;
+        DbRow player = new DbRow();
+        futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE player_id = ?", id);
+        try {
+            player = futurePlayer.get();
+        }
+        catch (Exception e)
+        {
+            EMI.getPlugin().getLogger().info(e.getMessage());
+        }
+        return player;
+    }
 }
