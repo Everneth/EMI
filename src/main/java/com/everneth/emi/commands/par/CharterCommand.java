@@ -116,7 +116,22 @@ public class CharterCommand extends BaseCommand {
     @CommandAlias("r")
     public void onRemoveCommand(CommandSender sender, int pointId)
     {
-
+        CharterPoint charterPoint = CharterPoint.getCharterPoint(pointId);
+        if(charterPoint == null)
+        {
+            sender.sendMessage("ERROR: No record found. Did you enter the right ID number?");
+        }
+        else
+        {
+            if(charterPoint.removeCharterPoint(pointId))
+            {
+                sender.sendMessage("The point(s) issued to " + charterPoint.getRecipient().getName() + " have been removed (expunged) from the players history.");
+            }
+            else
+            {
+                sender.sendMessage("Could not remove point(s) issued to " + charterPoint.getRecipient().getName() + ". DB error on update. Please notify Comms.");
+            }
+        }
     }
     @CommandPermission("emi.par.charter.pardon")
     @Subcommand("pardon")

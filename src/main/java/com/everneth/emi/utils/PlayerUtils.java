@@ -42,7 +42,7 @@ public class PlayerUtils {
             }
             else
             {
-                recordsList = DB.getResultsAsync("SELECT * FROM charter_points WHERE issued_to = ? AND date_expired > CURDATE()",
+                recordsList = DB.getResultsAsync("SELECT * FROM charter_points WHERE issued_to = ? AND date_expired > CURDATE() AND expunged = 0",
                         recipient.getInt("player_id")).get();
             }
         }

@@ -221,6 +221,24 @@ public class CharterPoint {
             return false;
     }
 
+    public boolean removeCharterPoint(int id)
+    {
+        int retVal = 0;
+        try {
+            retVal = DB.executeUpdateAsync("UPDATE charter_points SET expunged = 1 WHERE charter_point_id = ?",
+                    id
+            ).get();
+        } catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+            return false;
+        }
+        if(retVal != 0)
+            return true;
+        else
+            return false;
+    }
+
     private DbRow getPlayerRow(UUID uuid)
     {
         CompletableFuture<DbRow> futurePlayer;
