@@ -19,6 +19,7 @@ public class CharterPoint {
     private Player recipient;
     private String reason;
     private int amount;
+    private int pointId;
 
     public CharterPoint(Player issuer, Player recipient, String reason, int amount)
     {
@@ -58,6 +59,14 @@ public class CharterPoint {
 
     public void setAmount(int amount) {
         this.amount = amount;
+    }
+
+    public int getPointId() {
+        return pointId;
+    }
+    public void setPointId(int pointId)
+    {
+        this.pointId = pointId;
     }
 
     public long issuePoint()

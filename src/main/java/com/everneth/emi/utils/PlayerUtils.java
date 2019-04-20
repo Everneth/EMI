@@ -29,20 +29,23 @@ public class PlayerUtils {
         return player;
     }
 
-    public static List<CharterPoint> getAllPoints(String name, boolean includeExpired)
+    public static List<DbRow> getAllPoints(String name, boolean includeExpired)
     {
         DbRow recipient = getPlayerRow(name);
 
         List<DbRow> recordsList = new ArrayList<DbRow>();
-
         try {
             if(includeExpired) {
-                recordsList = DB.getResultsAsync("SELECT * FROM charter_points WHERE issued_to = ?",
+                recordsList = DB.getResultsAsync("SELECT charter_point_id, p1.player_name as 'issued_to', p2.player_name as 'issued_by', p2.player_uuid as 'issuer_uuid', reason, amount, date_issued, date_expired FROM charter_points c INNER JOIN\n" +
+                                "players p1 ON c.issued_to = p1.player_id\n" +
+                                "JOIN players p2 ON c.issued_by = p2.player_id WHERE issued_to = ?",
                         recipient.getInt("player_id")).get();
             }
             else
             {
-                recordsList = DB.getResultsAsync("SELECT * FROM charter_points WHERE issued_to = ? AND date_expired > CURDATE() AND expunged = 0",
+                recordsList = DB.getResultsAsync("SELECT charter_point_id, p1.player_name as 'issued_to', p2.player_name as 'issued_by', p2.player_uuid as 'issuer_uuid', reason, amount, date_issued, date_expired FROM charter_points c INNER JOIN\n" +
+                                "players p1 ON c.issued_to = p1.player_id\n" +
+                                "JOIN players p2 ON c.issued_by = p2.player_id WHERE issued_to = ? AND date_expired > CURDATE() AND expunged = 0",
                         recipient.getInt("player_id")).get();
             }
         }
@@ -51,14 +54,7 @@ public class PlayerUtils {
             System.out.println(e.getMessage());
         }
 
-        List<CharterPoint> pointsList = new ArrayList<>();
-        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(recipient.getString("player_uuid")));
-
-        for(DbRow record : recordsList)
-        {
-            pointsList.add(new CharterPoint(null, offlinePlayer.getPlayer(), record.getString("reason"), record.getInt("amount")));
-        }
-        return pointsList;
+        return recordsList;
     }
 
     public static CharterPoint getOnePoint(int id)
