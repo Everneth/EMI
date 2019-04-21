@@ -36,7 +36,7 @@ public class PlayerUtils {
         List<DbRow> recordsList = new ArrayList<DbRow>();
         try {
             if(includeExpired) {
-                recordsList = DB.getResultsAsync("SELECT charter_point_id, p1.player_name as 'issued_to', p2.player_name as 'issued_by', p2.player_uuid as 'issuer_uuid', reason, amount, date_issued, date_expired FROM charter_points c INNER JOIN\n" +
+                recordsList = DB.getResultsAsync("SELECT charter_point_id, p1.player_name as 'issued_to', p1.player_uuid as 'recipient_uuid', p2.player_name as 'issued_by', p2.player_uuid as 'issuer_uuid', reason, amount, date_issued, date_expired FROM charter_points c INNER JOIN\n" +
                                 "players p1 ON c.issued_to = p1.player_id\n" +
                                 "JOIN players p2 ON c.issued_by = p2.player_id WHERE issued_to = ?",
                         recipient.getInt("player_id")).get();

@@ -5,7 +5,6 @@ import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
 import com.everneth.emi.utils.PlayerUtils;
-import com.sun.xml.internal.ws.util.CompletedFuture;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 
@@ -100,14 +99,15 @@ public class CharterPoint {
 
     public void enforceCharter()
     {
-        List<CharterPoint> pointsList = PlayerUtils.getAllPoints(this.recipient.getPlayer().getName(), false);
+        List<DbRow> pointsList = PlayerUtils.getAllPoints(this.recipient.getPlayer().getName(), false);
         int points = 0;
-        for(CharterPoint point : pointsList)
+        for(DbRow point : pointsList)
+
         {
-            points += point.getAmount();
+            points += point.getInt("amount");
         }
 
-        Player player = pointsList.get(0).getRecipient();
+        Player player = Bukkit.getOfflinePlayer(UUID.fromString(pointsList.get(0).getString("recipient_uuid"))).getPlayer();
         Calendar cal = Calendar.getInstance();
         switch(points)
         {
@@ -118,7 +118,7 @@ public class CharterPoint {
                 cal.add(Calendar.HOUR_OF_DAY, 12);
                 Bukkit.getBanList(BanList.Type.NAME).addBan(
                         player.getName(),
-                        pointsList.get(pointsList.size()-1).getReason(),
+                        pointsList.get(pointsList.size()-1).getString("reason"),
                         cal.getTime(),
                         null);
                 this.getIssuer().sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 2 points " +
@@ -129,7 +129,7 @@ public class CharterPoint {
                 cal.add(Calendar.DAY_OF_MONTH, 1);
                 Bukkit.getBanList(BanList.Type.NAME).addBan(
                         player.getName(),
-                        pointsList.get(pointsList.size()-1).getReason(),
+                        pointsList.get(pointsList.size()-1).getString("reason"),
                         cal.getTime(),
                         null);
                 this.getIssuer().sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 3 points " +
@@ -140,7 +140,7 @@ public class CharterPoint {
                 cal.add(Calendar.DAY_OF_MONTH, 3);
                 Bukkit.getBanList(BanList.Type.NAME).addBan(
                         player.getName(),
-                        pointsList.get(pointsList.size()-1).getReason(),
+                        pointsList.get(pointsList.size()-1).getString("reason"),
                         cal.getTime(),
                         null);
                 this.getIssuer().sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 4 points " +
@@ -150,7 +150,7 @@ public class CharterPoint {
                 // Permanent ban
                 Bukkit.getBanList(BanList.Type.NAME).addBan(
                         player.getName(),
-                        pointsList.get(pointsList.size()-1).getReason(),
+                        pointsList.get(pointsList.size()-1).getString("reason"),
                         null,
                         null);
                 this.getIssuer().sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 5 points! " +
