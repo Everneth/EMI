@@ -4,6 +4,7 @@ import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.models.CharterPoint;
+import com.everneth.emi.models.EMIPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
@@ -36,14 +37,14 @@ public class PlayerUtils {
         List<DbRow> recordsList = new ArrayList<DbRow>();
         try {
             if(includeExpired) {
-                recordsList = DB.getResultsAsync("SELECT charter_point_id, p1.player_name as 'issued_to', p1.player_uuid as 'recipient_uuid', p2.player_name as 'issued_by', p2.player_uuid as 'issuer_uuid', reason, amount, date_issued, date_expired FROM charter_points c INNER JOIN\n" +
+                recordsList = DB.getResultsAsync("SELECT charter_point_id, p1.player_name as 'issued_to', p1.player_uuid as 'recipient_uuid', p2.player_name as 'issued_by', p2.player_uuid as 'issuer_uuid', reason, amount, date_issued, date_expired, expunged FROM charter_points c INNER JOIN\n" +
                                 "players p1 ON c.issued_to = p1.player_id\n" +
                                 "JOIN players p2 ON c.issued_by = p2.player_id WHERE issued_to = ?",
                         recipient.getInt("player_id")).get();
             }
             else
             {
-                recordsList = DB.getResultsAsync("SELECT charter_point_id, p1.player_name as 'issued_to', p2.player_name as 'issued_by', p2.player_uuid as 'issuer_uuid', reason, amount, date_issued, date_expired FROM charter_points c INNER JOIN\n" +
+                recordsList = DB.getResultsAsync("SELECT charter_point_id, p1.player_name as 'issued_to', p2.player_name as 'issued_by', p2.player_uuid as 'issuer_uuid', reason, amount, date_issued, date_expired, expunged FROM charter_points c INNER JOIN\n" +
                                 "players p1 ON c.issued_to = p1.player_id\n" +
                                 "JOIN players p2 ON c.issued_by = p2.player_id WHERE issued_to = ? AND date_expired > CURDATE() AND expunged = 0",
                         recipient.getInt("player_id")).get();
@@ -77,9 +78,19 @@ public class PlayerUtils {
             DbRow issuer = getPlayerRow(record.getInt("issued_by"));
             DbRow recipient = getPlayerRow(record.getInt("issued_to"));
 
+            EMIPlayer issuerPlayer = new EMIPlayer(
+                    issuer.getString("player_uuid"),
+                    issuer.getString("player_name"),
+                    issuer.getInt("player_id")
+            );
+            EMIPlayer recipientPlayer = new EMIPlayer(
+                    recipient.getString("player_uuid"),
+                    recipient.getString("player_name"),
+                    recipient.getInt("player_id")
+            );
             return new CharterPoint(
-                    Bukkit.getOfflinePlayer(UUID.fromString(issuer.getString("player_uuid"))).getPlayer(),
-                    Bukkit.getOfflinePlayer(UUID.fromString(recipient.getString("player_uuid"))).getPlayer(),
+                    issuerPlayer,
+                    recipientPlayer,
                     record.getString("reason"),
                     record.getInt("amount")
             );

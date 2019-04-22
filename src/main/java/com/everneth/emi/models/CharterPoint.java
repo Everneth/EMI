@@ -6,6 +6,7 @@ import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
 import com.everneth.emi.utils.PlayerUtils;
 import org.bukkit.*;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
@@ -14,13 +15,13 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class CharterPoint {
-    private Player issuer;
-    private Player recipient;
+    private EMIPlayer issuer;
+    private EMIPlayer recipient;
     private String reason;
     private int amount;
     private int pointId;
 
-    public CharterPoint(Player issuer, Player recipient, String reason, int amount)
+    public CharterPoint(EMIPlayer issuer, EMIPlayer recipient, String reason, int amount)
     {
         this.issuer = issuer;
         this.recipient = recipient;
@@ -28,19 +29,19 @@ public class CharterPoint {
         this.amount = amount;
     }
 
-    public Player getIssuer() {
+    public EMIPlayer getIssuer() {
         return issuer;
     }
 
-    public void setIssuer(Player issuer) {
+    public void setIssuer(EMIPlayer issuer) {
         this.issuer = issuer;
     }
 
-    public Player getRecipient() {
+    public EMIPlayer getRecipient() {
         return recipient;
     }
 
-    public void setRecipient(Player recipient) {
+    public void setRecipient(EMIPlayer recipient) {
         this.recipient = recipient;
     }
 
@@ -97,9 +98,9 @@ public class CharterPoint {
         }
     }
 
-    public void enforceCharter()
+    public void enforceCharter(CommandSender sender)
     {
-        List<DbRow> pointsList = PlayerUtils.getAllPoints(this.recipient.getPlayer().getName(), false);
+        List<DbRow> pointsList = PlayerUtils.getAllPoints(this.recipient.getName(), false);
         int points = 0;
         for(DbRow point : pointsList)
 
@@ -107,7 +108,7 @@ public class CharterPoint {
             points += point.getInt("amount");
         }
 
-        Player player = Bukkit.getOfflinePlayer(UUID.fromString(pointsList.get(0).getString("recipient_uuid"))).getPlayer();
+        EMIPlayer player = new EMIPlayer(pointsList.get(0).getString("recipient_uuid"), pointsList.get(0).getString("issued_to"));
         Calendar cal = Calendar.getInstance();
         switch(points)
         {
@@ -121,7 +122,7 @@ public class CharterPoint {
                         pointsList.get(pointsList.size()-1).getString("reason"),
                         cal.getTime(),
                         null);
-                this.getIssuer().sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 2 points " +
+                sender.sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 2 points " +
                         "and has been banned for 12 hours."));
                 break;
             case(3):
@@ -132,7 +133,7 @@ public class CharterPoint {
                         pointsList.get(pointsList.size()-1).getString("reason"),
                         cal.getTime(),
                         null);
-                this.getIssuer().sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 3 points " +
+                sender.sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 3 points " +
                         "and has been banned for 24 hours."));
                 break;
             case(4):
@@ -143,7 +144,7 @@ public class CharterPoint {
                         pointsList.get(pointsList.size()-1).getString("reason"),
                         cal.getTime(),
                         null);
-                this.getIssuer().sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 4 points " +
+                sender.sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 4 points " +
                         "and has been banned for 72 hours."));
                 break;
             case(5):
@@ -153,13 +154,13 @@ public class CharterPoint {
                         pointsList.get(pointsList.size()-1).getString("reason"),
                         null,
                         null);
-                this.getIssuer().sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 5 points! " +
+                sender.sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 5 points! " +
                         "If this was not in error, please proceed with /charter ban <player> <reason>."));
                 flagPlayer(player);
                 break;
             default:
                 // Permanent ban
-                this.getIssuer().sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated more than 5 points! " +
+                sender.sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated more than 5 points! " +
                         "If this was not in error, please proceed with /charter ban <player> <reason>."));
                 flagPlayer(player);
                 break;
@@ -193,19 +194,29 @@ public class CharterPoint {
             DB.executeUpdateAsync("UPDATE players SET flagged = 0 WHERE player_id = ?", playerRecord.getInt("player_id"));
         }
 
-        Player recipient = Bukkit.getOfflinePlayer(UUID.fromString(playerRecord.getString("player_uuid"))).getPlayer();
         // build point to issue after pardon is complete
         if(retVal != 0) {
-            CharterPoint charterPoint = new CharterPoint(sender, recipient, "You have been issued 1 point as part of the pardon process.", 1);
+            EMIPlayer recipient = new EMIPlayer(
+                    playerRecord.getString("player_uuid"),
+                    playerRecord.getString("player_name"),
+                    playerRecord.getInt("player_id")
+            );
+            EMIPlayer senderPlayer = new EMIPlayer(
+                    sender.getUniqueId().toString(),
+                    sender.getName()
+            );
+
+
+            CharterPoint charterPoint = new CharterPoint(senderPlayer, recipient, "You have been issued 1 point as part of the pardon process.", 1);
             long pointRecord = charterPoint.issuePoint();
-            charterPoint.enforceCharter();
+            charterPoint.enforceCharter(sender);
             return pointRecord;
         }
         else
             return 0;
     }
 
-    private void flagPlayer(Player player)
+    private void flagPlayer(EMIPlayer player)
     {
         DB.executeUpdateAsync("UPDATE players SET flagged = 1 WHERE player_uuid = ?", player.getUniqueId());
     }

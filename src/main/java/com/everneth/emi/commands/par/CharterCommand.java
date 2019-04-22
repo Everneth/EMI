@@ -4,8 +4,10 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import co.aikar.commands.annotation.Optional;
 import co.aikar.idb.DbRow;
+import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
 import com.everneth.emi.models.CharterPoint;
+import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.utils.PlayerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -32,10 +34,18 @@ public class CharterCommand extends BaseCommand {
         }
         else
         {
-            Player recipient = Bukkit.getServer().getOfflinePlayer(UUID.fromString(recipientRecord.getString("player_uuid"))).getPlayer();
-            CharterPoint point = new CharterPoint(issuer, recipient, reason, amount);
+            EMIPlayer recipient = new EMIPlayer(
+                    recipientRecord.getString("player_uuid"),
+                    recipientRecord.getString("player_name"),
+                    recipientRecord.getInt("player_id")
+            );
+            EMIPlayer issuerPlayer = new EMIPlayer(
+                    issuer.getUniqueId().toString(),
+                    issuer.getName()
+            );
+            CharterPoint point = new CharterPoint(issuerPlayer, recipient, reason, amount);
             pointRecordId = point.issuePoint();
-            point.enforceCharter();
+            point.enforceCharter(sender);
         }
     }
     @CommandPermission("emi.par.charter.ban")
@@ -55,9 +65,17 @@ public class CharterCommand extends BaseCommand {
         }
         else
         {
-            Player recipient = Bukkit.getServer().getOfflinePlayer(UUID.fromString(recipientRecord.getString("player_uuid"))).getPlayer();
-            CharterPoint point = new CharterPoint(issuer, recipient, reason, 5);
-            point.enforceCharter();
+            EMIPlayer recipient = new EMIPlayer(
+                    recipientRecord.getString("player_uuid"),
+                    recipientRecord.getString("player_name"),
+                    recipientRecord.getInt("player_id")
+            );
+            EMIPlayer issuerPlayer = new EMIPlayer(
+                    issuer.getUniqueId().toString(),
+                    issuer.getName()
+            );
+            CharterPoint point = new CharterPoint(issuerPlayer, recipient, reason, 5);
+            point.enforceCharter(sender);
         }
     }
     @CommandPermission("emi.par.charter.history")
@@ -83,21 +101,21 @@ public class CharterCommand extends BaseCommand {
             int i = 1;
             for(DbRow charterPoint : points)
             {
-                if(Boolean.valueOf(charterPoint.getInt("expunged").toString())) {
+                if(charterPoint.get("expunged")) {
                     String msg = "&m&3#" + charterPoint.getInt("charter_point_id") + "&7 - (&b" +
-                            charterPoint.getString("date_issued") + "&7)" + charterPoint.getInt("amount") +
-                            "&o point(s) issued by &l&d" + charterPoint.getString("issued_by") + ".&r&m&3&o Reason: &7" +
-                            charterPoint.getString("reason") + " [Expires " +
-                            charterPoint.getString("date_expired") + "]";
+                            charterPoint.get("date_issued").toString() + "&7) &c" + charterPoint.getInt("amount") +
+                            "&o point(s)&7 issued by &l&d" + charterPoint.getString("issued_by") + "&r.&m&3&o \nReason: &7" +
+                            charterPoint.getString("reason") + " -- &o[Expires: &b" +
+                            charterPoint.get("date_expired").toString() + "]";
                     map.put(i, msg);
                 }
                 else
                 {
                     String msg = "&3#" + charterPoint.getInt("charter_point_id") + "&7 - (&b" +
-                            charterPoint.getString("date_issued") + "&7)" + charterPoint.getInt("amount") +
-                            "&o point(s) issued by &l&d" + charterPoint.getString("issued_by") + ".&r&3&o Reason: &7" +
-                            charterPoint.getString("reason") + " [Expires " +
-                            charterPoint.getString("date_expired") + "]";
+                            charterPoint.get("date_issued").toString() + "&7) &c" + charterPoint.getInt("amount") +
+                            "&o point(s)&7 issued by &l&d" + charterPoint.getString("issued_by") + "&r.&3&o \nReason: &7" +
+                            charterPoint.getString("reason") + " -- &o[Expires: &b" +
+                            charterPoint.get("date_expired").toString() + "&7]";
                     map.put(i, msg);
                 }
                 i++;
@@ -175,7 +193,7 @@ public class CharterCommand extends BaseCommand {
 
     public void paginate(CommandSender sender, SortedMap<Integer, String> map,
                           int page, int pageLength) {
-        sender.sendMessage(ChatColor.YELLOW + "List: Page (" + String.valueOf(page) + " of " + (((map.size() % pageLength) == 0) ? map.size() / pageLength : (map.size() / pageLength) + 1));
+        sender.sendMessage(ChatColor.YELLOW + "List: Page (" + String.valueOf(page) + " of " + (((map.size() % pageLength) == 0) ? map.size() / pageLength : (map.size() / pageLength) + 1) + ")");
         int i = 0, k = 0;
         page--;
         for (final Map.Entry<Integer, String> e : map.entrySet()) {
