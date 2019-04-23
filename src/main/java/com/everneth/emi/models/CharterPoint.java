@@ -120,6 +120,10 @@ public class CharterPoint {
                 //TODO: notification to discord/private message from "system" user
                 break;
             case(2):
+                if(Bukkit.getBanList(BanList.Type.NAME).isBanned(player.getName()))
+                {
+                    Bukkit.getBanList(BanList.Type.NAME).pardon(player.getName());
+                }
                 cal.add(Calendar.HOUR_OF_DAY, 12);
                 Bukkit.getBanList(BanList.Type.NAME).addBan(
                         player.getName(),
@@ -131,6 +135,10 @@ public class CharterPoint {
                 break;
             case(3):
                 // 24 hour ban
+                if(Bukkit.getBanList(BanList.Type.NAME).isBanned(player.getName()))
+                {
+                    Bukkit.getBanList(BanList.Type.NAME).pardon(player.getName());
+                }
                 cal.add(Calendar.DAY_OF_MONTH, 1);
                 Bukkit.getBanList(BanList.Type.NAME).addBan(
                         player.getName(),
@@ -142,6 +150,10 @@ public class CharterPoint {
                 break;
             case(4):
                 // 72 hour ban
+                if(Bukkit.getBanList(BanList.Type.NAME).isBanned(player.getName()))
+                {
+                    Bukkit.getBanList(BanList.Type.NAME).pardon(player.getName());
+                }
                 cal.add(Calendar.DAY_OF_MONTH, 3);
                 Bukkit.getBanList(BanList.Type.NAME).addBan(
                         player.getName(),
@@ -153,6 +165,10 @@ public class CharterPoint {
                 break;
             case(5):
                 // Permanent ban
+                if(Bukkit.getBanList(BanList.Type.NAME).isBanned(player.getName()))
+                {
+                    Bukkit.getBanList(BanList.Type.NAME).pardon(player.getName());
+                }
                 Bukkit.getBanList(BanList.Type.NAME).addBan(
                         player.getName(),
                         Utils.color("&c" + pointsList.get(pointsList.size()-1).getString("reason") + "&c"),

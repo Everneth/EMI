@@ -72,12 +72,10 @@ public class CharterCommand extends BaseCommand {
                     recipientRecord.getString("player_name"),
                     recipientRecord.getInt("player_id")
             );
-            EMIPlayer issuerPlayer = new EMIPlayer(
-                    issuer.getUniqueId().toString(),
-                    issuer.getName()
-            );
-            CharterPoint point = new CharterPoint(issuerPlayer, recipient, reason, 5);
-            point.issuePoint();
+            if(Bukkit.getBanList(BanList.Type.NAME).isBanned(recipient.getName()))
+            {
+                Bukkit.getBanList(BanList.Type.NAME).pardon(recipient.getName());
+            }
             Bukkit.getBanList(BanList.Type.NAME).addBan(
                     recipient.getName(),
                     Utils.color("&c" + reason + "&c"),
@@ -164,14 +162,26 @@ public class CharterCommand extends BaseCommand {
         else
         {
             int oldAmt = charterPoint.getAmount();
+            String oldReason = charterPoint.getReason();
             charterPoint.setAmount(newPointAmt);
             if(newReason != null)
             {
                 charterPoint.setReason(newReason);
             }
+            else
+            {
+                newReason = oldReason;
+            }
             if(charterPoint.updateCharterPoint(charterPoint, pointId))
             {
-                sender.sendMessage(Utils.color("&9[Charter] &3Success: [ " + oldAmt + " -> " + charterPoint.getAmount() + " ]" ));
+                if(oldReason.equals(newReason)) {
+                    sender.sendMessage(Utils.color("&9[Charter] &3Success: [Points: " + oldAmt + " -> " + charterPoint.getAmount() + " / Reason unchanged. (" + oldReason + ")]"));
+                }
+                else
+                {
+                    sender.sendMessage(Utils.color("&9[Charter] &3Success: [Points: " + oldAmt + " -> " + charterPoint.getAmount() + " / New reason: " + newReason + "]"));
+                }
+                charterPoint.enforceCharter(sender);
             }
             else
             {
