@@ -71,8 +71,7 @@ public class CharterPoint {
 
     public long issuePoint()
     {
-        DbRow issuer = getPlayerRow(this.getIssuer().getUniqueId());
-        DbRow recipient = getPlayerRow(this.getRecipient().getUniqueId());
+        DbRow issuer = getPlayerRow(UUID.fromString(this.getIssuer().getUniqueId()));
         Date now = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -83,8 +82,8 @@ public class CharterPoint {
         try {
             return DB.executeInsert("INSERT INTO charter_points " +
                             "(issued_to, reason, amount, issued_by, date_issued, date_expired) " +
-                    "VALUES (?,?,?,?,?)",
-                    recipient.getInt("player_id"),
+                    "VALUES (?,?,?,?,?,?)",
+                    this.getRecipient().getId(),
                     this.getReason(),
                     this.getAmount(),
                     issuer.getInt("player_id"),
@@ -100,12 +99,17 @@ public class CharterPoint {
 
     public void enforceCharter(CommandSender sender)
     {
-        List<DbRow> pointsList = PlayerUtils.getAllPoints(this.recipient.getName(), false);
+        List<DbRow> pointsList = PlayerUtils.getAllPoints(this.recipient.getName());
         int points = 0;
-        for(DbRow point : pointsList)
+        Date now = new Date();
 
+        for(DbRow point : pointsList)
         {
-            points += point.getInt("amount");
+            boolean isExpired = now.after(point.get("date_expired"));
+            boolean isExpunged = point.get("expunged");
+            if(!isExpired && !isExpunged) {
+                points += point.getInt("amount");
+            }
         }
 
         EMIPlayer player = new EMIPlayer(pointsList.get(0).getString("recipient_uuid"), pointsList.get(0).getString("issued_to"));
@@ -119,7 +123,7 @@ public class CharterPoint {
                 cal.add(Calendar.HOUR_OF_DAY, 12);
                 Bukkit.getBanList(BanList.Type.NAME).addBan(
                         player.getName(),
-                        pointsList.get(pointsList.size()-1).getString("reason"),
+                        Utils.color("&c" + pointsList.get(pointsList.size()-1).getString("reason") + "&c"),
                         cal.getTime(),
                         null);
                 sender.sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 2 points " +
@@ -130,7 +134,7 @@ public class CharterPoint {
                 cal.add(Calendar.DAY_OF_MONTH, 1);
                 Bukkit.getBanList(BanList.Type.NAME).addBan(
                         player.getName(),
-                        pointsList.get(pointsList.size()-1).getString("reason"),
+                        Utils.color("&c" + pointsList.get(pointsList.size()-1).getString("reason") + "&c"),
                         cal.getTime(),
                         null);
                 sender.sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 3 points " +
@@ -141,7 +145,7 @@ public class CharterPoint {
                 cal.add(Calendar.DAY_OF_MONTH, 3);
                 Bukkit.getBanList(BanList.Type.NAME).addBan(
                         player.getName(),
-                        pointsList.get(pointsList.size()-1).getString("reason"),
+                        Utils.color("&c" + pointsList.get(pointsList.size()-1).getString("reason") + "&c"),
                         cal.getTime(),
                         null);
                 sender.sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 4 points " +
@@ -151,7 +155,7 @@ public class CharterPoint {
                 // Permanent ban
                 Bukkit.getBanList(BanList.Type.NAME).addBan(
                         player.getName(),
-                        pointsList.get(pointsList.size()-1).getString("reason"),
+                        Utils.color("&c" + pointsList.get(pointsList.size()-1).getString("reason") + "&c"),
                         null,
                         null);
                 sender.sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 5 points! " +
@@ -179,15 +183,19 @@ public class CharterPoint {
         Date now = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        try {
-            retVal = DB.executeUpdateAsync("UPDATE charter_points SET date_expired = ? WHERE issued_to = ? AND date_expired = NULL",
-                    format.format(now),
-                    playerRecord.getInt("player_id")).get();
-        }
-        catch (Exception e)
+        if(playerRecord.isEmpty())
         {
-            System.out.println(e.getMessage());
-            return 0;
+            return retVal;
+        }
+        else {
+            try {
+                DB.executeUpdateAsync("UPDATE charter_points SET date_expired = ? WHERE issued_to = ? AND date_expired > NOW()",
+                        format.format(now),
+                        playerRecord.getInt("player_id")).get();
+                retVal = 1;
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
         if(removeFlag)
         {
@@ -195,7 +203,6 @@ public class CharterPoint {
         }
 
         // build point to issue after pardon is complete
-        if(retVal != 0) {
             EMIPlayer recipient = new EMIPlayer(
                     playerRecord.getString("player_uuid"),
                     playerRecord.getString("player_name"),
@@ -210,10 +217,7 @@ public class CharterPoint {
             CharterPoint charterPoint = new CharterPoint(senderPlayer, recipient, "You have been issued 1 point as part of the pardon process.", 1);
             long pointRecord = charterPoint.issuePoint();
             charterPoint.enforceCharter(sender);
-            return pointRecord;
-        }
-        else
-            return 0;
+            return retVal;
     }
 
     private void flagPlayer(EMIPlayer player)
