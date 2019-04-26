@@ -9,6 +9,8 @@ import com.everneth.emi.Utils;
 import com.everneth.emi.models.CharterPoint;
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.utils.PlayerUtils;
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -16,11 +18,47 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 @CommandAlias("charter")
 public class CharterCommand extends BaseCommand {
+    @CommandPermission("emi.par.charter.pg")
+    @Subcommand("pg")
+    public void onPageCommand(CommandSender sender, int page)
+    {
+        Player commandSender = (Player)sender;
+        Gson gson = new Gson();
+        SortedMap<Integer, String> map = new TreeMap<Integer, String>(Collections.reverseOrder());
+        int itemsPerPage = EMI.getPlugin().getConfig().getInt("items-per-page");
+
+        try(JsonReader reader = new JsonReader(new FileReader(EMI.getPlugin().getDataFolder() + File.separator + "cache" + File.separator + commandSender.getUniqueId().toString() + ".json")))
+        {
+            map = gson.fromJson(reader, SortedMap.class);
+        }
+        catch (IOException e)
+        {
+            System.out.println(e.getMessage());
+        }
+
+        int numPages = (((map.size() % itemsPerPage) == 0) ? map.size() / itemsPerPage : (map.size() / itemsPerPage) + 1);
+
+        if(page > numPages)
+        {
+            sender.sendMessage(Utils.color("&c(╯°□°）╯︵ ┻━┻ &fThe list contains " + numPages + " pages... &c&o&nHOW DO I GIVE YOU " + page + "?!" ));
+        }
+        else if(page <= 0)
+        {
+            sender.sendMessage(Utils.color("&c(╯°□°）╯︵ ┻━┻ &fClearly by putting 0 or less you're trying to break things for no reason. &c&o&nDamnit &mPande&r&c&o&n Bobby..."));
+        }
+        else {
+            paginate(sender, map, page, itemsPerPage);
+        }
+    }
     @CommandPermission("emi.par.charter.issue")
     @Subcommand("issue")
     @CommandAlias("i")
@@ -145,8 +183,22 @@ public class CharterCommand extends BaseCommand {
                     i++;
                 }
             }
-            paginate(sender, map, 1, 5);
+
+            Gson gson = new Gson();
+
+            Player commandSender = (Player) sender;
+            try(FileWriter file = new FileWriter( EMI.getPlugin().getDataFolder() + File.separator + "cache" + File.separator + commandSender.getUniqueId().toString() + ".json"))
+            {
+                file.write(gson.toJson(map));
+                file.flush();
+            }
+            catch (IOException e)
+            {
+                System.out.println(e.getMessage());
+            }
+            paginate(sender, map, 1, EMI.getPlugin().getConfig().getInt("items-per-page"));
             sender.sendMessage(Utils.color("&e==== STATS: " + numActive + " active | " + (points.size() - numActive) + " historical ===="));
+            sender.sendMessage(Utils.color("&cUse /cpage [page #] to move to the next page"));
         }
     }
     @CommandPermission("emi.par.charter.edit")
