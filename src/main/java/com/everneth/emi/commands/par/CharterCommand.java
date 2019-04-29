@@ -14,7 +14,6 @@ import com.google.gson.stream.JsonReader;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -57,11 +56,12 @@ public class CharterCommand extends BaseCommand {
         }
         else {
             paginate(sender, map, page, itemsPerPage);
+            sender.sendMessage(Utils.color("&eUse /cpage [page #] to move to the next page"));
         }
     }
     @CommandPermission("emi.par.charter.issue")
     @Subcommand("issue")
-    @CommandAlias("i")
+    @CommandAlias("cissue")
     public void onIssueCommand(CommandSender sender, String player, int amount, String reason)
     {
         Player issuer = (Player) sender;
@@ -70,7 +70,7 @@ public class CharterCommand extends BaseCommand {
 
         if(recipientRecord == null)
         {
-            issuer.sendMessage(Utils.color("ERROR: Player not found! Is the name spelled correctly?"));
+            issuer.sendMessage(Utils.color("&9[Charter] &cERROR: Player not found! &3Is the name spelled correctly?"));
         }
         else
         {
@@ -90,7 +90,7 @@ public class CharterCommand extends BaseCommand {
     }
     @CommandPermission("emi.par.charter.ban")
     @Subcommand("ban")
-    @CommandAlias("b")
+    @CommandAlias("cban")
     public void onBanCommand(CommandSender sender, String player, @Optional String reason)
     {
         Player issuer = (Player) sender;
@@ -101,7 +101,7 @@ public class CharterCommand extends BaseCommand {
         }
         if(recipientRecord == null)
         {
-            issuer.sendMessage(Utils.color("ERROR: Player not found! Is the name spelled correctly?"));
+            issuer.sendMessage(Utils.color("&9[Charter] &cERROR: Player not found! &3Is the name spelled correctly?"));
         }
         else
         {
@@ -124,9 +124,17 @@ public class CharterCommand extends BaseCommand {
     }
     @CommandPermission("emi.par.charter.history")
     @Subcommand("history")
-    @CommandAlias("h")
+    @CommandAlias("chistory")
     public void onHistoryCommand(CommandSender sender, String name, @Default("false") boolean includeExpired)
     {
+        //before doing anything does this player exist?
+        DbRow player = PlayerUtils.getPlayerRow(name);
+        if(player == null || player.isEmpty())
+        {
+            sender.sendMessage(Utils.color("&9[Charter]&3 This player does not exist in our system."));
+        }
+        else
+        {
         List<DbRow> points;
         points = PlayerUtils.getAllPoints(name);
 
@@ -134,8 +142,7 @@ public class CharterCommand extends BaseCommand {
         {
             sender.sendMessage("&9[Charter] &3No charter point history found. Excellent citizenship!");
         }
-        else
-        {
+        else {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             Date now = new Date();
 
@@ -143,11 +150,10 @@ public class CharterCommand extends BaseCommand {
             int i = 1;
             int numActive = 0;
             int numExpired = 0;
-            for(DbRow charterPoint : points)
-            {
+            for (DbRow charterPoint : points) {
                 boolean isExpired = now.after(charterPoint.get("date_expired"));
                 boolean isExpunged = charterPoint.get("expunged");
-                if(includeExpired) {
+                if (includeExpired) {
                     if (isExpunged || isExpired) {
                         String msg = " &3#" + charterPoint.getInt("charter_point_id") + "&7 - (&b" +
                                 format.format(charterPoint.get("date_issued")) + "&7&m) &c&m" + charterPoint.getInt("amount") +
@@ -168,10 +174,8 @@ public class CharterCommand extends BaseCommand {
                         numActive++;
                     }
                     i++;
-                }
-                else
-                {
-                    if(!isExpunged && !isExpired) {
+                } else {
+                    if (!isExpunged && !isExpired) {
                         String msg = "&3#" + charterPoint.getInt("charter_point_id") + "&7 - (&b" +
                                 format.format(charterPoint.get("date_issued")) + "&7) &c" + charterPoint.getInt("amount") +
                                 "&o point(s)&7 issued to &c" + charterPoint.getString("issued_to") + " &7&oby &l&d" + charterPoint.getString("issued_by") + "&r.&3&o \nReason: &7&o" +
@@ -187,29 +191,27 @@ public class CharterCommand extends BaseCommand {
             Gson gson = new Gson();
 
             Player commandSender = (Player) sender;
-            try(FileWriter file = new FileWriter( EMI.getPlugin().getDataFolder() + File.separator + "cache" + File.separator + commandSender.getUniqueId().toString() + ".json"))
-            {
+            try (FileWriter file = new FileWriter(EMI.getPlugin().getDataFolder() + File.separator + "cache" + File.separator + commandSender.getUniqueId().toString() + ".json")) {
                 file.write(gson.toJson(map));
                 file.flush();
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
             paginate(sender, map, 1, EMI.getPlugin().getConfig().getInt("items-per-page"));
             sender.sendMessage(Utils.color("&e==== STATS: " + numActive + " active | " + (points.size() - numActive) + " historical ===="));
-            sender.sendMessage(Utils.color("&cUse /cpage [page #] to move to the next page"));
+            sender.sendMessage(Utils.color("&eUse /cpage [page #] to move to the next page"));
+            }
         }
     }
     @CommandPermission("emi.par.charter.edit")
     @Subcommand("edit")
-    @CommandAlias("e")
+    @CommandAlias("cedit")
     public void onEditCommand(CommandSender sender, int pointId, int newPointAmt, @Optional String newReason)
     {
         CharterPoint charterPoint = CharterPoint.getCharterPoint(pointId);
         if(charterPoint == null)
         {
-            sender.sendMessage("ERROR: No record found. Did you enter the right ID number?");
+            sender.sendMessage(Utils.color("&cERROR: &eNo record found. Did you enter the right ID number?"));
         }
         else
         {
@@ -237,20 +239,20 @@ public class CharterCommand extends BaseCommand {
             }
             else
             {
-                sender.sendMessage("ERROR: Please report the following to Comms..." );
+                sender.sendMessage(Utils.color("&cERROR: &e Please report the following to Comms..." ));
                 sender.sendMessage("RECORD [" + pointId + "] UPDATE TABLE FAIL. CC-onEdit()");
             }
         }
     }
     @CommandPermission("emi.par.charter.remove")
     @Subcommand("remove")
-    @CommandAlias("r")
+    @CommandAlias("cremove")
     public void onRemoveCommand(CommandSender sender, int pointId)
     {
         CharterPoint charterPoint = CharterPoint.getCharterPoint(pointId);
         if(charterPoint == null)
         {
-            sender.sendMessage("ERROR: No record found. Did you enter the right ID number?");
+            sender.sendMessage(Utils.color("&cERROR: &eNo record found. Did you enter the right ID number?"));
         }
         else
         {
@@ -266,7 +268,7 @@ public class CharterCommand extends BaseCommand {
     }
     @CommandPermission("emi.par.charter.pardon")
     @Subcommand("pardon")
-    @CommandAlias("p")
+    @CommandAlias("cpardon")
     public void onPardonCommand(CommandSender sender, String name, @Default("true") boolean removeFlag)
     {
         Player player = (Player) sender;
@@ -282,7 +284,7 @@ public class CharterCommand extends BaseCommand {
         }
     }
 
-    public void paginate(CommandSender sender, SortedMap<Integer, String> map,
+    private void paginate(CommandSender sender, SortedMap<Integer, String> map,
                           int page, int pageLength) {
         sender.sendMessage(ChatColor.YELLOW + "List: Page (" + String.valueOf(page) + " of " + (((map.size() % pageLength) == 0) ? map.size() / pageLength : (map.size() / pageLength) + 1) + ")");
         int i = 0, k = 0;
