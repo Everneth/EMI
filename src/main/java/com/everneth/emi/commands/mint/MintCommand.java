@@ -3,6 +3,7 @@ package com.everneth.emi.commands.mint;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import co.aikar.idb.DB;
+import co.aikar.idb.DbRow;
 import com.everneth.emi.Utils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -10,7 +11,10 @@ import org.bukkit.plugin.Plugin;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  *     Class: MintCommand
@@ -149,11 +153,35 @@ public class MintCommand extends BaseCommand {
 
     }
 
+    //TODO fix messages and add validation check
     @Subcommand("project complete")
     @CommandPermission("emi.mint.project.complete")
     public void onProjectComplete(Player player, String project)
     {
+        if(!doesProjectExist(project))
+        {
+            player.sendMessage("Unknown project");
+            return;
+        }
 
+        int projectID = getProjectID(project);
+
+        try
+        {
+            int complete = DB.getFirstColumn("SELECT complete FROM mint_projects WHERE project_id = ?", projectID);
+
+            if(complete == 0)
+            {
+                DB.executeUpdate("UPDATE mint_projects SET complete = 1, end_date = ?, focused = 0, WHERE project_id = ?", getCurrentDate(), projectID);
+                player.sendMessage("project has been completed");
+                return;
+            }
+            player.sendMessage("This project has alrady been completed");
+        }
+        catch(SQLException e)
+        {
+            player.sendMessage("error? " + e.toString());
+        }
     }
 
     //TODO fix messages
@@ -191,11 +219,101 @@ public class MintCommand extends BaseCommand {
         player.sendMessage(Utils.color("&aSuccessfully added project!"));
     }
 
+    //TODO fix messages and check for completed projects
+    @Subcommand("project focus")
+    @CommandPermission("emi.mint.project.focus")
+    public void onProjectFocus(Player player, String projectName)
+    {
+        if(!doesProjectExist(projectName))
+        {
+            player.sendMessage("project doesnt exist!");
+            return;
+        }
+
+        int projectID = getProjectID(projectName);
+
+        try
+        {
+            DbRow focused = DB.getFirstRow("SELECT * FROM mint_projects WHERE project_id = ?", projectID);
+
+            if(focused.getInt("focused") == 1)
+            {
+                player.sendMessage("this project is already focused");
+                return;
+            }
+        }
+        catch(SQLException e)
+        {
+            player.sendMessage("error? " + e.toString());
+            return;
+        }
+
+        List<DbRow> projects = getProjectList();
+
+        if(projects.isEmpty())
+        {
+            player.sendMessage("no projects available");
+            return;
+        }
+
+        DbRow formerFocusedProject = new DbRow();
+
+        for(DbRow project : projects)
+        {
+            if(project.getInt("focused") == 1)
+            {
+                formerFocusedProject = project;
+                break;
+            }
+        }
+
+        try
+        {
+            if(!formerFocusedProject.isEmpty())
+            {
+                DB.executeUpdate("UPDATE mint_projects SET focused = 0 WHERE project_id = ?", formerFocusedProject.getInt("project_id"));
+            }
+
+            DB.executeUpdate("UPDATE mint_projects SET focused = 1 WHERE project_id = ?", projectID);
+            player.sendMessage("set the project to focused!");
+        }
+        catch(SQLException e)
+        {
+            player.sendMessage("error? " + e.toString());
+        }
+    }
+
+    // TODO fix messages and add tasks/materials
     @Subcommand("project info")
     @CommandPermission("emi.mint.info")
-    public void onProjectInfo(Player player, String project)
+    public void onProjectInfo(Player player, String projectName)
     {
+        if(!doesProjectExist(projectName))
+        {
+            player.sendMessage("project doesnt exist xD");
+            return;
+        }
 
+        int projectID = getProjectID(projectName);
+        DbRow project = getProjectRow(projectID);
+        List<String> players = new ArrayList<>();
+
+        for(DbRow projectPlayer : getProjectPlayers(projectID))
+        {
+            if(projectPlayer.getInt("player_id") == project.getInt("project_lead"))
+            {
+                continue;
+            }
+
+            players.add(getPlayerName(projectPlayer.getInt("player_id")));
+        }
+
+        player.sendMessage("Mint project: " + project.getString("project_name") + "\n" +
+                project.getString("description") + "\n" +
+                getPlayerName(project.getInt("project_lead")) + "\n" +
+                "ADDING TASKS LATER" + "\n" +
+                "ADDING MATERIALS LATER" + "\n" +
+                "Workers: " + players.toString());
     }
 
     //TODO Fix messages
@@ -244,18 +362,51 @@ public class MintCommand extends BaseCommand {
         }
     }
 
+    //TODO fix messages
     @Subcommand("project list")
     @CommandPermission("emi.mint.project.list")
-    public void onProjectList(Player player, String list)
+    public void onProjectList(Player player)
     {
+        List<DbRow> projects = getProjectList();
+        HashMap<String, ArrayList<String>> sortedProjects = new HashMap<>();
 
+        if(projects.isEmpty())
+        {
+            player.sendMessage("no projects available");
+            return;
+        }
+
+        sortedProjects.put("focused", new ArrayList<>());
+        sortedProjects.put("current", new ArrayList<>());
+        sortedProjects.put("complete", new ArrayList<>());
+
+        for(DbRow project : projects)
+        {
+            if(project.getInt("focused") == 1)
+            {
+                sortedProjects.get("focused").add(project.getString("project_name"));
+            }
+            else if(project.getInt("complete") == 1)
+            {
+                sortedProjects.get("complete").add(project.getString("project_name"));
+            }
+            else
+            {
+                sortedProjects.get("current").add(project.getString("project_name"));
+            }
+        }
+
+        player.sendMessage("Mint Projects:\n" +
+                "Focused Project: " + sortedProjects.get("focused").toString() + "\n" +
+                "Current Projects: " + sortedProjects.get("current").toString() + "\n" +
+                "Complete Projects: " + sortedProjects.get("complete").toString());
     }
 
     @Subcommand("project work")
     @CommandPermission("emi.mint.project.work")
     public void onWork(Player player, String project)
     {
-
+        //TODO Compete when finished with task and materials commands
     }
 
     @Subcommand("task complete")
@@ -328,6 +479,42 @@ public class MintCommand extends BaseCommand {
         return projectID;
     }
 
+    private DbRow getProjectRow(int projectID)
+    {
+        try
+        {
+            return DB.getFirstRow("SELECT * FROM mint_projects WHERE project_id = ?", projectID);
+        }
+        catch(SQLException e)
+        {
+            return null;
+        }
+    }
+
+    private DbRow getProjectRow(String projectName)
+    {
+        try
+        {
+            return DB.getFirstRow("SELECT * FROM mint_projects WHERE project_id = ?", projectName);
+        }
+        catch(SQLException e)
+        {
+            return null;
+        }
+    }
+
+    private List<DbRow> getProjectList()
+    {
+        try
+        {
+            return DB.getResults("SELECT * FROM mint_projects");
+        }
+        catch(SQLException e)
+        {
+            return new ArrayList<>();
+        }
+    }
+
     private int getPlayerId(String playerName)
     {
         int playerID;
@@ -341,6 +528,30 @@ public class MintCommand extends BaseCommand {
             playerID = 0;
         }
         return playerID;
+    }
+
+    private String getPlayerName(int playerID)
+    {
+        try
+        {
+            return DB.getFirstRow("SELECT * FROM players WHERE player_id = ?", playerID).getString("player_name");
+        }
+        catch(SQLException e)
+        {
+            return null;
+        }
+    }
+
+    private List<DbRow> getProjectPlayers(int projectID)
+    {
+        try
+        {
+            return DB.getResults("SELECT * FROM mint_project_join_log WHERE project_id = ?", projectID);
+        }
+        catch(SQLException e)
+        {
+            return null;
+        }
     }
 
     private String getCurrentDate()
