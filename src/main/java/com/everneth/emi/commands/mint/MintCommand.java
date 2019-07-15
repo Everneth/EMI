@@ -9,6 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  *     Class: MintCommand
@@ -154,11 +156,39 @@ public class MintCommand extends BaseCommand {
 
     }
 
+    //TODO fix messages
     @Subcommand("project create")
     @CommandPermission("emi.mint.project.create")
     public void onProjectAdd(Player player, String projectName, String projectLead, String[] description)
     {
+        int playerLead;
 
+
+        if(doesProjectExist(projectName))
+        {
+            player.sendMessage(Utils.color("&cProject already exists!"));
+            return;
+        }
+
+        playerLead = getPlayerId(projectLead);
+
+        if(playerLead == 0)
+        {
+            player.sendMessage(Utils.color("&cUnrecognized player, did you spell it correctly?"));
+            return;
+        }
+
+        try
+        {
+            DB.executeInsert("INSERT INTO mint_projects (project_lead, project_name, start_date, complete, focused, description) VALUES (?, ?, ?, ?, ?, ?)",
+                    playerLead, projectName, getCurrentDate(), 0, 0, Utils.buildMessage(description, 0));
+        }
+        catch(SQLException e)
+        {
+            return;
+        }
+
+        player.sendMessage(Utils.color("&aSuccessfully added project!"));
     }
 
     @Subcommand("project info")
@@ -168,11 +198,50 @@ public class MintCommand extends BaseCommand {
 
     }
 
+    //TODO Fix messages
     @Subcommand("project join")
     @CommandPermission("emi.mint.project.join")
     public void onProjectJoin(Player player, String project)
     {
+        int projectID = getProjectID(project);
 
+        if(projectID == 0)
+        {
+            return;
+        }
+
+        int playerID = getPlayerId(player.getName());
+
+        if(playerID == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            int rows = DB.getResults("SELECT log_id FROM mint_project_join_log WHERE player_id = ? AND project_id = ?", playerID, projectID).size();
+
+            if(rows > 0)
+            {
+                player.sendMessage("You already joined this project.");
+                return;
+            }
+        }
+        catch (SQLException e)
+        {
+            player.sendMessage("error: " + e.toString());
+            return;
+        }
+
+        try
+        {
+            DB.executeInsert("INSERT INTO mint_project_join_log (player_id, project_id, join_date) VALUES (?, ?, ?)", playerID, projectID, getCurrentDate());
+            player.sendMessage("You have joined the project.");
+        }
+        catch (SQLException e)
+        {
+            player.sendMessage(Utils.color("&cUnknown error?!\n" + e.toString()));
+        }
     }
 
     @Subcommand("project list")
@@ -222,5 +291,62 @@ public class MintCommand extends BaseCommand {
     public void onValidate(Player player, String project)
     {
 
+    }
+
+    private boolean doesProjectExist(String projectName)
+    {
+        int records;
+
+        try
+        {
+            records = DB.getResults("SELECT project_name FROM mint_projects WHERE project_name = ?", projectName).size();
+
+            if(records > 0)
+            {
+                return true;
+            }
+        }
+        catch (SQLException e)
+        {
+            return false;
+        }
+        return false;
+    }
+
+    private int getProjectID(String projectName)
+    {
+        int projectID;
+
+        try
+        {
+            projectID = DB.getFirstColumn("SELECT project_id FROM mint_projects WHERE project_name = ?", projectName);
+        }
+        catch(SQLException e)
+        {
+            projectID = 0;
+        }
+        return projectID;
+    }
+
+    private int getPlayerId(String playerName)
+    {
+        int playerID;
+
+        try
+        {
+            playerID = DB.getFirstColumn("SELECT player_id FROM players WHERE player_name = ?", playerName);
+        }
+        catch(SQLException e)
+        {
+            playerID = 0;
+        }
+        return playerID;
+    }
+
+    private String getCurrentDate()
+    {
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return simpleDateFormat.format(date);
     }
 }
