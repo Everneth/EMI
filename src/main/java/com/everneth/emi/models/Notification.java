@@ -12,7 +12,8 @@ public class Notification {
     private EMIPlayer recipient;
     private EMIPlayer notifier;
 
-    public Notification(EMIPlayer recipient, EMIPlayer notifier, String type, String message, Date dateTime) {
+    public Notification(EMIPlayer recipient, EMIPlayer notifier, String type, String message, Date dateTime)
+    {
         this.recipient = recipient;
         this.notifier = notifier;
         this.type = type;
@@ -20,7 +21,8 @@ public class Notification {
         this.dateTime = dateTime;
     }
 
-    public List<Notification> getAllNotifications() {
+    public List<Notification> getAllNotifications()
+    {
         List<Notification> notifications = new ArrayList<>();
         return notifications;
     }
@@ -30,3 +32,4 @@ public class Notification {
         return notifications;
     }
 }
+
