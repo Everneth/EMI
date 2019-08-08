@@ -27,4 +27,10 @@ public class Notification {
         return notifications;
     }
 
+    public List<Notification> getAllNotificationsByID(int id)
+    {
+        List<Notification> notifications = new ArrayList<>();
+        return notifications;
+    }
+
 }
