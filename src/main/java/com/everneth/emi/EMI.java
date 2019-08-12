@@ -74,6 +74,7 @@ public class EMI extends JavaPlugin {
         registerListeners();
         initBot();
         initApi();
+        initMintProjects();
     }
     @Override
     public void onDisable() {
@@ -143,6 +144,10 @@ public class EMI extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new LeaveEvent(this), this);
     }
 
+    private void initMintProjects()
+    {
+
+    }
 
     public static EMI getPlugin()
     {
