@@ -4,7 +4,11 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
+import com.everneth.emi.MintProjectManager;
 import com.everneth.emi.Utils;
+import com.everneth.emi.models.EMIPlayer;
+import com.everneth.emi.models.MintProject;
+import com.everneth.emi.utils.PlayerUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -189,34 +193,56 @@ public class MintCommand extends BaseCommand {
     @CommandPermission("emi.mint.project.create")
     public void onProjectAdd(Player player, String projectName, String projectLead, String[] description)
     {
-        int playerLead;
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(projectName);
 
-
-        if(doesProjectExist(projectName))
+        if(project != null)
         {
-            player.sendMessage(Utils.color("&cProject already exists!"));
+            player.sendMessage(Utils.color("&cProject already exist!"));
             return;
         }
 
-        playerLead = getPlayerId(projectLead);
+        DbRow dbPlayerLead = PlayerUtils.getPlayerRow(projectLead);
 
-        if(playerLead == 0)
+        if(dbPlayerLead.isEmpty())
         {
-            player.sendMessage(Utils.color("&cUnrecognized player, did you spell it correctly?"));
+            player.sendMessage("&cUnrecognized player, did you spell it correctly?");
             return;
         }
 
-        try
-        {
-            DB.executeInsert("INSERT INTO mint_projects (project_lead, project_name, start_date, complete, focused, description) VALUES (?, ?, ?, ?, ?, ?)",
-                    playerLead, projectName, getCurrentDate(), 0, 0, Utils.buildMessage(description, 0));
-        }
-        catch(SQLException e)
-        {
-            return;
-        }
+        EMIPlayer playerLead = new EMIPlayer(dbPlayerLead.getString("player_uuid"), dbPlayerLead.getString("player_name"), dbPlayerLead.getInt("player_id"));
 
-        player.sendMessage(Utils.color("&aSuccessfully added project!"));
+        project = new MintProject(playerLead, projectName, getCurrentDate(), null, false, false, Utils.buildMessage(description, 0));
+
+        manager.addProject(project);
+
+//        int playerLead;
+//
+//        if(doesProjectExist(projectName))
+//        {
+//            player.sendMessage(Utils.color("&cProject already exists!"));
+//            return;
+//        }
+//
+//        playerLead = getPlayerId(projectLead);
+//
+//        if(playerLead == 0)
+//        {
+//            player.sendMessage(Utils.color("&cUnrecognized player, did you spell it correctly?"));
+//            return;
+//        }
+//
+//        try
+//        {
+//            DB.executeInsert("INSERT INTO mint_projects (project_lead, project_name, start_date, complete, focused, description) VALUES (?, ?, ?, ?, ?, ?)",
+//                    playerLead, projectName, getCurrentDate(), 0, 0, Utils.buildMessage(description, 0));
+//        }
+//        catch(SQLException e)
+//        {
+//            return;
+//        }
+//
+//        player.sendMessage(Utils.color("&aSuccessfully added project!"));
     }
 
     //TODO fix messages and check for completed projects
