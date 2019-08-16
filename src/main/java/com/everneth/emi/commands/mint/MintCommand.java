@@ -212,7 +212,7 @@ public class MintCommand extends BaseCommand {
 
         EMIPlayer playerLead = new EMIPlayer(dbPlayerLead.getString("player_uuid"), dbPlayerLead.getString("player_name"), dbPlayerLead.getInt("player_id"));
 
-        project = new MintProject(playerLead, projectName, getCurrentDate(), null, false, false, Utils.buildMessage(description, 0));
+        project = new MintProject(playerLead, projectName, getCurrentDate(), null, 0, 0, Utils.buildMessage(description, 0));
 
         manager.addProject(project);
 
@@ -393,39 +393,46 @@ public class MintCommand extends BaseCommand {
     @CommandPermission("emi.mint.project.list")
     public void onProjectList(Player player)
     {
-        List<DbRow> projects = getProjectList();
-        HashMap<String, ArrayList<String>> sortedProjects = new HashMap<>();
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
 
-        if(projects.isEmpty())
+        for(MintProject project : manager.getProjects().values())
         {
-            player.sendMessage("no projects available");
-            return;
+            player.sendMessage(Utils.color("&a" + project.getName()));
         }
 
-        sortedProjects.put("focused", new ArrayList<>());
-        sortedProjects.put("current", new ArrayList<>());
-        sortedProjects.put("complete", new ArrayList<>());
-
-        for(DbRow project : projects)
-        {
-            if(project.getInt("focused") == 1)
-            {
-                sortedProjects.get("focused").add(project.getString("project_name"));
-            }
-            else if(project.getInt("complete") == 1)
-            {
-                sortedProjects.get("complete").add(project.getString("project_name"));
-            }
-            else
-            {
-                sortedProjects.get("current").add(project.getString("project_name"));
-            }
-        }
-
-        player.sendMessage("Mint Projects:\n" +
-                "Focused Project: " + sortedProjects.get("focused").toString() + "\n" +
-                "Current Projects: " + sortedProjects.get("current").toString() + "\n" +
-                "Complete Projects: " + sortedProjects.get("complete").toString());
+//        List<DbRow> projects = getProjectList();
+//        HashMap<String, ArrayList<String>> sortedProjects = new HashMap<>();
+//
+//        if(projects.isEmpty())
+//        {
+//            player.sendMessage("no projects available");
+//            return;
+//        }
+//
+//        sortedProjects.put("focused", new ArrayList<>());
+//        sortedProjects.put("current", new ArrayList<>());
+//        sortedProjects.put("complete", new ArrayList<>());
+//
+//        for(DbRow project : projects)
+//        {
+//            if(project.getInt("focused") == 1)
+//            {
+//                sortedProjects.get("focused").add(project.getString("project_name"));
+//            }
+//            else if(project.getInt("complete") == 1)
+//            {
+//                sortedProjects.get("complete").add(project.getString("project_name"));
+//            }
+//            else
+//            {
+//                sortedProjects.get("current").add(project.getString("project_name"));
+//            }
+//        }
+//
+//        player.sendMessage("Mint Projects:\n" +
+//                "Focused Project: " + sortedProjects.get("focused").toString() + "\n" +
+//                "Current Projects: " + sortedProjects.get("current").toString() + "\n" +
+//                "Complete Projects: " + sortedProjects.get("complete").toString());
     }
 
     @Subcommand("project work")

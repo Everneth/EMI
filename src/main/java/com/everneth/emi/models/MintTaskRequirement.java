@@ -3,10 +3,10 @@ package com.everneth.emi.models;
 public class MintTaskRequirement
 {
     private String task;
-    private boolean complete;
-    private boolean focused;
+    private int complete;
+    private int focused;
 
-    public MintTaskRequirement(String task, boolean complete, boolean focused)
+    public MintTaskRequirement(String task, int complete, int focused)
     {
         this.task = task;
         this.complete = complete;
@@ -25,20 +25,20 @@ public class MintTaskRequirement
 
     public boolean isComplete()
     {
-        return complete;
+        return complete != 0;
     }
 
-    public void setComplete(boolean complete)
+    public void setComplete(int complete)
     {
         this.complete = complete;
     }
 
     public boolean isFocused()
     {
-        return focused;
+        return focused != 0;
     }
 
-    public void setFocused(boolean focused)
+    public void setFocused(int focused)
     {
         this.focused = focused;
     }

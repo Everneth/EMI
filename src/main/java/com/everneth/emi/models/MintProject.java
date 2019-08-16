@@ -9,15 +9,15 @@ public class MintProject
     private String name;
     private String startDate;
     private String endDate;
-    private boolean complete;
-    private boolean focused;
+    private int complete;
+    private int focused;
     private String description;
-    private HashMap<Long, MintWorkLog> workLog = new HashMap<>();
-    private HashMap<Long, MintMaterialLog> materialLog = new HashMap<>();
-    private HashMap<Long, MintTaskRequirement> taskRequirements = new HashMap<>();
-    private HashMap<Long, MintMaterialReuirement> materialRequirements = new HashMap<>();
+    private HashMap<Integer, MintWorkLog> workLog = new HashMap<>();
+    private HashMap<Integer, MintMaterialLog> materialLog = new HashMap<>();
+    private HashMap<Integer, MintTaskRequirement> taskRequirements = new HashMap<>();
+    private HashMap<Integer, MintMaterialReuirement> materialRequirements = new HashMap<>();
 
-    public MintProject(EMIPlayer lead, String name, String startDate, String endDate, boolean complete, boolean focused, String description)
+    public MintProject(EMIPlayer lead, String name, String startDate, String endDate, int complete, int focused, String description)
     {
         this.lead = lead;
         this.name = name;
@@ -70,60 +70,60 @@ public class MintProject
 
     public boolean isComplete()
     {
-        return complete;
+        return complete != 0;
     }
 
-    public void setComplete(boolean complete)
+    public void setComplete(int complete)
     {
         this.complete = complete;
     }
 
     public boolean isFocused()
     {
-        return focused;
+        return focused != 0;
     }
 
-    public void setFocused(boolean focused)
+    public void setFocused(int focused)
     {
         this.focused = focused;
     }
 
-    public HashMap<Long, MintWorkLog> getWorkLog()
+    public HashMap<Integer, MintWorkLog> getWorkLog()
     {
         return workLog;
     }
 
-    public void setWorkLog(HashMap<Long, MintWorkLog> workLog)
+    public void setWorkLog(HashMap<Integer, MintWorkLog> workLog)
     {
         this.workLog = workLog;
     }
 
-    public HashMap<Long, MintMaterialLog> getMaterialLog()
+    public HashMap<Integer, MintMaterialLog> getMaterialLog()
     {
         return materialLog;
     }
 
-    public void setMaterialLog(HashMap<Long, MintMaterialLog> materialLog)
+    public void setMaterialLog(HashMap<Integer, MintMaterialLog> materialLog)
     {
         this.materialLog = materialLog;
     }
 
-    public HashMap<Long, MintTaskRequirement> getTaskRequirements()
+    public HashMap<Integer, MintTaskRequirement> getTaskRequirements()
     {
         return taskRequirements;
     }
 
-    public void setTaskRequirements(HashMap<Long, MintTaskRequirement> taskRequirements)
+    public void setTaskRequirements(HashMap<Integer, MintTaskRequirement> taskRequirements)
     {
         this.taskRequirements = taskRequirements;
     }
 
-    public HashMap<Long, MintMaterialReuirement> getMaterialRequirements()
+    public HashMap<Integer, MintMaterialReuirement> getMaterialRequirements()
     {
         return materialRequirements;
     }
 
-    public void setMaterialRequirements(HashMap<Long, MintMaterialReuirement> materialRequirements)
+    public void setMaterialRequirements(HashMap<Integer, MintMaterialReuirement> materialRequirements)
     {
         this.materialRequirements = materialRequirements;
     }

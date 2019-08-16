@@ -33,13 +33,23 @@ public class MintProjectManager
         return null;
     }
 
+    public HashMap<Long, MintProject> getProjects()
+    {
+        return projects;
+    }
+
+    public void addProject(long projectID, MintProject project)
+    {
+        projects.put(projectID, project);
+    }
+
     public void addProject(MintProject mintProject)
     {
         Long projectID;
 
         try
         {
-            projectID = DB.executeInsert("INSERT INTO mint_projects (project_lead, project_name, start_date, complete, focused, description VALUES (?, ?, ?, ?, ?, ?)",
+            projectID = DB.executeInsert("INSERT INTO mint_project (project_lead, project_name, start_date, complete, focused, description VALUES (?, ?, ?, ?, ?, ?)",
                     mintProject.getLead(),
                     mintProject.getName(),
                     mintProject.getStartDate(),
@@ -49,7 +59,7 @@ public class MintProjectManager
         }
         catch (SQLException e)
         {
-            Bukkit.getLogger().info(e.toString());
+            Bukkit.getLogger().info("ERROR?! " + e.toString());
             return;
         }
         projects.put(projectID, mintProject);

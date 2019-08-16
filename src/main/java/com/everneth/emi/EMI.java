@@ -1,10 +1,7 @@
 package com.everneth.emi;
 
 import co.aikar.commands.BukkitCommandManager;
-import co.aikar.idb.DB;
-import co.aikar.idb.Database;
-import co.aikar.idb.DatabaseOptions;
-import co.aikar.idb.PooledDatabaseOptions;
+import co.aikar.idb.*;
 import com.everneth.emi.api.*;
 import com.everneth.emi.commands.*;
 import com.everneth.emi.commands.bot.CloseReportCommand;
@@ -17,6 +14,9 @@ import com.everneth.emi.commands.par.CharterCommand;
 import com.everneth.emi.events.JoinEvent;
 import com.everneth.emi.events.LeaveEvent;
 import com.everneth.emi.events.bot.MessageReceivedListener;
+import com.everneth.emi.models.EMIPlayer;
+import com.everneth.emi.models.MintProject;
+import com.everneth.emi.utils.PlayerUtils;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 
@@ -33,6 +33,9 @@ import static spark.Spark.*;
 import javax.security.auth.login.LoginException;
 
 import java.io.File;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 
 import static spark.Spark.get;
 import static spark.Spark.port;
@@ -68,12 +71,12 @@ public class EMI extends JavaPlugin {
         Database db = PooledDatabaseOptions.builder().options(options).createHikariDatabase();
         DB.setGlobalDatabase(db);
 
-        ReportManager.getReportManager().loadManager();
+//        ReportManager.getReportManager().loadManager();
 
         registerCommands();
         registerListeners();
-        initBot();
-        initApi();
+//        initBot();
+//        initApi();
         initMintProjects();
     }
     @Override
@@ -146,6 +149,61 @@ public class EMI extends JavaPlugin {
 
     private void initMintProjects()
     {
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+
+        ArrayList<DbRow> projects;
+        ArrayList<DbRow> tasks;
+        ArrayList<DbRow> materials;
+        ArrayList<DbRow> workLog;
+        ArrayList<DbRow> materialLog;
+
+        try
+        {
+            projects = new ArrayList<>(DB.getResults("SELECT * FROM mint_project"));
+            tasks = new ArrayList<>(DB.getResults("SELECT * FROM mint_task_requirements"));
+            materials = new ArrayList<>(DB.getResults("SELECT * FROM mint_material_requirements"));
+            workLog = new ArrayList<>(DB.getResults("SELECT * FROM mint_task_log"));
+            materialLog = new ArrayList<>(DB.getResults("SELECT * FROM mint_material_log"));
+        }
+        catch(SQLException e)
+        {
+            this.getLogger().info("Failed to gather info for mint projects: " + e.toString());
+            return;
+        }
+
+        for(DbRow projectRow : projects)
+        {
+            DbRow playerRow = PlayerUtils.getPlayerRow(projectRow.getInt("project_lead"));
+            EMIPlayer playerLead = new EMIPlayer(playerRow.getString("player_uuid"), playerRow.getString("player_name"), playerRow.getInt("player_id"));
+            Timestamp endDateTime = projectRow.get("end_date");
+            String endDate = "";
+            if(endDateTime != null)
+            {
+                endDate = endDateTime.toString();
+            }
+            MintProject project = new MintProject(
+                    playerLead,
+                    projectRow.getString("project_name"),
+                    projectRow.get("start_date").toString(),
+                    endDate,
+                    projectRow.getInt("complete"),
+                    projectRow.getInt("focused"),
+                    projectRow.getString("description"));
+
+//            for(DbRow taskRow : tasks)
+//            {
+//                if(projectRow.getInt("project_id") != projectRow.getInt("project_id"))
+//                {
+//                    continue;
+//                }
+//
+//                MintTaskRequirement task = new MintTaskRequirement(taskRow.get("task"), taskRow.getInt("complete"), taskRow.get("focused"));
+//                project.getTaskRequirements().put(taskRow.getInt("task_id"), task);
+//            }
+
+            manager.addProject(projectRow.getInt("project_id"), project);
+        }
+
 
     }
 
