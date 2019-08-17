@@ -26,7 +26,7 @@ public class Notification {
         List<Notification> notifications = new ArrayList<>();
         return notifications;
     }
-    
+
     public List<Notification> getAllNotificationsByID(int id) {
         List<Notification> notifications = new ArrayList<>();
         return notifications;
