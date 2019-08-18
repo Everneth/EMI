@@ -83,7 +83,6 @@ public class ReportCommand extends BaseCommand {
         eb.addField("Z", Double.toString(player.getLocation().getZ()), true);
         eb.addField("Dimension", player.getWorld().getEnvironment().toString(), true);
         eb.addField("Time Reported (EST)", format.format(now), true);
-        eb.addField("Server", player.getServer().getServerName(), true);
         eb.addField("Description", message, false);
         eb.setFooter("Help requested!", null);
 

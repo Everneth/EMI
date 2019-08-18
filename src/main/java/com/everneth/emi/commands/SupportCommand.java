@@ -16,7 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- *     Class: MinorHelpCommand
+ *     Class: SupportCommand
  *     Author: Faceman (@TptMike)
  *     Purpose: Generate an embed and post it in the designated Discord channel
  *     using the JDA bot
@@ -24,14 +24,14 @@ import java.util.Date;
  */
 
 @CommandAlias("minorhelp|mhelp")
-public class MinorHelpCommand extends BaseCommand {
+public class SupportCommand extends BaseCommand {
 
     @Dependency
     private Plugin plugin;
 
     @Default
     @CommandAlias("minorhelp|mhelp")
-    public void onMinorHelp(CommandSender sender, String message)
+    public void onSupport(CommandSender sender, String message)
     {
         // Get the player and supply all potentially useful
         // information to the embed builder
@@ -50,7 +50,6 @@ public class MinorHelpCommand extends BaseCommand {
         eb.addField("Z", Double.toString(player.getLocation().getZ()), true);
         eb.addField("Dimension", player.getWorld().getEnvironment().toString(), true);
         eb.addField("Time Reported (EST)", format.format(now), true);
-        eb.addField("Server", player.getServer().getServerName(), true);
         eb.addField("Description", message, false);
         eb.setFooter("Help requested!", null);
 
