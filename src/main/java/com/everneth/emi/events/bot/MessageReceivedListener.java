@@ -5,9 +5,9 @@ import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.ReportManager;
 import com.everneth.emi.Utils;
-import net.dv8tion.jda.core.entities.ChannelType;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
