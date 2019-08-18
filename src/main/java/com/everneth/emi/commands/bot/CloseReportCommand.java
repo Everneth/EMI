@@ -7,9 +7,9 @@ import com.everneth.emi.utils.FileUtils;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.core.MessageBuilder;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Role;
 import org.apache.http.Consts;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -78,7 +78,7 @@ public class CloseReportCommand extends Command {
                 File embedFile = transcribeToFile(messageList);
                 String msg = "Log from " + playerName + "'s report could not be transmitted to the site. A txt file transcript has been attached.";
                 Message message = new MessageBuilder().append(msg).build();
-                event.getGuild().getTextChannelById(178247194862682112L).sendFile(embedFile, message).queue();
+                event.getGuild().getTextChannelById(178247194862682112L).sendMessage(message).addFile(embedFile).queue();
             }
 
             event.getTextChannel().delete().queue();

@@ -21,9 +21,10 @@ import com.everneth.emi.utils.PlayerUtils;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.entities.Game;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+
+import net.dv8tion.jda.api.entities.Activity;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -119,7 +120,7 @@ public class EMI extends JavaPlugin {
     {
         CommandClientBuilder builder = new CommandClientBuilder();
         builder.setPrefix(this.getConfig().getString("bot-prefix"));
-        builder.setGame(Game.playing(this.getConfig().getString("bot-game")));
+        builder.setActivity(Activity.playing(this.getConfig().getString("bot-game")));
         builder.addCommand(new HelpClearCommand());
         builder.addCommand(new ConfirmSyncCommand());
         builder.addCommand(new DenySyncCommand());
@@ -130,8 +131,8 @@ public class EMI extends JavaPlugin {
 
         try {
             jda = new JDABuilder(config.getString("bot-token"))
-                    .addEventListener(client)
-                    .addEventListener(new MessageReceivedListener())
+                    .addEventListeners(client)
+                    .addEventListeners(new MessageReceivedListener())
                     .build();
             jda.awaitReady();
         }

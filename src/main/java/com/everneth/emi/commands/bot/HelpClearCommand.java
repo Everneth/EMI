@@ -4,9 +4,9 @@ import com.everneth.emi.EMI;
 import com.everneth.emi.utils.FileUtils;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.core.MessageBuilder;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Role;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,7 +63,7 @@ public class HelpClearCommand extends Command {
                     // and embed the file into a message
                     File embedFile = transcribe(messageList);
                     Message message = new MessageBuilder().append("Transcript from #help").build();
-                    event.getGuild().getTextChannelById(178247194862682112L).sendFile(embedFile, message).queue();
+                    event.getGuild().getTextChannelById(178247194862682112L).sendMessage(message).addFile(embedFile).queue();
 
                     // We've got a history, lets clear out
                     for (Message msg : messageList) {
