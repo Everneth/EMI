@@ -21,7 +21,6 @@ import java.util.concurrent.CompletableFuture;
 
 public class ConfirmSyncCommand extends Command {
     private CompletableFuture<DbRow> playerObjectFuture;
-    private DbRow playerRow;
     private CompletableFuture<Integer> futurePlayerId;
     public ConfirmSyncCommand()
     {
@@ -40,39 +39,40 @@ public class ConfirmSyncCommand extends Command {
 
         if(event.isFromType(ChannelType.PRIVATE))
         {
-        if(toFind == null)
-        {
-            event.replyInDm("No sync request exists for your account.");
-        }
-        else {
-            if (syncExists(toFind)) {
-                event.replyInDm("You have already synced this account. If this is in error, please contact staff.");
-            } else {
-                int playerId = syncAccount(toFind);
-                if (playerId == 0) {
-                    event.replyInDm("ERROR: Could not sync account. No player record found.");
+            if(toFind == null)
+            {
+                event.replyInDm("No sync request exists for your account or it hs already been synced.");
+            }
+            else {
+                if (syncExists(toFind)) {
+                    event.replyInDm("You have already synced this account. If this is in error, please contact staff.");
                 } else {
-                    dsm.removeSyncRequest(this.getPlayerRow(playerId).getString("player_uuid"));
-                    EMI.getJda().getGuildById(guildId).addRoleToMember(
-                            EMI.getJda().getGuildById(guildId).getMemberById(event.getAuthor().getIdLong()), EMI.getJda().getGuildById(guildId).getRoleById(syncRoleId)
-                    ).queue();
-                    Role memberRole = EMI.getJda().getGuildById(guildId).getRoleById(memberRoleId);
-                    if (EMI.getPlugin().getConfig().getBoolean("use-pending-role")) {
-                        Role pendingRole = EMI.getJda().getGuildById(guildId).getRoleById(pendingRoleId);
-                        Member member = EMI.getJda().getGuildById(guildId).getMember(event.getSelfUser());
-                        if (member.getRoles().contains(pendingRole)) {
-                            member.getRoles().remove(pendingRole);
-                            member.getRoles().add(memberRole);
-                            event.replyInDm("Your account has been synced and your roles updated!");
+                    int playerId = syncAccount(toFind);
+                    if (playerId == 0) {
+                        event.replyInDm("ERROR: Could not sync account. No player record found.");
+                    } else {
+                        dsm.removeSyncRequest(this.getPlayerRow(playerId).getString("player_uuid"));
+                        EMI.getJda().getGuildById(guildId).addRoleToMember(
+                                EMI.getJda().getGuildById(guildId).getMemberById(event.getAuthor().getIdLong()),
+                                EMI.getJda().getGuildById(guildId).getRoleById(syncRoleId)
+                        ).queue();
+                        Role memberRole = EMI.getJda().getGuildById(guildId).getRoleById(memberRoleId);
+                        if (EMI.getPlugin().getConfig().getBoolean("use-pending-role")) {
+                            Role pendingRole = EMI.getJda().getGuildById(guildId).getRoleById(pendingRoleId);
+                            Member member = EMI.getJda().getGuildById(guildId).getMember(event.getSelfUser());
+                            if (member.getRoles().contains(pendingRole)) {
+                                member.getRoles().remove(pendingRole);
+                                member.getRoles().add(memberRole);
+                                event.replyInDm("Your account has been synced and your roles updated!");
+                            } else {
+                                event.replyInDm("Your account has been synced!");
+                            }
                         } else {
                             event.replyInDm("Your account has been synced!");
                         }
-                    } else {
-                        event.replyInDm("Your account has been synced!");
                     }
                 }
             }
-        }
         }
     }
     private boolean syncExists(User user)
