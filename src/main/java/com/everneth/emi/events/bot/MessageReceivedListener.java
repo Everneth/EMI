@@ -69,5 +69,6 @@ public class MessageReceivedListener extends ListenerAdapter {
                 }
             }
         }
+
     }
 }
