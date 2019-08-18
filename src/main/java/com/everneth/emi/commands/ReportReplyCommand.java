@@ -8,7 +8,7 @@ import com.everneth.emi.EMI;
 import com.everneth.emi.ReportManager;
 import com.everneth.emi.Utils;
 import com.everneth.emi.models.Report;
-import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.api.JDA;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 

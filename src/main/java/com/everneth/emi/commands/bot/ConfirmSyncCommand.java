@@ -6,10 +6,10 @@ import com.everneth.emi.DiscordSyncManager;
 import com.everneth.emi.EMI;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.core.entities.ChannelType;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -53,7 +53,7 @@ public class ConfirmSyncCommand extends Command {
                     event.replyInDm("ERROR: Could not sync account. No player record found.");
                 } else {
                     dsm.removeSyncRequest(this.getPlayerRow(playerId).getString("player_uuid"));
-                    EMI.getJda().getGuildById(guildId).getController().addSingleRoleToMember(
+                    EMI.getJda().getGuildById(guildId).addRoleToMember(
                             EMI.getJda().getGuildById(guildId).getMemberById(event.getAuthor().getIdLong()), EMI.getJda().getGuildById(guildId).getRoleById(syncRoleId)
                     ).queue();
                     Role memberRole = EMI.getJda().getGuildById(guildId).getRoleById(memberRoleId);
