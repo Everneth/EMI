@@ -23,14 +23,14 @@ import java.util.Date;
  *
  */
 
-@CommandAlias("minorhelp|mhelp")
+@CommandAlias("support")
 public class SupportCommand extends BaseCommand {
 
     @Dependency
     private Plugin plugin;
 
     @Default
-    @CommandAlias("minorhelp|mhelp")
+    @CommandAlias("support")
     public void onSupport(CommandSender sender, String message)
     {
         // Get the player and supply all potentially useful
