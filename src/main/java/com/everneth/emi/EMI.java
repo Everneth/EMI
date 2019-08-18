@@ -90,7 +90,7 @@ public class EMI extends JavaPlugin {
         commandManager.registerCommand(new ReportCommand());
         commandManager.registerCommand(new ReportReplyCommand());
         commandManager.registerCommand(new GetRepliesCommand());
-        commandManager.registerCommand(new MinorHelpCommand());
+        commandManager.registerCommand(new SupportCommand());
         commandManager.registerCommand(new DiscordsyncCommand());
         commandManager.registerCommand(new CharterCommand());
     }
