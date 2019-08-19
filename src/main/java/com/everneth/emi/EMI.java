@@ -156,6 +156,7 @@ public class EMI extends JavaPlugin {
         ArrayList<DbRow> materials;
         ArrayList<DbRow> workLog;
         ArrayList<DbRow> materialLog;
+        ArrayList<DbRow> workers;
 
         try
         {
@@ -164,6 +165,7 @@ public class EMI extends JavaPlugin {
             materials = new ArrayList<>(DB.getResults("SELECT * FROM mint_material_requirements"));
             workLog = new ArrayList<>(DB.getResults("SELECT * FROM mint_task_log"));
             materialLog = new ArrayList<>(DB.getResults("SELECT * FROM mint_material_log"));
+            workers = new ArrayList<>(DB.getResults("SELECT * FROM mint_project_join_log"));
         }
         catch(SQLException e)
         {
@@ -177,11 +179,14 @@ public class EMI extends JavaPlugin {
             EMIPlayer playerLead = new EMIPlayer(playerRow.getString("player_uuid"), playerRow.getString("player_name"), playerRow.getInt("player_id"));
             Timestamp endDateTime = projectRow.get("end_date");
             String endDate = null;
+
             if(endDateTime != null)
             {
                 endDate = endDateTime.toString();
             }
+
             MintProject project = new MintProject(
+                    projectRow.getInt("project_id"),
                     playerLead,
                     projectRow.getString("project_name"),
                     projectRow.get("start_date").toString(),
@@ -189,6 +194,19 @@ public class EMI extends JavaPlugin {
                     projectRow.getInt("complete"),
                     projectRow.getInt("focused"),
                     projectRow.getString("description"));
+
+            for(DbRow worker : workers)
+            {
+                if(!projectRow.getInt("project_id").equals(worker.getInt("project_id")))
+                {
+                    continue;
+                }
+
+                DbRow player = PlayerUtils.getPlayerRow(worker.getInt("player_id"));
+                EMIPlayer emiPlayer = new EMIPlayer(player.getString("player_uuid"), player.getString("player_name"), player.getInt("player_id"));
+
+                project.getWorkers().add(emiPlayer);
+            }
 
 //            for(DbRow taskRow : tasks)
 //            {

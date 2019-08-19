@@ -33,6 +33,11 @@ public class MintProjectManager
         return null;
     }
 
+    public MintProject getProject(long projectID)
+    {
+        return projects.get(projectID);
+    }
+
     public HashMap<Long, MintProject> getProjects()
     {
         return projects;
@@ -50,7 +55,7 @@ public class MintProjectManager
         try
         {
             projectID = DB.executeInsert("INSERT INTO mint_project (project_lead, project_name, start_date, complete, focused, description) VALUES (?, ?, ?, ?, ?, ?)",
-                    mintProject.getLead(),
+                    mintProject.getLead().getId(),
                     mintProject.getName(),
                     mintProject.getStartDate(),
                     mintProject.getComplete(),
@@ -60,8 +65,32 @@ public class MintProjectManager
         catch (SQLException e)
         {
             Bukkit.getLogger().info("MintProjectManager/addProject(MintProject) ERROR: " + e.toString());
+            Bukkit.getLogger().info("MintProjectManager/addProject(MintProject) ERROR: " + mintProject.toString());
             return;
         }
+        mintProject.setProjectID(projectID);
         projects.put(projectID, mintProject);
+    }
+
+    public void switchFocus(MintProject newFocus, MintProject formerFocus)
+    {
+        try
+        {
+            if(formerFocus != null)
+            {
+                DB.executeUpdate("UPDATE mint_project SET focused = 0 WHERE project_id = ?",
+                        formerFocus.getProjectID());
+                formerFocus.setFocused(0);
+                Utils.bugTest("Switched");
+            }
+            DB.executeUpdate("UPDATE mint_project SET focused = 1 WHERE project_id = ?",
+                    newFocus.getProjectID());
+            newFocus.setFocused(1);
+            Utils.bugTest("New focused added");
+        }
+        catch (SQLException e)
+        {
+            Bukkit.getLogger().info("ERROR: MintProjectManager/switchFocus: " + e.toString());
+        }
     }
 }

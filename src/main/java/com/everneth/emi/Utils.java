@@ -3,6 +3,9 @@ package com.everneth.emi;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  *     Class: Utils
  *     Author: Redstonehax (@SterlingHeaton)
@@ -37,5 +40,12 @@ public class Utils
             message.append(parts[count] + " ");
         }
         return message.toString();
+    }
+
+    public static String getCurrentDate()
+    {
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return simpleDateFormat.format(date);
     }
 }

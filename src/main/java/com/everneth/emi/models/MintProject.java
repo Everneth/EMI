@@ -1,10 +1,16 @@
 package com.everneth.emi.models;
 
+import co.aikar.idb.DB;
+import com.everneth.emi.Utils;
+import org.bukkit.Bukkit;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MintProject
 {
+    private long projectID;
     private EMIPlayer lead;
     private String name;
     private String startDate;
@@ -12,6 +18,7 @@ public class MintProject
     private int complete;
     private int focused;
     private String description;
+    private ArrayList<EMIPlayer> workers = new ArrayList<>();
     private HashMap<Integer, MintWorkLog> workLog = new HashMap<>();
     private HashMap<Integer, MintMaterialLog> materialLog = new HashMap<>();
     private HashMap<Integer, MintTaskRequirement> taskRequirements = new HashMap<>();
@@ -26,6 +33,58 @@ public class MintProject
         this.complete = complete;
         this.focused = focused;
         this.description = description;
+    }
+
+    public MintProject(long projectID, EMIPlayer lead, String name, String startDate, String endDate, int complete, int focused, String description)
+    {
+        this.projectID = projectID;
+        this.lead = lead;
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.complete = complete;
+        this.focused = focused;
+        this.description = description;
+    }
+
+    public void addWorker(EMIPlayer emiPlayer)
+    {
+        try
+        {
+            DB.executeInsert("INSERT INTO mint_project_join_log (player_id, project_id, join_date) VALUES (?, ?, ?)",
+                    emiPlayer.getId(),
+                    projectID, Utils.getCurrentDate());
+            workers.add(emiPlayer);
+        }
+        catch (SQLException e)
+        {
+            Bukkit.getLogger().info("ERROR: MintProject/addPlayer: " + e.toString());
+        }
+    }
+
+    public void complete()
+    {
+        try
+        {
+            DB.executeUpdate("UPDATE mint_project SET end_date = ?, complete = 1 WHERE project_id = ?",
+                    Utils.getCurrentDate(),
+                    projectID);
+            complete = 1;
+        }
+        catch (SQLException e)
+        {
+            Bukkit.getLogger().info("ERROR: MintProject/complete: " + e.toString());
+        }
+    }
+
+    public long getProjectID()
+    {
+        return projectID;
+    }
+
+    public void setProjectID(long projectID)
+    {
+        this.projectID = projectID;
     }
 
     public EMIPlayer getLead()
@@ -136,5 +195,21 @@ public class MintProject
     public void setDescription(String description)
     {
         this.description = description;
+    }
+
+    public ArrayList<EMIPlayer> getWorkers()
+    {
+        return workers;
+    }
+
+    public void setWorkers(ArrayList<EMIPlayer> workers)
+    {
+        this.workers = workers;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "MintProject{" + "lead=" + lead + ", name='" + name + '\'' + ", startDate='" + startDate + '\'' + ", endDate='" + endDate + '\'' + ", complete=" + complete + ", focused=" + focused + ", description='" + description + '\'' + ", workLog=" + workLog + ", materialLog=" + materialLog + ", taskRequirements=" + taskRequirements + ", materialRequirements=" + materialRequirements + '}';
     }
 }

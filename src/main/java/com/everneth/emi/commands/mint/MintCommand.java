@@ -160,32 +160,24 @@ public class MintCommand extends BaseCommand {
     //TODO fix messages and add validation check
     @Subcommand("project complete")
     @CommandPermission("emi.mint.project.complete")
-    public void onProjectComplete(Player player, String project)
+    public void onProjectComplete(Player player, String mintProject)
     {
-        if(!doesProjectExist(project))
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(mintProject);
+
+        if(project == null)
         {
-            player.sendMessage("Unknown project");
+            player.sendMessage(Utils.color("&cProject doesnt exist!"));
             return;
         }
 
-        int projectID = getProjectID(project);
-
-        try
+        if(project.getComplete() != 0)
         {
-            int complete = DB.getFirstColumn("SELECT complete FROM mint_projects WHERE project_id = ?", projectID);
-
-            if(complete == 0)
-            {
-                DB.executeUpdate("UPDATE mint_projects SET complete = 1, end_date = ?, focused = 0, WHERE project_id = ?", getCurrentDate(), projectID);
-                player.sendMessage("project has been completed");
-                return;
-            }
-            player.sendMessage("This project has alrady been completed");
+            player.sendMessage(Utils.color("&cProject has already been marked for completion"));
+            return;
         }
-        catch(SQLException e)
-        {
-            player.sendMessage("error? " + e.toString());
-        }
+        project.complete();
+        player.sendMessage(Utils.color("&aProject has been marked for completion!"));
     }
 
     //TODO fix messages
@@ -212,37 +204,10 @@ public class MintCommand extends BaseCommand {
 
         EMIPlayer playerLead = new EMIPlayer(dbPlayerLead.getString("player_uuid"), dbPlayerLead.getString("player_name"), dbPlayerLead.getInt("player_id"));
 
-        project = new MintProject(playerLead, projectName, getCurrentDate(), null, 0, 0, Utils.buildMessage(description, 0));
+        project = new MintProject(playerLead, projectName, Utils.getCurrentDate(), null, 0, 0, Utils.buildMessage(description, 0));
 
         manager.addProject(project);
-
-//        int playerLead;
-//
-//        if(doesProjectExist(projectName))
-//        {
-//            player.sendMessage(Utils.color("&cProject already exists!"));
-//            return;
-//        }
-//
-//        playerLead = getPlayerId(projectLead);
-//
-//        if(playerLead == 0)
-//        {
-//            player.sendMessage(Utils.color("&cUnrecognized player, did you spell it correctly?"));
-//            return;
-//        }
-//
-//        try
-//        {
-//            DB.executeInsert("INSERT INTO mint_projects (project_lead, project_name, start_date, complete, focused, description) VALUES (?, ?, ?, ?, ?, ?)",
-//                    playerLead, projectName, getCurrentDate(), 0, 0, Utils.buildMessage(description, 0));
-//        }
-//        catch(SQLException e)
-//        {
-//            return;
-//        }
-//
-//        player.sendMessage(Utils.color("&aSuccessfully added project!"));
+        player.sendMessage(Utils.color("&cSuccessfully added the project &6" + project.getName()));
     }
 
     //TODO fix messages and check for completed projects
@@ -250,63 +215,97 @@ public class MintCommand extends BaseCommand {
     @CommandPermission("emi.mint.project.focus")
     public void onProjectFocus(Player player, String projectName)
     {
-        if(!doesProjectExist(projectName))
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(projectName);
+
+        if(project == null)
         {
-            player.sendMessage("project doesnt exist!");
+            player.sendMessage(Utils.color("&cProject doesnt exist!"));
+        }
+
+        if(project.getFocused() == 1)
+        {
+            player.sendMessage(Utils.color("&cProject is already focused!"));
             return;
         }
 
-        int projectID = getProjectID(projectName);
-
-        try
+        if(project.getComplete() == 1)
         {
-            DbRow focused = DB.getFirstRow("SELECT * FROM mint_projects WHERE project_id = ?", projectID);
+            player.sendMessage(Utils.color("&cProject is already complete and therefore cant be set as focused!"));
+            return;
+        }
 
-            if(focused.getInt("focused") == 1)
+        MintProject formerProject = null;
+        
+        for(MintProject mintProject : manager.getProjects().values())
+        {
+            if(mintProject.getFocused() == 1)
             {
-                player.sendMessage("this project is already focused");
-                return;
-            }
-        }
-        catch(SQLException e)
-        {
-            player.sendMessage("error? " + e.toString());
-            return;
-        }
-
-        List<DbRow> projects = getProjectList();
-
-        if(projects.isEmpty())
-        {
-            player.sendMessage("no projects available");
-            return;
-        }
-
-        DbRow formerFocusedProject = new DbRow();
-
-        for(DbRow project : projects)
-        {
-            if(project.getInt("focused") == 1)
-            {
-                formerFocusedProject = project;
+                formerProject = mintProject;
                 break;
             }
         }
 
-        try
-        {
-            if(!formerFocusedProject.isEmpty())
-            {
-                DB.executeUpdate("UPDATE mint_projects SET focused = 0 WHERE project_id = ?", formerFocusedProject.getInt("project_id"));
-            }
+        manager.switchFocus(project, formerProject);
+        player.sendMessage(Utils.color("&aProject has been marked as focused!"));
 
-            DB.executeUpdate("UPDATE mint_projects SET focused = 1 WHERE project_id = ?", projectID);
-            player.sendMessage("set the project to focused!");
-        }
-        catch(SQLException e)
-        {
-            player.sendMessage("error? " + e.toString());
-        }
+//        if(!doesProjectExist(projectName))
+//        {
+//            player.sendMessage("project doesnt exist!");
+//            return;
+//        }
+//
+//        int projectID = getProjectID(projectName);
+//
+//        try
+//        {
+//            DbRow focused = DB.getFirstRow("SELECT * FROM mint_projects WHERE project_id = ?", projectID);
+//
+//            if(focused.getInt("focused") == 1)
+//            {
+//                player.sendMessage("this project is already focused");
+//                return;
+//            }
+//        }
+//        catch(SQLException e)
+//        {
+//            player.sendMessage("error? " + e.toString());
+//            return;
+//        }
+//
+//        List<DbRow> projects = getProjectList();
+//
+//        if(projects.isEmpty())
+//        {
+//            player.sendMessage("no projects available");
+//            return;
+//        }
+//
+//        DbRow formerFocusedProject = new DbRow();
+//
+//        for(DbRow project : projects)
+//        {
+//            if(project.getInt("focused") == 1)
+//            {
+//                formerFocusedProject = project;
+//                break;
+//            }
+//        }
+//
+//        try
+//        {
+//            if(!formerFocusedProject.isEmpty())
+//            {
+//                DB.executeUpdate("UPDATE mint_projects SET focused = 0 WHERE project_id = ?", formerFocusedProject.getInt("project_id"));
+//            }
+//
+//            DB.executeUpdate("UPDATE mint_projects SET focused = 1 WHERE project_id = ?", projectID);
+//            player.sendMessage("set the project to focused!");
+//        }
+//        catch(SQLException e)
+//        {
+//            player.sendMessage("error? " + e.toString());
+//        }
     }
 
     // TODO fix messages and add tasks/materials
@@ -314,78 +313,50 @@ public class MintCommand extends BaseCommand {
     @CommandPermission("emi.mint.info")
     public void onProjectInfo(Player player, String projectName)
     {
-        if(!doesProjectExist(projectName))
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(projectName);
+
+        if(project == null)
         {
-            player.sendMessage("project doesnt exist xD");
+            player.sendMessage(Utils.color("&cCouldn't find the project &6" + projectName));
             return;
         }
 
-        int projectID = getProjectID(projectName);
-        DbRow project = getProjectRow(projectID);
-        List<String> players = new ArrayList<>();
-
-        for(DbRow projectPlayer : getProjectPlayers(projectID))
-        {
-            if(projectPlayer.getInt("player_id") == project.getInt("project_lead"))
-            {
-                continue;
-            }
-
-            players.add(getPlayerName(projectPlayer.getInt("player_id")));
-        }
-
-        player.sendMessage("Mint project: " + project.getString("project_name") + "\n" +
-                project.getString("description") + "\n" +
-                getPlayerName(project.getInt("project_lead")) + "\n" +
-                "ADDING TASKS LATER" + "\n" +
-                "ADDING MATERIALS LATER" + "\n" +
-                "Workers: " + players.toString());
+        player.sendMessage(Utils.color("&aInformation for project: &6" + project.getName() + "&7 " + project.getFocused() + " " + project.getComplete() + "\n" +
+                "&aProject lead: &6" + project.getLead().getName() + "\n" +
+                "&aProject description: &6" + project.getDescription() + "\n" +
+                "&aDates: &6" + project.getStartDate() + " &7- &6" + project.getEndDate() + "\n" +
+                "&aWorkers: &6" + project.getWorkers().toString()));
     }
 
     //TODO Fix messages
     @Subcommand("project join")
     @CommandPermission("emi.mint.project.join")
-    public void onProjectJoin(Player player, String project)
+    public void onProjectJoin(Player player, String mintProject)
     {
-        int projectID = getProjectID(project);
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(mintProject);
 
-        if(projectID == 0)
+        if(project == null)
         {
+            player.sendMessage(Utils.color("&cProject &6" + mintProject + " &cdoesn't exist!"));
             return;
         }
 
-        int playerID = getPlayerId(player.getName());
-
-        if(playerID == 0)
+        for(EMIPlayer emiPlayer : project.getWorkers())
         {
-            return;
-        }
-
-        try
-        {
-            int rows = DB.getResults("SELECT log_id FROM mint_project_join_log WHERE player_id = ? AND project_id = ?", playerID, projectID).size();
-
-            if(rows > 0)
+            if(emiPlayer.getUniqueId().equalsIgnoreCase(player.getUniqueId().toString()))
             {
-                player.sendMessage("You already joined this project.");
+                player.sendMessage(Utils.color("&cYou have already joined this project."));
                 return;
             }
         }
-        catch (SQLException e)
-        {
-            player.sendMessage("error: " + e.toString());
-            return;
-        }
 
-        try
-        {
-            DB.executeInsert("INSERT INTO mint_project_join_log (player_id, project_id, join_date) VALUES (?, ?, ?)", playerID, projectID, getCurrentDate());
-            player.sendMessage("You have joined the project.");
-        }
-        catch (SQLException e)
-        {
-            player.sendMessage(Utils.color("&cUnknown error?!\n" + e.toString()));
-        }
+        DbRow playerRow = PlayerUtils.getPlayerRow(player.getName());
+        EMIPlayer emiPlayer = new EMIPlayer(playerRow.getString("player_uuid"), playerRow.getString("player_name"), playerRow.getInt("player_id"));
+
+        project.addWorker(emiPlayer);
+        player.sendMessage(Utils.color("&aSuccessfully joined the project: &6" + project.getName()));
     }
 
     //TODO fix messages
@@ -399,40 +370,6 @@ public class MintCommand extends BaseCommand {
         {
             player.sendMessage(Utils.color("&a" + project.getName()));
         }
-
-//        List<DbRow> projects = getProjectList();
-//        HashMap<String, ArrayList<String>> sortedProjects = new HashMap<>();
-//
-//        if(projects.isEmpty())
-//        {
-//            player.sendMessage("no projects available");
-//            return;
-//        }
-//
-//        sortedProjects.put("focused", new ArrayList<>());
-//        sortedProjects.put("current", new ArrayList<>());
-//        sortedProjects.put("complete", new ArrayList<>());
-//
-//        for(DbRow project : projects)
-//        {
-//            if(project.getInt("focused") == 1)
-//            {
-//                sortedProjects.get("focused").add(project.getString("project_name"));
-//            }
-//            else if(project.getInt("complete") == 1)
-//            {
-//                sortedProjects.get("complete").add(project.getString("project_name"));
-//            }
-//            else
-//            {
-//                sortedProjects.get("current").add(project.getString("project_name"));
-//            }
-//        }
-//
-//        player.sendMessage("Mint Projects:\n" +
-//                "Focused Project: " + sortedProjects.get("focused").toString() + "\n" +
-//                "Current Projects: " + sortedProjects.get("current").toString() + "\n" +
-//                "Complete Projects: " + sortedProjects.get("complete").toString());
     }
 
     @Subcommand("project work")
@@ -585,12 +522,5 @@ public class MintCommand extends BaseCommand {
         {
             return null;
         }
-    }
-
-    private String getCurrentDate()
-    {
-        Date date = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return simpleDateFormat.format(date);
     }
 }
