@@ -70,6 +70,5 @@ public class WhitelistAppService {
         {
             appMap.get(id).setInProgress(false);
         }
-        appMap.get(id).setStep(appMap.get(id).getStep() + 1);
     }
 }

@@ -91,10 +91,10 @@ public class MessageReceivedListener extends ListenerAdapter {
             }
         }
         else if(event.isFromType(ChannelType.PRIVATE)) {
-            if (!event.getAuthor().isBot()) {
+            if (!event.getAuthor().isBot() && !event.getMessage().getContentRaw().isEmpty()) {
                 WhitelistApp appInProgress = WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong());
                 appInProgress.setHoldForNextStep(false);
-                if (!appInProgress.isHoldForNextStep()) {
+                if (!appInProgress.isHoldForNextStep() ) {
                     if (appInProgress.getStep() == 10 && event.getMessage().getContentRaw().toLowerCase().equals("yes")) {
                         WhitelistAppService.getService().addData(appInProgress.getDiscordId(), appInProgress.getStep(), event.getMessage().getContentRaw());
                     } else if (appInProgress.getStep() == 10 && event.getMessage().getContentRaw().toLowerCase().equals("no")) {
