@@ -45,7 +45,7 @@ public class VotingService {
         }
         return app;
     }
-
+/*
     private WhitelistApp buildApp(DbRow app)
     {
         return new WhitelistApp(
@@ -61,4 +61,6 @@ public class VotingService {
                 UUID.fromString(app.getString("player_uuid"))
         );
     }
+    
+ */
 }
