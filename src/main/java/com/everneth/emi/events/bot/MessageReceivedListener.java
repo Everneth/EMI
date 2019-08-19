@@ -95,17 +95,8 @@ public class MessageReceivedListener extends ListenerAdapter {
                 WhitelistApp appInProgress = WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong());
                 if(appInProgress != null) {
                     appInProgress.setHoldForNextStep(false);
-
-                    if (!appInProgress.isHoldForNextStep()) {
-                        if (appInProgress.getStep() == 10 && event.getMessage().getContentRaw().toLowerCase().equals("yes")) {
-                            WhitelistAppService.getService().addData(appInProgress.getDiscordId(), appInProgress.getStep(), event.getMessage().getContentRaw());
-                        } else if (appInProgress.getStep() == 10 && event.getMessage().getContentRaw().toLowerCase().equals("no")) {
-                            WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong()).setStep(1);
-                        } else if (appInProgress.getStep() == 10 && (!event.getMessage().getContentRaw().toLowerCase().equals("no") || !event.getMessage().getContentRaw().toLowerCase().equals("yes"))) {
-                            event.getPrivateChannel().sendMessage("**INVALID INPUT** Please review once more and answer with yes or no!").queue();
-                        } else {
-                            WhitelistAppService.getService().addData(appInProgress.getDiscordId(), appInProgress.getStep(), event.getMessage().getContentRaw());
-                        }
+                        if(!appInProgress.isHoldForNextStep())
+                        {
                         switch (appInProgress.getStep()) {
                             case 1:
                                 event.getPrivateChannel().sendMessage("What is your Minecraft IGN?").queue();
@@ -190,11 +181,23 @@ public class MessageReceivedListener extends ListenerAdapter {
                                 }
                                 WhitelistAppService.getService().removeApp(appInProgress.getDiscordId());
                         }
+                        }
+                        else {
+                            if (appInProgress.getStep() == 10 && event.getMessage().getContentRaw().toLowerCase().equals("yes")) {
+                                WhitelistAppService.getService().addData(appInProgress.getDiscordId(), appInProgress.getStep(), event.getMessage().getContentRaw());
+                            } else if (appInProgress.getStep() == 10 && event.getMessage().getContentRaw().toLowerCase().equals("no")) {
+                                WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong()).setStep(1);
+                            } else if (appInProgress.getStep() == 10 && (!event.getMessage().getContentRaw().toLowerCase().equals("no") || !event.getMessage().getContentRaw().toLowerCase().equals("yes"))) {
+                                event.getPrivateChannel().sendMessage("**INVALID INPUT** Please review once more and answer with yes or no!").queue();
+                            } else {
+                                WhitelistAppService.getService().addData(appInProgress.getDiscordId(), appInProgress.getStep(), event.getMessage().getContentRaw());
+                            }
+                        }
                     }
                 }
             }
         }
-    }
+    
     private PostResponse transcribeToPost(WhitelistApp app) throws IOException {
         final String URL =
                 EMI.getPlugin().getConfig().getString("api-topic-post-url") + "api" +
