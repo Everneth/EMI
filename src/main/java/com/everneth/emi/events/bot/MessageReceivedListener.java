@@ -90,7 +90,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                 }
             }
         }
-        else if(event.isFromType(ChannelType.PRIVATE)) {
+        else if(event.isFromType(ChannelType.PRIVATE) && !event.getAuthor().isBot()) {
             if (!event.getAuthor().isBot() && !event.getMessage().getContentRaw().isEmpty()) {
                 WhitelistApp appInProgress = WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong());
                 appInProgress.setHoldForNextStep(false);
