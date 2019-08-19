@@ -25,7 +25,7 @@ public class WhitelistAppService {
         app.setStep(1);
         app.setDiscordId(id);
         app.setInProgress(true);
-        app.setHoldForNextStep(true);
+        app.setHoldForNextStep(false);
         appMap.put(id, app);
     }
 
