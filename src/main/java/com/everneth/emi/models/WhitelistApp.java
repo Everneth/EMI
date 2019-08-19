@@ -8,7 +8,10 @@ public class WhitelistApp {
     private String location;
     private int age;
     private String friend;
+<<<<<<< HEAD
     private String bannedElsewhere;
+=======
+>>>>>>> 0c39a0555f20fd4f125f09fa90d0c43afcfadf11
     private String lookingFor;
     private String loveHate;
     private String intro;
@@ -16,11 +19,18 @@ public class WhitelistApp {
     private long discordId;
     private UUID minecraftUuid;
     private int step;
+<<<<<<< HEAD
     private boolean inProgress;
 
     public WhitelistApp() {}
 
     public WhitelistApp(String inGameName, String location, int age, String friend, String bannedElsewhere, String lookingFor, String loveHate,
+=======
+
+    public WhitelistApp() {}
+
+    public WhitelistApp(String inGameName, String location, int age, String friend, String lookingFor, String loveHate,
+>>>>>>> 0c39a0555f20fd4f125f09fa90d0c43afcfadf11
                         String intro, String secretWord, long discordId, UUID minecraftUuid)
     {
         this.inGameName = inGameName;
@@ -28,7 +38,10 @@ public class WhitelistApp {
         this.age = age;
         this.friend = friend;
         this.lookingFor = lookingFor;
+<<<<<<< HEAD
         this.bannedElsewhere = bannedElsewhere;
+=======
+>>>>>>> 0c39a0555f20fd4f125f09fa90d0c43afcfadf11
         this.loveHate = loveHate;
         this.intro = intro;
         this.secretWord = secretWord;
@@ -100,6 +113,7 @@ public class WhitelistApp {
         this.secretWord = secretWord;
     }
 
+<<<<<<< HEAD
     public String getBannedElsewhere() {
         return bannedElsewhere;
     }
@@ -108,6 +122,8 @@ public class WhitelistApp {
         this.bannedElsewhere = bannedElsewhere;
     }
 
+=======
+>>>>>>> 0c39a0555f20fd4f125f09fa90d0c43afcfadf11
     public long getDiscordId() {
         return discordId;
     }
@@ -133,6 +149,7 @@ public class WhitelistApp {
     {
         this.step = step;
     }
+<<<<<<< HEAD
 
     public boolean isInProgress()
     {
@@ -143,4 +160,6 @@ public class WhitelistApp {
     {
         this.inProgress = inProgress;
     }
+=======
+>>>>>>> 0c39a0555f20fd4f125f09fa90d0c43afcfadf11
 }
