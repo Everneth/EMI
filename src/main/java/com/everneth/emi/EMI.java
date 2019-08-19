@@ -7,10 +7,7 @@ import co.aikar.idb.DatabaseOptions;
 import co.aikar.idb.PooledDatabaseOptions;
 import com.everneth.emi.api.*;
 import com.everneth.emi.commands.*;
-import com.everneth.emi.commands.bot.CloseReportCommand;
-import com.everneth.emi.commands.bot.ConfirmSyncCommand;
-import com.everneth.emi.commands.bot.DenySyncCommand;
-import com.everneth.emi.commands.bot.HelpClearCommand;
+import com.everneth.emi.commands.bot.*;
 import com.everneth.emi.commands.comm.CommCommand;
 import com.everneth.emi.commands.comp.CompCommand;
 import com.everneth.emi.commands.par.CharterCommand;
@@ -105,6 +102,7 @@ public class EMI extends JavaPlugin {
         builder.addCommand(new ConfirmSyncCommand());
         builder.addCommand(new DenySyncCommand());
         builder.addCommand(new CloseReportCommand());
+        builder.addCommand(new ApplyCommand());
         builder.setOwnerId(this.getConfig().getString("bot-owner-id"));
 
         CommandClient client = builder.build();
