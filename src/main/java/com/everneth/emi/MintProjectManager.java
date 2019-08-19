@@ -49,17 +49,17 @@ public class MintProjectManager
 
         try
         {
-            projectID = DB.executeInsert("INSERT INTO mint_project (project_lead, project_name, start_date, complete, focused, description VALUES (?, ?, ?, ?, ?, ?)",
+            projectID = DB.executeInsert("INSERT INTO mint_project (project_lead, project_name, start_date, complete, focused, description) VALUES (?, ?, ?, ?, ?, ?)",
                     mintProject.getLead(),
                     mintProject.getName(),
                     mintProject.getStartDate(),
-                    mintProject.isComplete(),
-                    mintProject.isFocused(),
+                    mintProject.getComplete(),
+                    mintProject.getFocused(),
                     mintProject.getDescription());
         }
         catch (SQLException e)
         {
-            Bukkit.getLogger().info("ERROR?! " + e.toString());
+            Bukkit.getLogger().info("MintProjectManager/addProject(MintProject) ERROR: " + e.toString());
             return;
         }
         projects.put(projectID, mintProject);

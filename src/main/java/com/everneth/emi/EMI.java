@@ -176,7 +176,7 @@ public class EMI extends JavaPlugin {
             DbRow playerRow = PlayerUtils.getPlayerRow(projectRow.getInt("project_lead"));
             EMIPlayer playerLead = new EMIPlayer(playerRow.getString("player_uuid"), playerRow.getString("player_name"), playerRow.getInt("player_id"));
             Timestamp endDateTime = projectRow.get("end_date");
-            String endDate = "";
+            String endDate = null;
             if(endDateTime != null)
             {
                 endDate = endDateTime.toString();

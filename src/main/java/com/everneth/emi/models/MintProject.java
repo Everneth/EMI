@@ -68,9 +68,9 @@ public class MintProject
         this.endDate = endDate;
     }
 
-    public boolean isComplete()
+    public int getComplete()
     {
-        return complete != 0;
+        return complete;
     }
 
     public void setComplete(int complete)
@@ -78,9 +78,9 @@ public class MintProject
         this.complete = complete;
     }
 
-    public boolean isFocused()
+    public int getFocused()
     {
-        return focused != 0;
+        return focused;
     }
 
     public void setFocused(int focused)
