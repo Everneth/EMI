@@ -94,37 +94,45 @@ public class MessageReceivedListener extends ListenerAdapter {
             if (!event.getAuthor().isBot() && !event.getMessage().getContentRaw().isEmpty()) {
                 WhitelistApp appInProgress = WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong());
                 if(appInProgress != null) {
-                    appInProgress.setHoldForNextStep(false);
                         if(!appInProgress.isHoldForNextStep())
                         {
                         switch (appInProgress.getStep()) {
                             case 1:
                                 event.getPrivateChannel().sendMessage("What is your Minecraft IGN?").queue();
                                 appInProgress.setHoldForNextStep(true);
+                                break;
                             case 2:
                                 event.getPrivateChannel().sendMessage("Where do you live?").queue();
                                 appInProgress.setHoldForNextStep(true);
+                                break;
                             case 3:
                                 event.getPrivateChannel().sendMessage("What is your age? (Must be 13 or older to use Discord!)").queue();
                                 appInProgress.setHoldForNextStep(true);
+                                break;
                             case 4:
                                 event.getPrivateChannel().sendMessage("Do you know someone in our community? If yes, please state who.").queue();
                                 appInProgress.setHoldForNextStep(true);
+                                break;
                             case 5:
                                 event.getPrivateChannel().sendMessage("Have you been banned elsewhere before?").queue();
                                 appInProgress.setHoldForNextStep(true);
+                                break;
                             case 6:
                                 event.getPrivateChannel().sendMessage("What are you looking for in a Minecraft community?").queue();
                                 appInProgress.setHoldForNextStep(true);
+                                break;
                             case 7:
                                 event.getPrivateChannel().sendMessage("What do you love and/or hate about Minecraft?").queue();
                                 appInProgress.setHoldForNextStep(true);
+                                break;
                             case 8:
                                 event.getPrivateChannel().sendMessage("Tell us something about you!").queue();
                                 appInProgress.setHoldForNextStep(true);
+                                break;
                             case 9:
                                 event.getPrivateChannel().sendMessage("What is the secret word?").queue();
                                 appInProgress.setHoldForNextStep(true);
+                                break;
                             case 10:
                                 event.getPrivateChannel().sendMessage("```css The following is your whitelist app```\n").queue();
                                 appInProgress.setHoldForNextStep(true);
@@ -143,6 +151,7 @@ public class MessageReceivedListener extends ListenerAdapter {
 
                                 event.getPrivateChannel().sendMessage(eb.build()).queue();
                                 event.getPrivateChannel().sendMessage("Is this information correct? Please reply **yes** or **no**.").queue();
+                                break;
                             case 11:
                                 appInProgress.setHoldForNextStep(true);
                                 EmbedBuilder eb2 = new EmbedBuilder();
@@ -180,6 +189,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                                     event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage(msg).queue();
                                 }
                                 WhitelistAppService.getService().removeApp(appInProgress.getDiscordId());
+                                break;
                         }
                         }
                         else {
@@ -197,7 +207,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                 }
             }
         }
-    
+
     private PostResponse transcribeToPost(WhitelistApp app) throws IOException {
         final String URL =
                 EMI.getPlugin().getConfig().getString("api-topic-post-url") + "api" +

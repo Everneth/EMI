@@ -46,24 +46,34 @@ public class WhitelistAppService {
         {
             case 1:
                 appMap.get(id).setInGameName(data);
+                break;
             case 2:
                 appMap.get(id).setLocation(data);
+                break;
             case 3:
                 appMap.get(id).setAge(Integer.valueOf(data));
+                break;
             case 4:
                 appMap.get(id).setFriend(data);
+                break;
             case 5:
                 appMap.get(id).setBannedElsewhere(data);
+                break;
             case 6:
                 appMap.get(id).setLookingFor(data);
+                break;
             case 7:
                 appMap.get(id).setLoveHate(data);
+                break;
             case 8:
                 appMap.get(id).setIntro(data);
+                break;
             case 9:
                 appMap.get(id).setSecretWord(data);
+                break;
             case 10:
                 appMap.get(id).setStep(0); // restart app
+                break;
         }
         appMap.get(id).setStep(appMap.get(id).getStep() + 1);
         if(appMap.get(id).getStep() >= 13)
