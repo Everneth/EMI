@@ -333,23 +333,23 @@ public class MintCommand extends BaseCommand {
 
         if(project == null)
         {
-            player.sendMessage("&cProject doesnt exist!");
+            player.sendMessage(Utils.color("&cProject doesnt exist!"));
             return;
         }
 
         if(project.getTaskRequirements().get(taskID) == null)
         {
-            player.sendMessage("&cTask in project &6" + project.getName() + " &cdoesnt exist!");
+            player.sendMessage(Utils.color("&cTask in project &6" + project.getName() + " &cdoesnt exist!"));
             return;
         }
 
         if(project.getTaskRequirements().get(taskID).getComplete() == 1)
         {
-            player.sendMessage("&cTask in project &6" + project.getName() + " &cis already complete!");
+            player.sendMessage(Utils.color("&cTask in project &6" + project.getName() + " &cis already complete!"));
             return;
         }
         project.completeTask(taskID);
-        player.sendMessage("&aSuccessfully marked the task as complete!");
+        player.sendMessage(Utils.color("&aSuccessfully marked the task as complete!"));
     }
 
     @Subcommand("task create")
@@ -371,14 +371,32 @@ public class MintCommand extends BaseCommand {
         MintTaskRequirement task = new MintTaskRequirement(taskString, 0, 0);
 
         project.addTask(task);
-        player.sendMessage("&aSuccessfully added task to project &6" + project.getName());
+        player.sendMessage(Utils.color("&aSuccessfully added task to project &6" + project.getName()));
     }
 
     @Subcommand("task delete")
     @CommandPermission("emi.task.delete")
-    public void onTaskDelete(Player player, String mintProject, String taskID)
+    public void onTaskDelete(Player player, String mintProject, long taskID)
     {
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(mintProject);
 
+        if (project == null)
+        {
+            player.sendMessage(Utils.color("&cProject doesnt exist!"));
+            return;
+        }
+
+        MintTaskRequirement task = project.getTaskRequirements().get(taskID);
+
+        if (task == null)
+        {
+            player.sendMessage(Utils.color("&cTaskID isnt associated with any other tasks"));
+            return;
+        }
+
+        project.deleteTask(task);
+        player.sendMessage(Utils.color("&aSuccessfully deleted task!"));
     }
 
     @Subcommand("task focus")
@@ -428,6 +446,33 @@ public class MintCommand extends BaseCommand {
 
         project.switchTaskFocus(task, formerTask);
         player.sendMessage(Utils.color("&aSuccessfully set task as focued!"));
+    }
+
+    @Subcommand("task list")
+    @Syntax("<ProjectName>")
+    @CommandPermission("emi.task.list")
+    public void onTaskList(Player player, String mintProject)
+    {
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(mintProject);
+
+        if(project == null)
+        {
+            player.sendMessage(Utils.color("&cProject doesnt exist!"));
+            return;
+        }
+
+        if(project.getTaskRequirements().isEmpty())
+        {
+            player.sendMessage(Utils.color("&cProject doesnt have any tasks to list!"));
+            return;
+        }
+
+        player.sendMessage(Utils.color("&aTasks for project: &6" + project.getName()));
+        for(MintTaskRequirement task : project.getTaskRequirements().values())
+        {
+            player.sendMessage(Utils.color("&8[&9" + task.getTaskID() + "&8] &a" + task.getTask()));
+        }
     }
 
     @Subcommand("validate")

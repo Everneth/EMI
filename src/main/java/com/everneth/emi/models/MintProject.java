@@ -98,7 +98,7 @@ public class MintProject
         try
         {
             DB.executeUpdate("UPDATE mint_task_requirements SET complete = 1 WHERE task_id = ?",
-                    projectID);
+                    taskID);
             taskRequirements.get(taskID).setComplete(1);
         }
         catch(SQLException e)
@@ -125,6 +125,20 @@ public class MintProject
         catch(SQLException e)
         {
             Bukkit.getLogger().info("ERROR: MintProject/switchTaskFocus: " + e.toString());
+        }
+    }
+
+    public void deleteTask(MintTaskRequirement task)
+    {
+        try
+        {
+            DB.executeUpdate("DELETE FROM mint_task_requirements WHERE task_id = ?",
+                    task.getTaskID());
+            taskRequirements.remove(task.getTaskID());
+        }
+        catch(SQLException e)
+        {
+            Bukkit.getLogger().info("ERROR: MintProject/deleteTask: " + e.toString());
         }
     }
 

@@ -16,6 +16,7 @@ import com.everneth.emi.events.LeaveEvent;
 import com.everneth.emi.events.bot.MessageReceivedListener;
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.MintProject;
+import com.everneth.emi.models.MintTaskRequirement;
 import com.everneth.emi.utils.PlayerUtils;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -208,17 +209,16 @@ public class EMI extends JavaPlugin {
                 project.getWorkers().add(emiPlayer);
             }
 
-//            for(DbRow taskRow : tasks)
-//            {
-//                if(projectRow.getInt("project_id") != projectRow.getInt("project_id"))
-//                {
-//                    continue;
-//                }
-//
-//                MintTaskRequirement task = new MintTaskRequirement(taskRow.get("task"), taskRow.getInt("complete"), taskRow.get("focused"));
-//                project.getTaskRequirements().put(taskRow.getInt("task_id"), task);
-//            }
+            for(DbRow taskRow : tasks)
+            {
+                if(projectRow.getInt("project_id") != projectRow.getInt("project_id"))
+                {
+                    continue;
+                }
 
+                MintTaskRequirement task = new MintTaskRequirement(taskRow.getInt("task_id"), taskRow.getString("task"), taskRow.getInt("complete"), taskRow.getInt("focused"));
+                project.getTaskRequirements().put(task.getTaskID(), task);
+            }
             manager.addProject(projectRow.getInt("project_id"), project);
         }
 
