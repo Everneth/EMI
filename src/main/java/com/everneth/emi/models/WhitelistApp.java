@@ -17,8 +17,9 @@ public class WhitelistApp {
     private UUID minecraftUuid;
     private int step;
     private boolean inProgress;
+    private boolean holdForNextStep;
 
-    public WhitelistApp() {}
+    public WhitelistApp() {this.setHoldForNextStep(false);}
 
     public WhitelistApp(String inGameName, String location, int age, String friend, String bannedElsewhere, String lookingFor, String loveHate,
                         String intro, String secretWord, long discordId, UUID minecraftUuid)
@@ -142,5 +143,13 @@ public class WhitelistApp {
     public void setInProgress(boolean inProgress)
     {
         this.inProgress = inProgress;
+    }
+
+    public boolean isHoldForNextStep() {
+        return holdForNextStep;
+    }
+
+    public void setHoldForNextStep(boolean holdForNextStep) {
+        this.holdForNextStep = holdForNextStep;
     }
 }

@@ -9,6 +9,7 @@ import com.everneth.emi.Utils;
 import com.everneth.emi.models.PostResponse;
 import com.everneth.emi.models.WhitelistApp;
 import com.everneth.emi.services.WhitelistAppService;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -89,100 +90,106 @@ public class MessageReceivedListener extends ListenerAdapter {
                 }
             }
         }
-        if(event.isFromType(ChannelType.PRIVATE) && WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong()).isInProgress() && !event.getAuthor().isBot())
+        else if(event.isFromType(ChannelType.PRIVATE) && WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong()).isInProgress() && !event.getAuthor().isBot())
         {
             WhitelistApp appInProgress = WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong());
-            if(appInProgress.getStep() == 10 && event.getMessage().getContentRaw().toLowerCase().equals("yes")) {
-                WhitelistAppService.getService().addData(appInProgress.getDiscordId(), appInProgress.getStep(), event.getMessage().getContentRaw());
-            }
-            else if (appInProgress.getStep() == 10 && event.getMessage().getContentRaw().toLowerCase().equals("no"))
-            {
-                WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong()).setStep(1);
-            }
-            else if (appInProgress.getStep() == 10 && (!event.getMessage().getContentRaw().toLowerCase().equals("no") || !event.getMessage().getContentRaw().toLowerCase().equals("yes")))
-            {
-                event.getPrivateChannel().sendMessage("**INVALID INPUT** Please review once more and answer with yes or no!").queue();
-            }
-            else
-            {
-                WhitelistAppService.getService().addData(appInProgress.getDiscordId(), appInProgress.getStep(), event.getMessage().getContentRaw());
-            }
-            switch(appInProgress.getStep()) {
-                case 1:
-                    event.getPrivateChannel().sendMessage("What is your Minecraft IGN?").queue();
-                case 2:
-                    event.getPrivateChannel().sendMessage("Where do you live?").queue();
-                case 3:
-                    event.getPrivateChannel().sendMessage("What is your age? (Must be 13 or older to use Discord!)").queue();
-                case 4:
-                    event.getPrivateChannel().sendMessage("Do you know someone in our community? If yes, please state who.").queue();
-                case 5:
-                    event.getPrivateChannel().sendMessage("Have you been banned elsewhere before?").queue();
-                case 6:
-                    event.getPrivateChannel().sendMessage("What are you looking for in a Minecraft community?").queue();
-                case 7:
-                    event.getPrivateChannel().sendMessage("What do you love and/or hate about Minecraft?").queue();
-                case 8:
-                    event.getPrivateChannel().sendMessage("Tell us something about you!").queue();
-                case 9:
-                    event.getPrivateChannel().sendMessage("What is the secret word?").queue();
-                case 10:
-                    event.getPrivateChannel().sendMessage("```css The following is your whitelist app```\n").queue();
-                    EmbedBuilder eb = new EmbedBuilder();
-                    eb.setTitle(appInProgress.getInGameName());
-                    eb.setDescription("Discord Name: " + event.getAuthor().getAsTag() + " - Discord ID: " + appInProgress.getDiscordId());
-                    eb.addField("Minecraft IGN", appInProgress.getInGameName(), false);
-                    eb.addField("Where do  you live?", appInProgress.getLocation(), false);
-                    eb.addField("What is your age?", String.valueOf(appInProgress.getAge()), false);
-                    eb.addField("Do you know someone in our community", appInProgress.getFriend(), false);
-                    eb.addField("Have you been banned elsewhere before?", appInProgress.getBannedElsewhere(), false);
-                    eb.addField("What are you looking for in a minecraft community?", appInProgress.getLookingFor(), false);
-                    eb.addField("What do you love and/or hate about Minecraft?", appInProgress.getLoveHate(), false);
-                    eb.addField("Tell us something about you.", appInProgress.getIntro(), false);
-                    eb.addField("What is the secret word?", appInProgress.getSecretWord(), false);
+            appInProgress.setHoldForNextStep(false);
+            if(!appInProgress.isHoldForNextStep()) {
+                if (appInProgress.getStep() == 10 && event.getMessage().getContentRaw().toLowerCase().equals("yes")) {
+                    WhitelistAppService.getService().addData(appInProgress.getDiscordId(), appInProgress.getStep(), event.getMessage().getContentRaw());
+                } else if (appInProgress.getStep() == 10 && event.getMessage().getContentRaw().toLowerCase().equals("no")) {
+                    WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong()).setStep(1);
+                } else if (appInProgress.getStep() == 10 && (!event.getMessage().getContentRaw().toLowerCase().equals("no") || !event.getMessage().getContentRaw().toLowerCase().equals("yes"))) {
+                    event.getPrivateChannel().sendMessage("**INVALID INPUT** Please review once more and answer with yes or no!").queue();
+                } else {
+                    WhitelistAppService.getService().addData(appInProgress.getDiscordId(), appInProgress.getStep(), event.getMessage().getContentRaw());
+                }
+                switch (appInProgress.getStep()) {
+                    case 1:
+                        event.getPrivateChannel().sendMessage("What is your Minecraft IGN?").queue();
+                        appInProgress.setHoldForNextStep(true);
+                    case 2:
+                        event.getPrivateChannel().sendMessage("Where do you live?").queue();
+                        appInProgress.setHoldForNextStep(true);
+                    case 3:
+                        event.getPrivateChannel().sendMessage("What is your age? (Must be 13 or older to use Discord!)").queue();
+                        appInProgress.setHoldForNextStep(true);
+                    case 4:
+                        event.getPrivateChannel().sendMessage("Do you know someone in our community? If yes, please state who.").queue();
+                        appInProgress.setHoldForNextStep(true);
+                    case 5:
+                        event.getPrivateChannel().sendMessage("Have you been banned elsewhere before?").queue();
+                        appInProgress.setHoldForNextStep(true);
+                    case 6:
+                        event.getPrivateChannel().sendMessage("What are you looking for in a Minecraft community?").queue();
+                        appInProgress.setHoldForNextStep(true);
+                    case 7:
+                        event.getPrivateChannel().sendMessage("What do you love and/or hate about Minecraft?").queue();
+                        appInProgress.setHoldForNextStep(true);
+                    case 8:
+                        event.getPrivateChannel().sendMessage("Tell us something about you!").queue();
+                        appInProgress.setHoldForNextStep(true);
+                    case 9:
+                        event.getPrivateChannel().sendMessage("What is the secret word?").queue();
+                        appInProgress.setHoldForNextStep(true);
+                    case 10:
+                        event.getPrivateChannel().sendMessage("```css The following is your whitelist app```\n").queue();
+                        appInProgress.setHoldForNextStep(true);
+                        EmbedBuilder eb = new EmbedBuilder();
+                        eb.setTitle(appInProgress.getInGameName());
+                        eb.setDescription("Discord Name: " + event.getAuthor().getAsTag() + " - Discord ID: " + appInProgress.getDiscordId());
+                        eb.addField("Minecraft IGN", appInProgress.getInGameName(), false);
+                        eb.addField("Where do  you live?", appInProgress.getLocation(), false);
+                        eb.addField("What is your age?", String.valueOf(appInProgress.getAge()), false);
+                        eb.addField("Do you know someone in our community", appInProgress.getFriend(), false);
+                        eb.addField("Have you been banned elsewhere before?", appInProgress.getBannedElsewhere(), false);
+                        eb.addField("What are you looking for in a minecraft community?", appInProgress.getLookingFor(), false);
+                        eb.addField("What do you love and/or hate about Minecraft?", appInProgress.getLoveHate(), false);
+                        eb.addField("Tell us something about you.", appInProgress.getIntro(), false);
+                        eb.addField("What is the secret word?", appInProgress.getSecretWord(), false);
 
-                    event.getPrivateChannel().sendMessage(eb.build()).queue();
-                    event.getPrivateChannel().sendMessage("Is this information correct? Please reply **yes** or **no**.").queue();
-                case 11:
-                    EmbedBuilder eb2 = new EmbedBuilder();
-                    eb2.setTitle(appInProgress.getInGameName());
-                    eb2.setDescription("Discord Name: " + event.getAuthor().getAsTag() + " - Discord ID: " + appInProgress.getDiscordId());
-                    eb2.addField("Minecraft IGN", appInProgress.getInGameName(), false);
-                    eb2.addField("Where do  you live?", appInProgress.getLocation(), false);
-                    eb2.addField("What is your age?", String.valueOf(appInProgress.getAge()), false);
-                    eb2.addField("Do you know someone in our community", appInProgress.getFriend(), false);
-                    eb2.addField("Have you been banned elsewhere before?", appInProgress.getBannedElsewhere(), false);
-                    eb2.addField("What are you looking for in a minecraft community?", appInProgress.getLookingFor(), false);
-                    eb2.addField("What do you love and/or hate about Minecraft?", appInProgress.getLoveHate(), false);
-                    eb2.addField("Tell us something about you.", appInProgress.getIntro(), false);
-                    eb2.addField("What is the secret word?", appInProgress.getSecretWord(), false);
-                    event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage(eb2.build()).queue();
-                    event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage("Attempting to transmit application to forums").queue();
+                        event.getPrivateChannel().sendMessage(eb.build()).queue();
+                        event.getPrivateChannel().sendMessage("Is this information correct? Please reply **yes** or **no**.").queue();
+                    case 11:
+                        appInProgress.setHoldForNextStep(true);
+                        EmbedBuilder eb2 = new EmbedBuilder();
+                        eb2.setTitle(appInProgress.getInGameName());
+                        eb2.setDescription("Discord Name: " + event.getAuthor().getAsTag() + " - Discord ID: " + appInProgress.getDiscordId());
+                        eb2.addField("Minecraft IGN", appInProgress.getInGameName(), false);
+                        eb2.addField("Where do  you live?", appInProgress.getLocation(), false);
+                        eb2.addField("What is your age?", String.valueOf(appInProgress.getAge()), false);
+                        eb2.addField("Do you know someone in our community", appInProgress.getFriend(), false);
+                        eb2.addField("Have you been banned elsewhere before?", appInProgress.getBannedElsewhere(), false);
+                        eb2.addField("What are you looking for in a minecraft community?", appInProgress.getLookingFor(), false);
+                        eb2.addField("What do you love and/or hate about Minecraft?", appInProgress.getLoveHate(), false);
+                        eb2.addField("Tell us something about you.", appInProgress.getIntro(), false);
+                        eb2.addField("What is the secret word?", appInProgress.getSecretWord(), false);
+                        event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage(eb2.build()).queue();
+                        event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage("Attempting to transmit application to forums").queue();
 
-                    PostResponse postResponse;
-                    int statusCode = 0;
-                    String url = "";
-                    try {
-                        postResponse = transcribeToPost(appInProgress);
-                        statusCode = postResponse.getStatusCode();
-                        url = postResponse.getUrl();
-                    }
-                    catch(IOException e)
-                    {
-                        System.out.println(e.getMessage());
-                    }
-                    if(statusCode == 200 || statusCode == 201) {
-                        String msg = appInProgress.getInGameName() + "'s whitelist application successfully transmitted to the site.\n\n" +
-                                url;
-                        event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage(msg).queue();
-                    }
-                    else {
+                        PostResponse postResponse;
+                        int statusCode = 0;
+                        String url = "";
+                        try {
+                            postResponse = transcribeToPost(appInProgress);
+                            statusCode = postResponse.getStatusCode();
+                            url = postResponse.getUrl();
+                        } catch (IOException e) {
+                            System.out.println(e.getMessage());
+                        }
+                        if (statusCode == 200 || statusCode == 201) {
+                            String msg = appInProgress.getInGameName() + "'s whitelist application successfully transmitted to the site.\n\n" +
+                                    url;
+                            event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage(msg).queue();
+                        } else {
 
-                        String msg = appInProgress.getInGameName() + "'s whitelist application could not be transmitted to the site. An embed of the application has been posted.";
-                        event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage(msg).queue();
-                    }
-                    WhitelistAppService.getService().removeApp(appInProgress.getDiscordId());
+                            String msg = appInProgress.getInGameName() + "'s whitelist application could not be transmitted to the site. An embed of the application has been posted.";
+                            event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage(msg).queue();
+                        }
+                        WhitelistAppService.getService().removeApp(appInProgress.getDiscordId());
+                }
             }
+
         }
     }
     private PostResponse transcribeToPost(WhitelistApp app) throws IOException {
