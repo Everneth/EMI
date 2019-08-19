@@ -8,6 +8,7 @@ public class WhitelistApp {
     private String location;
     private int age;
     private String friend;
+    private String bannedElsewhere;
     private String lookingFor;
     private String loveHate;
     private String intro;
@@ -15,10 +16,11 @@ public class WhitelistApp {
     private long discordId;
     private UUID minecraftUuid;
     private int step;
+    private boolean inProgress;
 
     public WhitelistApp() {}
 
-    public WhitelistApp(String inGameName, String location, int age, String friend, String lookingFor, String loveHate,
+    public WhitelistApp(String inGameName, String location, int age, String friend, String bannedElsewhere, String lookingFor, String loveHate,
                         String intro, String secretWord, long discordId, UUID minecraftUuid)
     {
         this.inGameName = inGameName;
@@ -26,6 +28,7 @@ public class WhitelistApp {
         this.age = age;
         this.friend = friend;
         this.lookingFor = lookingFor;
+        this.bannedElsewhere = bannedElsewhere;
         this.loveHate = loveHate;
         this.intro = intro;
         this.secretWord = secretWord;
@@ -97,6 +100,14 @@ public class WhitelistApp {
         this.secretWord = secretWord;
     }
 
+    public String getBannedElsewhere() {
+        return bannedElsewhere;
+    }
+
+    public void setBannedElsewhere(String bannedElsewhere) {
+        this.bannedElsewhere = bannedElsewhere;
+    }
+
     public long getDiscordId() {
         return discordId;
     }
@@ -121,5 +132,15 @@ public class WhitelistApp {
     public void setStep(int step)
     {
         this.step = step;
+    }
+
+    public boolean isInProgress()
+    {
+        return this.inProgress;
+    }
+
+    public void setInProgress(boolean inProgress)
+    {
+        this.inProgress = inProgress;
     }
 }
