@@ -42,6 +42,7 @@ use-pending-role: true
 pending-role-id: 0
 staff-role-id: 0
 staff-channel-id: 0
+applicant-role-id: 0
 
 ###############################################################################################
 #########                              --EMI Settings--                               #########

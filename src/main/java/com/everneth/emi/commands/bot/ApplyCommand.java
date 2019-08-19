@@ -16,7 +16,7 @@ public class ApplyCommand extends Command {
     @Override
     public void execute(CommandEvent event)
     {
-        long applicationRoleId = EMI.getPlugin().getConfig().getLong("member-role-id");
+        long applicationRoleId = EMI.getPlugin().getConfig().getLong("applicant-role-id");
         Role applicantRole = event.getGuild().getRoleById(applicationRoleId);
 
         if(event.getMember().getRoles().contains(applicantRole))
