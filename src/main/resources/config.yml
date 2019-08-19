@@ -16,6 +16,7 @@ report-log-forum-id: 0
 system-user-id: 0
 api-topic-post-url: ''
 api-topic-post-endpoint: ''
+whitelist-app-forum-id: 0
 
 ###############################################################################################
 #########                              --Bot Settings--                               #########
