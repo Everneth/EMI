@@ -19,10 +19,10 @@ public class MintProject
     private int focused;
     private String description;
     private ArrayList<EMIPlayer> workers = new ArrayList<>();
-    private HashMap<Integer, MintWorkLog> workLog = new HashMap<>();
-    private HashMap<Integer, MintMaterialLog> materialLog = new HashMap<>();
-    private HashMap<Integer, MintTaskRequirement> taskRequirements = new HashMap<>();
-    private HashMap<Integer, MintMaterialReuirement> materialRequirements = new HashMap<>();
+    private HashMap<Long, MintWorkLog> workLog = new HashMap<>();
+    private HashMap<Long, MintMaterialLog> materialLog = new HashMap<>();
+    private HashMap<Long, MintTaskRequirement> taskRequirements = new HashMap<>();
+    private HashMap<Long, MintMaterialReuirement> materialRequirements = new HashMap<>();
 
     public MintProject(EMIPlayer lead, String name, String startDate, String endDate, int complete, int focused, String description)
     {
@@ -62,7 +62,7 @@ public class MintProject
         }
     }
 
-    public void complete()
+    public void completeProject()
     {
         try
         {
@@ -74,6 +74,57 @@ public class MintProject
         catch (SQLException e)
         {
             Bukkit.getLogger().info("ERROR: MintProject/complete: " + e.toString());
+        }
+    }
+
+    public void addTask(MintTaskRequirement task)
+    {
+        try
+        {
+            long taskID = DB.executeInsert("INSERT INTO mint_task_requirements (project_id, task, complete, focused) VALUES (?, ?, 0, 0)",
+                    projectID,
+                    task.getTask());
+            task.setTaskID(taskID);
+            taskRequirements.put(taskID, task);
+        }
+        catch(SQLException e)
+        {
+            Bukkit.getLogger().info("ERROR: MintProject/addTask: " + e.toString());
+        }
+    }
+
+    public void completeTask(long taskID)
+    {
+        try
+        {
+            DB.executeUpdate("UPDATE mint_task_requirements SET complete = 1 WHERE task_id = ?",
+                    projectID);
+            taskRequirements.get(taskID).setComplete(1);
+        }
+        catch(SQLException e)
+        {
+            Bukkit.getLogger().info("ERROR: MintProject/completeTask: " + e.toString());
+        }
+    }
+
+    public void switchTaskFocus(MintTaskRequirement newTask, MintTaskRequirement formerTask)
+    {
+        try
+        {
+            if(formerTask != null)
+            {
+                DB.executeUpdate("UPDATE mint_task_requirements SET focused = 0 WHERE task_id = ?",
+                        formerTask.getTaskID());
+                formerTask.setFocused(0);
+            }
+
+            DB.executeUpdate("UPDATE mint_task_requirements SET focused = 1 WHERE task_id = ?",
+                    newTask.getTaskID());
+            newTask.setFocused(1);
+        }
+        catch(SQLException e)
+        {
+            Bukkit.getLogger().info("ERROR: MintProject/switchTaskFocus: " + e.toString());
         }
     }
 
@@ -147,42 +198,42 @@ public class MintProject
         this.focused = focused;
     }
 
-    public HashMap<Integer, MintWorkLog> getWorkLog()
+    public HashMap<Long, MintWorkLog> getWorkLog()
     {
         return workLog;
     }
 
-    public void setWorkLog(HashMap<Integer, MintWorkLog> workLog)
+    public void setWorkLog(HashMap<Long, MintWorkLog> workLog)
     {
         this.workLog = workLog;
     }
 
-    public HashMap<Integer, MintMaterialLog> getMaterialLog()
+    public HashMap<Long, MintMaterialLog> getMaterialLog()
     {
         return materialLog;
     }
 
-    public void setMaterialLog(HashMap<Integer, MintMaterialLog> materialLog)
+    public void setMaterialLog(HashMap<Long, MintMaterialLog> materialLog)
     {
         this.materialLog = materialLog;
     }
 
-    public HashMap<Integer, MintTaskRequirement> getTaskRequirements()
+    public HashMap<Long, MintTaskRequirement> getTaskRequirements()
     {
         return taskRequirements;
     }
 
-    public void setTaskRequirements(HashMap<Integer, MintTaskRequirement> taskRequirements)
+    public void setTaskRequirements(HashMap<Long, MintTaskRequirement> taskRequirements)
     {
         this.taskRequirements = taskRequirements;
     }
 
-    public HashMap<Integer, MintMaterialReuirement> getMaterialRequirements()
+    public HashMap<Long, MintMaterialReuirement> getMaterialRequirements()
     {
         return materialRequirements;
     }
 
-    public void setMaterialRequirements(HashMap<Integer, MintMaterialReuirement> materialRequirements)
+    public void setMaterialRequirements(HashMap<Long, MintMaterialReuirement> materialRequirements)
     {
         this.materialRequirements = materialRequirements;
     }

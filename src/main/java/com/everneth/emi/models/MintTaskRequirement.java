@@ -3,8 +3,17 @@ package com.everneth.emi.models;
 public class MintTaskRequirement
 {
     private String task;
+    private long taskID;
     private int complete;
     private int focused;
+
+    public MintTaskRequirement(long taskID, String task, int complete, int focused)
+    {
+        this.taskID = taskID;
+        this.task = task;
+        this.complete = complete;
+        this.focused = focused;
+    }
 
     public MintTaskRequirement(String task, int complete, int focused)
     {
@@ -23,9 +32,19 @@ public class MintTaskRequirement
         this.task = task;
     }
 
-    public boolean isComplete()
+    public long getTaskID()
     {
-        return complete != 0;
+        return taskID;
+    }
+
+    public void setTaskID(long taskID)
+    {
+        this.taskID = taskID;
+    }
+
+    public int getComplete()
+    {
+        return complete;
     }
 
     public void setComplete(int complete)
@@ -33,9 +52,9 @@ public class MintTaskRequirement
         this.complete = complete;
     }
 
-    public boolean isFocused()
+    public int getFocused()
     {
-        return focused != 0;
+        return focused;
     }
 
     public void setFocused(int focused)

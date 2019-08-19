@@ -8,14 +8,13 @@ import com.everneth.emi.MintProjectManager;
 import com.everneth.emi.Utils;
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.MintProject;
+import com.everneth.emi.models.MintTaskRequirement;
 import com.everneth.emi.utils.PlayerUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *     Class: MintCommand
@@ -114,49 +113,49 @@ public class MintCommand extends BaseCommand {
 
     @Subcommand("log material")
     @CommandPermission("emi.mint.log")
-    public void onLogMaterial(Player player, String project, String time, String material, int amount, String[] description)
+    public void onLogMaterial(Player player, String mintProject, String time, String material, int amount, String[] description)
     {
 
     }
 
     @Subcommand("log work")
     @CommandPermission("emi.mint.log")
-    public void onLogWork(Player player, String project, String time, String[] description)
+    public void onLogWork(Player player, String mintProject, String time, String[] description)
     {
 
     }
 
     @Subcommand("material complete")
     @CommandPermission("emi.material.complete")
-    public void onMaterialComplete(Player player, String project, int materialID)
+    public void onMaterialComplete(Player player, String mintProject, int materialID)
     {
 
     }
 
     @Subcommand("material create")
     @CommandPermission("emi.material.create")
-    public void onMaterialCreate(Player player, String project, String material, int amount)
+    public void onMaterialCreate(Player player, String mintProject, String material, int amount)
     {
 
     }
 
     @Subcommand("material delete")
     @CommandPermission("emi.material.delete")
-    public void onMaterialDelete(Player player, String project, String materialID)
+    public void onMaterialDelete(Player player, String mintProject, String materialID)
     {
 
     }
 
     @Subcommand("material focus")
     @CommandPermission("emi.material.focus")
-    public void onMaterialFocus(Player player, String project, String materialID)
+    public void onMaterialFocus(Player player, String mintProject, String materialID)
     {
 
     }
 
     //TODO fix messages and add validation check
     @Subcommand("project complete")
-    @Syntax("<Project Name>")
+    @Syntax("<ProjectName>")
     @CommandPermission("emi.mint.project.complete")
     public void onProjectComplete(Player player, String mintProject)
     {
@@ -174,13 +173,13 @@ public class MintCommand extends BaseCommand {
             player.sendMessage(Utils.color("&cProject has already been marked for completion"));
             return;
         }
-        project.complete();
+        project.completeProject();
         player.sendMessage(Utils.color("&aProject has been marked for completion!"));
     }
 
     //TODO fix messages
     @Subcommand("project create")
-    @Syntax("<Project Name> <Player Lead> <Description>")
+    @Syntax("<ProjectName> <PlayerLead> <Description>")
     @CommandPermission("emi.mint.project.create")
     public void onProjectAdd(Player player, String projectName, String projectLead, String[] description)
     {
@@ -211,6 +210,7 @@ public class MintCommand extends BaseCommand {
 
     //TODO fix messages and check for completed projects
     @Subcommand("project focus")
+    @Syntax("<ProjectName>")
     @CommandPermission("emi.mint.project.focus")
     public void onProjectFocus(Player player, String projectName)
     {
@@ -220,6 +220,7 @@ public class MintCommand extends BaseCommand {
         if(project == null)
         {
             player.sendMessage(Utils.color("&cProject doesnt exist!"));
+            return;
         }
 
         if(project.getFocused() == 1)
@@ -251,6 +252,7 @@ public class MintCommand extends BaseCommand {
 
     // TODO fix messages and add tasks/materials
     @Subcommand("project info")
+    @Syntax("<ProjectName>")
     @CommandPermission("emi.mint.info")
     public void onProjectInfo(Player player, String projectName)
     {
@@ -272,6 +274,7 @@ public class MintCommand extends BaseCommand {
 
     //TODO Fix messages
     @Subcommand("project join")
+    @Syntax("<ProjectName>")
     @CommandPermission("emi.mint.project.join")
     public void onProjectJoin(Player player, String mintProject)
     {
@@ -315,42 +318,121 @@ public class MintCommand extends BaseCommand {
 
     @Subcommand("project work")
     @CommandPermission("emi.mint.project.work")
-    public void onWork(Player player, String project)
+    public void onWork(Player player, String mintProject)
     {
         //TODO Compete when finished with task and materials commands
     }
 
     @Subcommand("task complete")
+    @Syntax("<ProjectName> <taskID>")
     @CommandPermission("emi.task.complete")
-    public void onTaskComplete(Player player, String project, int taskID)
+    public void onTaskComplete(Player player, String mintProject, long taskID)
     {
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(mintProject);
 
+        if(project == null)
+        {
+            player.sendMessage("&cProject doesnt exist!");
+            return;
+        }
+
+        if(project.getTaskRequirements().get(taskID) == null)
+        {
+            player.sendMessage("&cTask in project &6" + project.getName() + " &cdoesnt exist!");
+            return;
+        }
+
+        if(project.getTaskRequirements().get(taskID).getComplete() == 1)
+        {
+            player.sendMessage("&cTask in project &6" + project.getName() + " &cis already complete!");
+            return;
+        }
+        project.completeTask(taskID);
+        player.sendMessage("&aSuccessfully marked the task as complete!");
     }
 
     @Subcommand("task create")
+    @Syntax("<ProjectName> <Task>")
     @CommandPermission("emi.task.create")
-    public void onTaskCreate(Player player, String project, String[] task)
+    public void onTaskCreate(Player player, String mintProject, String[] taskParts)
     {
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(mintProject);
 
+        if(project == null)
+        {
+            player.sendMessage(Utils.color("&cProject doesnt exist!"));
+            return;
+        }
+
+        String taskString = Utils.buildMessage(taskParts, 0);
+
+        MintTaskRequirement task = new MintTaskRequirement(taskString, 0, 0);
+
+        project.addTask(task);
+        player.sendMessage("&aSuccessfully added task to project &6" + project.getName());
     }
 
     @Subcommand("task delete")
     @CommandPermission("emi.task.delete")
-    public void onTaskDelete(Player player, String project, String taskID)
+    public void onTaskDelete(Player player, String mintProject, String taskID)
     {
 
     }
 
     @Subcommand("task focus")
+    @Syntax("<ProjectName> <taskID>")
     @CommandPermission("emi.task.focus")
-    public void onTaskFocus(Player player, String project, String taskID)
+    public void onTaskFocus(Player player, String mintProject, long taskID)
     {
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(mintProject);
 
+        if(project == null)
+        {
+            player.sendMessage(Utils.color("&cProject doesnt exist!"));
+            return;
+        }
+
+        MintTaskRequirement task = project.getTaskRequirements().get(taskID);
+
+        if(task == null)
+        {
+            player.sendMessage(Utils.color("&cTask doesnt exist in project &6" + project.getName()));
+            return;
+        }
+
+        if(task.getFocused() == 1)
+        {
+            player.sendMessage(Utils.color("&cTask is already set to focused!"));
+            return;
+        }
+
+        if(task.getComplete() == 1)
+        {
+            player.sendMessage(Utils.color("&cCant set complete tasks to be focused!"));
+            return;
+        }
+
+        MintTaskRequirement formerTask = null;
+
+        for(MintTaskRequirement mintTaskRequirement : project.getTaskRequirements().values())
+        {
+            if(mintTaskRequirement.getFocused() == 1)
+            {
+                formerTask = mintTaskRequirement;
+                break;
+            }
+        }
+
+        project.switchTaskFocus(task, formerTask);
+        player.sendMessage(Utils.color("&aSuccessfully set task as focued!"));
     }
 
     @Subcommand("validate")
     @CommandPermission("emi.validate")
-    public void onValidate(Player player, String project)
+    public void onValidate(Player player, String mintProject)
     {
 
     }

@@ -81,12 +81,10 @@ public class MintProjectManager
                 DB.executeUpdate("UPDATE mint_project SET focused = 0 WHERE project_id = ?",
                         formerFocus.getProjectID());
                 formerFocus.setFocused(0);
-                Utils.bugTest("Switched");
             }
             DB.executeUpdate("UPDATE mint_project SET focused = 1 WHERE project_id = ?",
                     newFocus.getProjectID());
             newFocus.setFocused(1);
-            Utils.bugTest("New focused added");
         }
         catch (SQLException e)
         {
