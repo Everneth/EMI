@@ -218,6 +218,7 @@ public class EMI extends JavaPlugin {
 
                 MintTaskRequirement task = new MintTaskRequirement(taskRow.getInt("task_id"), taskRow.getString("task"), taskRow.getInt("complete"), taskRow.getInt("focused"));
                 project.getTaskRequirements().put(task.getTaskID(), task);
+                project.setFocusedTask(task);
             }
             manager.addProject(projectRow.getInt("project_id"), project);
         }

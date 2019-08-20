@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  *     Class: MintCommand
@@ -265,10 +266,18 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
+        String endDate = project.getEndDate();
+
+        if(endDate == null)
+        {
+            endDate = "ongoing";
+        }
+
         player.sendMessage(Utils.color("&aInformation for project: &6" + project.getName() + "&7 " + project.getFocused() + " " + project.getComplete() + "\n" +
                 "&aProject lead: &6" + project.getLead().getName() + "\n" +
                 "&aProject description: &6" + project.getDescription() + "\n" +
-                "&aDates: &6" + project.getStartDate() + " &7- &6" + project.getEndDate() + "\n" +
+                "&aFocused Task: &6" + project.getFocusedTask().getTask() + "\n" +
+                "&aDates: &6" + project.getStartDate() + " &7- &6" + endDate + "\n" +
                 "&aWorkers: &6" + project.getWorkers().toString()));
     }
 
@@ -310,10 +319,34 @@ public class MintCommand extends BaseCommand {
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
 
+        if(manager.getProjects().isEmpty())
+        {
+            player.sendMessage(Utils.color("&cNo projects have been added!"));
+            return;
+        }
+
+        ArrayList<String> currentProjects = new ArrayList<>();
+        String focusedProject = null;
+        ArrayList<String> completeProjects = new ArrayList<>();
+
         for(MintProject project : manager.getProjects().values())
         {
-            player.sendMessage(Utils.color("&a" + project.getName()));
+            if(project.getFocused() == 1)
+            {
+                focusedProject = project.getName();
+            }
+            else if(project.getComplete() == 1)
+            {
+                completeProjects.add(project.getName());
+            }
+            else
+            {
+                currentProjects.add(project.getName());
+            }
         }
+        player.sendMessage(Utils.color("&aFocused Project: &6 " + focusedProject + "\n" +
+                "&aOnGoing Projects: &6" + currentProjects.toString() + "\n" +
+                "&aComplete Projects: &6" + completeProjects.toString()));
     }
 
     @Subcommand("project work")

@@ -18,6 +18,8 @@ public class MintProject
     private int complete;
     private int focused;
     private String description;
+    private MintTaskRequirement focusedTask;
+    private MintMaterialReuirement focusedMaterial;
     private ArrayList<EMIPlayer> workers = new ArrayList<>();
     private HashMap<Long, MintWorkLog> workLog = new HashMap<>();
     private HashMap<Long, MintMaterialLog> materialLog = new HashMap<>();
@@ -121,6 +123,7 @@ public class MintProject
             DB.executeUpdate("UPDATE mint_task_requirements SET focused = 1 WHERE task_id = ?",
                     newTask.getTaskID());
             newTask.setFocused(1);
+            focusedTask = newTask;
         }
         catch(SQLException e)
         {
@@ -140,6 +143,26 @@ public class MintProject
         {
             Bukkit.getLogger().info("ERROR: MintProject/deleteTask: " + e.toString());
         }
+    }
+
+    public MintTaskRequirement getFocusedTask()
+    {
+        return focusedTask;
+    }
+
+    public void setFocusedTask(MintTaskRequirement focusedTask)
+    {
+        this.focusedTask = focusedTask;
+    }
+
+    public MintMaterialReuirement getFocusedMaterial()
+    {
+        return focusedMaterial;
+    }
+
+    public void setFocusedMaterial(MintMaterialReuirement focusedMaterial)
+    {
+        this.focusedMaterial = focusedMaterial;
     }
 
     public long getProjectID()
