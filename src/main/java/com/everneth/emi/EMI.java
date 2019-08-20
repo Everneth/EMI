@@ -15,6 +15,7 @@ import com.everneth.emi.events.JoinEvent;
 import com.everneth.emi.events.LeaveEvent;
 import com.everneth.emi.events.bot.MessageReceivedListener;
 import com.everneth.emi.models.EMIPlayer;
+import com.everneth.emi.models.MintMaterialRequirement;
 import com.everneth.emi.models.MintProject;
 import com.everneth.emi.models.MintTaskRequirement;
 import com.everneth.emi.utils.PlayerUtils;
@@ -211,15 +212,45 @@ public class EMI extends JavaPlugin {
 
             for(DbRow taskRow : tasks)
             {
-                if(projectRow.getInt("project_id") != projectRow.getInt("project_id"))
+                if(!projectRow.getInt("project_id").equals(taskRow.getInt("project_id")))
                 {
                     continue;
                 }
 
-                MintTaskRequirement task = new MintTaskRequirement(taskRow.getInt("task_id"), taskRow.getString("task"), taskRow.getInt("complete"), taskRow.getInt("focused"));
+                MintTaskRequirement task = new MintTaskRequirement(
+                        taskRow.getInt("task_id"),
+                        taskRow.getString("task"),
+                        taskRow.getInt("complete"),
+                        taskRow.getInt("focused"));
                 project.getTaskRequirements().put(task.getTaskID(), task);
-                project.setFocusedTask(task);
+
+                if(task.getFocused() == 1)
+                {
+                    project.setFocusedTask(task);
+                }
             }
+
+            for(DbRow materialRow : materials)
+            {
+                if(!projectRow.getInt("project_id").equals(materialRow.getInt("project_id")))
+                {
+                    continue;
+                }
+
+                MintMaterialRequirement material = new MintMaterialRequirement(
+                        materialRow.getInt("material_id"),
+                        materialRow.getString("material"),
+                        materialRow.getInt("amount"),
+                        materialRow.getInt("complete"),
+                        materialRow.getInt("focused"));
+                project.getMaterialRequirements().put(material.getMaterialID(), material);
+
+                if(material.getFocused() == 1)
+                {
+                    project.setFocusedMaterial(material);
+                }
+            }
+
             manager.addProject(projectRow.getInt("project_id"), project);
         }
 

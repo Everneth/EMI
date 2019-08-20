@@ -19,12 +19,12 @@ public class MintProject
     private int focused;
     private String description;
     private MintTaskRequirement focusedTask;
-    private MintMaterialReuirement focusedMaterial;
+    private MintMaterialRequirement focusedMaterial;
     private ArrayList<EMIPlayer> workers = new ArrayList<>();
     private HashMap<Long, MintWorkLog> workLog = new HashMap<>();
     private HashMap<Long, MintMaterialLog> materialLog = new HashMap<>();
     private HashMap<Long, MintTaskRequirement> taskRequirements = new HashMap<>();
-    private HashMap<Long, MintMaterialReuirement> materialRequirements = new HashMap<>();
+    private HashMap<Long, MintMaterialRequirement> materialRequirements = new HashMap<>();
 
     public MintProject(EMIPlayer lead, String name, String startDate, String endDate, int complete, int focused, String description)
     {
@@ -145,6 +145,72 @@ public class MintProject
         }
     }
 
+    public void addMaterial(MintMaterialRequirement material)
+    {
+        try
+        {
+            long materialID = DB.executeInsert("INSERT INTO mint_material_requirements (project_id, material, amount, complete, focused) VALUES (?, ?, ?, 0, 0)",
+                    projectID,
+                    material.getMaterial(),
+                    material.getAmount());
+            material.setMaterialID(materialID);
+            materialRequirements.put(materialID, material);
+        }
+        catch(SQLException e)
+        {
+            Bukkit.getLogger().info("ERROR: MintProject/addMaterial: " + e.toString());
+        }
+    }
+
+    public void completeMaterial(long materialID)
+    {
+        try
+        {
+            DB.executeUpdate("UPDATE mint_material_requirements SET complete = 1 WHERE material_id = ?",
+                    materialRequirements.get(materialID).getMaterialID());
+        }
+        catch(SQLException e)
+        {
+            Bukkit.getLogger().info("ERROR: MintProject/completeMaterial: " + e.toString());
+        }
+    }
+
+    public void switchMaterialFocus(MintMaterialRequirement newMaterial, MintMaterialRequirement formerMaterial)
+    {
+        try
+        {
+            if(formerMaterial != null)
+            {
+                DB.executeUpdate("UPDATE mint_material_requirements SET focused = 0 WHERE material_id = ?",
+                        formerMaterial.getMaterialID());
+                formerMaterial.setFocused(0);
+            }
+
+            DB.executeUpdate("UPDATE mint_material_requirements SET focused = 1 WHERE material_id = ?",
+                    newMaterial.getMaterialID());
+            newMaterial.setFocused(1);
+            focusedMaterial = newMaterial;
+        }
+        catch(SQLException e)
+        {
+            Bukkit.getLogger().info("ERROR: MintProject/switchMaterialFocus: " + e.toString());
+        }
+    }
+
+    public void deleteMaterial(MintMaterialRequirement material)
+    {
+        try
+        {
+            DB.executeUpdate("DELETE FROM mint_material_requirements WHERE material_id = ?",
+                    material.getMaterialID());
+            materialRequirements.remove(material.getMaterialID());
+        }
+        catch(SQLException e)
+        {
+            Bukkit.getLogger().info("ERROR: MintProject/deleteMaterial: " + e.toString());
+        }
+    }
+
     public MintTaskRequirement getFocusedTask()
     {
         return focusedTask;
@@ -155,12 +221,12 @@ public class MintProject
         this.focusedTask = focusedTask;
     }
 
-    public MintMaterialReuirement getFocusedMaterial()
+    public MintMaterialRequirement getFocusedMaterial()
     {
         return focusedMaterial;
     }
 
-    public void setFocusedMaterial(MintMaterialReuirement focusedMaterial)
+    public void setFocusedMaterial(MintMaterialRequirement focusedMaterial)
     {
         this.focusedMaterial = focusedMaterial;
     }
@@ -265,12 +331,12 @@ public class MintProject
         this.taskRequirements = taskRequirements;
     }
 
-    public HashMap<Long, MintMaterialReuirement> getMaterialRequirements()
+    public HashMap<Long, MintMaterialRequirement> getMaterialRequirements()
     {
         return materialRequirements;
     }
 
-    public void setMaterialRequirements(HashMap<Long, MintMaterialReuirement> materialRequirements)
+    public void setMaterialRequirements(HashMap<Long, MintMaterialRequirement> materialRequirements)
     {
         this.materialRequirements = materialRequirements;
     }
