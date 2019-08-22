@@ -90,52 +90,65 @@ public class MessageReceivedListener extends ListenerAdapter {
                 }
             }
         }
-        else if(event.isFromType(ChannelType.PRIVATE) && !event.getAuthor().isBot()) {
+        if(event.isFromType(ChannelType.PRIVATE) && !event.getAuthor().isBot()) {
             if (!event.getAuthor().isBot() && !event.getMessage().getContentRaw().isEmpty()) {
                 WhitelistApp appInProgress = WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong());
                 if(appInProgress != null) {
+
+                        if (appInProgress.getStep() == 11 && event.getMessage().getContentRaw().toLowerCase().equals("yes")) {
+                            appInProgress.setHoldForNextStep(false);
+                        } else if (appInProgress.getStep() == 11 && event.getMessage().getContentRaw().toLowerCase().equals("no")) {
+                            WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong()).setStep(1);
+                            appInProgress.setHoldForNextStep(false);
+                        } else if (appInProgress.getStep() == 11 && (!event.getMessage().getContentRaw().toLowerCase().equals("no") || !event.getMessage().getContentRaw().toLowerCase().equals("yes"))) {
+                            event.getPrivateChannel().sendMessage("**INVALID INPUT** Please review once more and answer with yes or no!").queue();
+                        } else {
+                            WhitelistAppService.getService().addData(appInProgress.getDiscordId(), appInProgress.getStep(), event.getMessage().getContentRaw());
+                            appInProgress.setHoldForNextStep(false);
+                        }
+
                         if(!appInProgress.isHoldForNextStep())
                         {
                         switch (appInProgress.getStep()) {
                             case 1:
-                                event.getPrivateChannel().sendMessage("What is your Minecraft IGN?").queue();
                                 appInProgress.setHoldForNextStep(true);
+                                event.getPrivateChannel().sendMessage("What is your Minecraft IGN?").queue();
                                 break;
                             case 2:
-                                event.getPrivateChannel().sendMessage("Where do you live?").queue();
                                 appInProgress.setHoldForNextStep(true);
+                                event.getPrivateChannel().sendMessage("Where do you live?").queue();
                                 break;
                             case 3:
-                                event.getPrivateChannel().sendMessage("What is your age? (Must be 13 or older to use Discord!)").queue();
                                 appInProgress.setHoldForNextStep(true);
+                                event.getPrivateChannel().sendMessage("What is your age? (Must be 13 or older to use Discord!)").queue();
                                 break;
                             case 4:
-                                event.getPrivateChannel().sendMessage("Do you know someone in our community? If yes, please state who.").queue();
                                 appInProgress.setHoldForNextStep(true);
+                                event.getPrivateChannel().sendMessage("Do you know someone in our community? If yes, please state who.").queue();
                                 break;
                             case 5:
-                                event.getPrivateChannel().sendMessage("Have you been banned elsewhere before?").queue();
                                 appInProgress.setHoldForNextStep(true);
+                                event.getPrivateChannel().sendMessage("Have you been banned elsewhere before?").queue();
                                 break;
                             case 6:
-                                event.getPrivateChannel().sendMessage("What are you looking for in a Minecraft community?").queue();
                                 appInProgress.setHoldForNextStep(true);
+                                event.getPrivateChannel().sendMessage("What are you looking for in a Minecraft community?").queue();
                                 break;
                             case 7:
-                                event.getPrivateChannel().sendMessage("What do you love and/or hate about Minecraft?").queue();
                                 appInProgress.setHoldForNextStep(true);
+                                event.getPrivateChannel().sendMessage("What do you love and/or hate about Minecraft?").queue();
                                 break;
                             case 8:
-                                event.getPrivateChannel().sendMessage("Tell us something about you!").queue();
                                 appInProgress.setHoldForNextStep(true);
+                                event.getPrivateChannel().sendMessage("Tell us something about you!").queue();
                                 break;
                             case 9:
-                                event.getPrivateChannel().sendMessage("What is the secret word?").queue();
                                 appInProgress.setHoldForNextStep(true);
+                                event.getPrivateChannel().sendMessage("What is the secret word?").queue();
                                 break;
                             case 10:
-                                event.getPrivateChannel().sendMessage("```css The following is your whitelist app```\n").queue();
                                 appInProgress.setHoldForNextStep(true);
+                                event.getPrivateChannel().sendMessage("```css\n The following is your whitelist app```\n").queue();
                                 EmbedBuilder eb = new EmbedBuilder();
                                 eb.setTitle(appInProgress.getInGameName());
                                 eb.setDescription("Discord Name: " + event.getAuthor().getAsTag() + " - Discord ID: " + appInProgress.getDiscordId());
@@ -166,8 +179,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                                 eb2.addField("What do you love and/or hate about Minecraft?", appInProgress.getLoveHate(), false);
                                 eb2.addField("Tell us something about you.", appInProgress.getIntro(), false);
                                 eb2.addField("What is the secret word?", appInProgress.getSecretWord(), false);
-                                event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage(eb2.build()).queue();
-                                event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage("Attempting to transmit application to forums").queue();
+                                WhitelistAppService.getService().messageStaffWithEmbed(eb2);
 
                                 PostResponse postResponse;
                                 int statusCode = 0;
@@ -182,26 +194,15 @@ public class MessageReceivedListener extends ListenerAdapter {
                                 if (statusCode == 200 || statusCode == 201) {
                                     String msg = appInProgress.getInGameName() + "'s whitelist application successfully transmitted to the site.\n\n" +
                                             url;
-                                    event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage(msg).queue();
+                                    WhitelistAppService.getService().messageStaff(msg);
                                 } else {
 
                                     String msg = appInProgress.getInGameName() + "'s whitelist application could not be transmitted to the site. An embed of the application has been posted.";
-                                    event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage(msg).queue();
+                                    WhitelistAppService.getService().messageStaff(msg);
                                 }
                                 WhitelistAppService.getService().removeApp(appInProgress.getDiscordId());
                                 break;
                         }
-                        }
-                        else {
-                            if (appInProgress.getStep() == 10 && event.getMessage().getContentRaw().toLowerCase().equals("yes")) {
-                                WhitelistAppService.getService().addData(appInProgress.getDiscordId(), appInProgress.getStep(), event.getMessage().getContentRaw());
-                            } else if (appInProgress.getStep() == 10 && event.getMessage().getContentRaw().toLowerCase().equals("no")) {
-                                WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong()).setStep(1);
-                            } else if (appInProgress.getStep() == 10 && (!event.getMessage().getContentRaw().toLowerCase().equals("no") || !event.getMessage().getContentRaw().toLowerCase().equals("yes"))) {
-                                event.getPrivateChannel().sendMessage("**INVALID INPUT** Please review once more and answer with yes or no!").queue();
-                            } else {
-                                WhitelistAppService.getService().addData(appInProgress.getDiscordId(), appInProgress.getStep(), event.getMessage().getContentRaw());
-                            }
                         }
                     }
                 }
@@ -218,14 +219,14 @@ public class MessageReceivedListener extends ListenerAdapter {
 
         StringBuilder sb = new StringBuilder();
 
-        String postHeader = "<font size=\"16px\"><b>Whitelist application submitted by " + app.getInGameName() + "</b></font><br />";
+        String postHeader = "<font size=\"14px\"><b>Whitelist application submitted by " + app.getInGameName() + "</b></font><br />";
         sb.append(postHeader);
 
         CloseableHttpClient httpclient = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(URL);
         List<NameValuePair> params = new ArrayList<NameValuePair>();
 
-        String title = "Report submitted by " + app.getInGameName();
+        String title = app.getInGameName() + "'s whitelist application";
 
         params.add(new BasicNameValuePair("key", KEY));
         params.add(new BasicNameValuePair("forum", String.valueOf(FORUM_ID)));

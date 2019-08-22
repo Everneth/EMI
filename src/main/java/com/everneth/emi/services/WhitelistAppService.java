@@ -3,6 +3,10 @@ package com.everneth.emi.services;
 import com.everneth.emi.EMI;
 
 import com.everneth.emi.models.WhitelistApp;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.MessageChannel;
 
 import java.util.HashMap;
 
@@ -27,11 +31,29 @@ public class WhitelistAppService {
         app.setInProgress(true);
         app.setHoldForNextStep(false);
         appMap.put(id, app);
+
+        MessageBuilder mb = new MessageBuilder();
+
+        EMI.getJda().getGuildById(177976693942779904L).getMemberById(id).getUser().openPrivateChannel().queue(privateChannel ->
+                privateChannel.sendMessage("What be ye minecraft IGN?").queue()
+        );
     }
 
     public void removeApp(long id)
     {
         appMap.remove(id);
+    }
+
+
+    public void messageStaffWithEmbed(EmbedBuilder eb2)
+    {
+        EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage(eb2.build()).queue();
+        EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage("Attempting to transmit application to forums").queue();
+    }
+
+    public void messageStaff(String msg)
+    {
+        EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id")).sendMessage(msg).queue();
     }
 
     public WhitelistApp findByDiscordId(long id)
@@ -72,7 +94,7 @@ public class WhitelistAppService {
                 appMap.get(id).setSecretWord(data);
                 break;
             case 10:
-                appMap.get(id).setStep(0); // restart app
+                //appMap.get(id).setStep(0); // restart app
                 break;
         }
         appMap.get(id).setStep(appMap.get(id).getStep() + 1);

@@ -14,12 +14,15 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.managers.GuildManager;
+import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import javax.xml.soap.Text;
+import java.nio.channels.Channel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -87,33 +90,32 @@ public class ReportCommand extends BaseCommand {
 
         if(hasSynced(playerRow)) {
             discordMember = guildManager.getGuild().getMemberById(playerRow.getLong("discord_id"));
-            ChannelAction channelAction = guildManager.getGuild().createTextChannel(player.getName().toLowerCase() + "_staff");
+            ChannelAction<TextChannel> channelAction = guildManager.getGuild().createTextChannel(player.getName().toLowerCase() + "_staff");
             channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
-                    .addPermissionOverride(staffRole, Permission.ALL_TEXT_PERMISSIONS, 0)
+                    .addPermissionOverride(staffRole, Permission.ALL_CHANNEL_PERMISSIONS, 0)
                     .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0)
                     .addPermissionOverride(discordMember, Permission.MESSAGE_READ.getRawValue(), 0)
                     .addPermissionOverride(discordMember, Permission.MESSAGE_HISTORY.getRawValue(), 0)
                     .addPermissionOverride(discordMember, Permission.MESSAGE_WRITE.getRawValue(), 0).queue(
                     channel -> {
-                        Report reportToAdd = new Report(((GuildChannel) channel).getIdLong());
+                        Report reportToAdd = new Report(channel.getIdLong());
                         reportToAdd.setDiscordUserId(discordMember.getUser().getIdLong());
                         rm.addReport(player.getUniqueId(), reportToAdd);
                         rm.addReportRecord(reportToAdd, playerRow.getInt("player_id"));
-                        ((GuildChannel) channel).getGuild().getTextChannelById(((GuildChannel) channel).getIdLong()).sendMessage(eb.build()).queue();
+                        channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessage(eb.build()).queue();
                     });
         }
         else
         {
-            ChannelAction channelAction = guildManager.getGuild().createTextChannel(player.getName().toLowerCase() + "_staff");
+            ChannelAction<TextChannel> channelAction = guildManager.getGuild().createTextChannel(player.getName().toLowerCase() + "_staff");
             channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
                     .addPermissionOverride(staffRole, Permission.ALL_TEXT_PERMISSIONS, 0)
                     .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0).queue(
                     channel -> {
-
-                        Report reportToAdd = new Report(((GuildChannel) channel).getIdLong());
+                        Report reportToAdd = new Report(channel.getIdLong());
                         rm.addReport(player.getUniqueId(), reportToAdd);
                         rm.addReportRecord(reportToAdd, playerRow.getInt("player_id"));
-                        ((GuildChannel) channel).getGuild().getTextChannelById(((GuildChannel) channel).getIdLong()).sendMessage(eb.build()).queue();
+                        channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessage(eb.build()).queue();
                     });
         }
     }
