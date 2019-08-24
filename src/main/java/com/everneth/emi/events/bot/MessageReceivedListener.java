@@ -150,8 +150,9 @@ public class MessageReceivedListener extends ListenerAdapter {
                                 appInProgress.setHoldForNextStep(true);
                                 event.getPrivateChannel().sendMessage("```css\n The following is your whitelist app```\n").queue();
                                 EmbedBuilder eb = new EmbedBuilder();
-                                eb.setTitle(appInProgress.getInGameName());
+                                eb.setTitle("Discord Whitelist Application for " + appInProgress.getInGameName());
                                 eb.setDescription("Discord Name: " + event.getAuthor().getAsTag() + " - Discord ID: " + appInProgress.getDiscordId());
+                                eb.setThumbnail("https://everneth.com/uploads/monthly_2017_05/par-icon.png.7be3a897907506e63716375bda342551.png");
                                 eb.addField("Minecraft IGN", appInProgress.getInGameName(), false);
                                 eb.addField("Where do  you live?", appInProgress.getLocation(), false);
                                 eb.addField("What is your age?", String.valueOf(appInProgress.getAge()), false);
@@ -161,6 +162,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                                 eb.addField("What do you love and/or hate about Minecraft?", appInProgress.getLoveHate(), false);
                                 eb.addField("Tell us something about you.", appInProgress.getIntro(), false);
                                 eb.addField("What is the secret word?", appInProgress.getSecretWord(), false);
+                                eb.setFooter("THIS IS A PREVIEW APPLICATION AND MUST BE CONFIRMED BEFORE SENDING!");
 
                                 event.getPrivateChannel().sendMessage(eb.build()).queue();
                                 event.getPrivateChannel().sendMessage("Is this information correct? Please reply **yes** or **no**.").queue();
@@ -168,8 +170,9 @@ public class MessageReceivedListener extends ListenerAdapter {
                             case 11:
                                 appInProgress.setHoldForNextStep(true);
                                 EmbedBuilder eb2 = new EmbedBuilder();
-                                eb2.setTitle(appInProgress.getInGameName());
+                                eb2.setTitle("Discord Whitelist Application for " + appInProgress.getInGameName());
                                 eb2.setDescription("Discord Name: " + event.getAuthor().getAsTag() + " - Discord ID: " + appInProgress.getDiscordId());
+                                eb2.setThumbnail("https://everneth.com/uploads/monthly_2017_05/par-icon.png.7be3a897907506e63716375bda342551.png");
                                 eb2.addField("Minecraft IGN", appInProgress.getInGameName(), false);
                                 eb2.addField("Where do  you live?", appInProgress.getLocation(), false);
                                 eb2.addField("What is your age?", String.valueOf(appInProgress.getAge()), false);
@@ -221,6 +224,7 @@ public class MessageReceivedListener extends ListenerAdapter {
 
         String postHeader = "<font size=\"14px\"><b>Whitelist application submitted by " + app.getInGameName() + "</b></font><br />";
         sb.append(postHeader);
+        sb.append(app.prepareAppForPost());
 
         CloseableHttpClient httpclient = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(URL);
