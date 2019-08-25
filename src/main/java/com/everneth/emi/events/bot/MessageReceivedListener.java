@@ -9,7 +9,6 @@ import com.everneth.emi.Utils;
 import com.everneth.emi.models.PostResponse;
 import com.everneth.emi.models.WhitelistApp;
 import com.everneth.emi.services.WhitelistAppService;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -198,6 +197,8 @@ public class MessageReceivedListener extends ListenerAdapter {
                                     String msg = appInProgress.getInGameName() + "'s whitelist application successfully transmitted to the site.\n\n" +
                                             url;
                                     WhitelistAppService.getService().messageStaff(msg);
+                                    WhitelistAppService.getService().changeRoleToPending(event.getMember());
+                                    event.getPrivateChannel().sendMessage("Your application has been submitted! Your role is now Pending").queue();
                                 } else {
 
                                     String msg = appInProgress.getInGameName() + "'s whitelist application could not be transmitted to the site. An embed of the application has been posted.";
@@ -222,7 +223,7 @@ public class MessageReceivedListener extends ListenerAdapter {
 
         StringBuilder sb = new StringBuilder();
 
-        String postHeader = "<font size=\"14px\"><b>Whitelist application submitted by " + app.getInGameName() + "</b></font><br />";
+        String postHeader = "<span style=\"font-size:24px;\"><b>Whitelist application submitted by " + app.getInGameName() + "</b></span><br />";
         sb.append(postHeader);
         sb.append(app.prepareAppForPost());
 

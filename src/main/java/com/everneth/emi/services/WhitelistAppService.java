@@ -6,7 +6,10 @@ import com.everneth.emi.models.WhitelistApp;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.managers.GuildManager;
 
 import java.util.HashMap;
 
@@ -34,7 +37,7 @@ public class WhitelistAppService {
 
         MessageBuilder mb = new MessageBuilder();
 
-        EMI.getJda().getGuildById(177976693942779904L).getMemberById(id).getUser().openPrivateChannel().queue(privateChannel ->
+        EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getMemberById(id).getUser().openPrivateChannel().queue(privateChannel ->
                 privateChannel.sendMessage("What be ye minecraft IGN?").queue()
         );
     }
@@ -44,6 +47,14 @@ public class WhitelistAppService {
         appMap.remove(id);
     }
 
+    public void changeRoleToPending(Member member)
+    {
+        GuildManager manager = EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getManager();
+        Role applicant = manager.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("applicant-role-id"));
+        Role pending = manager.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("pending-role-id"));
+        manager.getGuild().removeRoleFromMember(member, applicant).queue();
+        manager.getGuild().addRoleToMember(member, pending).queue();
+    }
 
     public void messageStaffWithEmbed(EmbedBuilder eb2)
     {
