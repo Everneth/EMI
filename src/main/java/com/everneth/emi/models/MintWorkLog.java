@@ -4,12 +4,13 @@ public class MintWorkLog
 {
     private EMIPlayer loggedBy;
     private EMIPlayer validatedBy;
-    private boolean validated;
-    private int workLength;
+    private long workID;
+    private int validated;
+    private String workLength;
     private String logDate;
     private String description;
 
-    public MintWorkLog(EMIPlayer loggedBy, EMIPlayer validatedBy, boolean validated, int workLength, String logDate, String description)
+    public MintWorkLog(EMIPlayer loggedBy, EMIPlayer validatedBy, int validated, String workLength, String logDate, String description)
     {
         this.loggedBy = loggedBy;
         this.validatedBy = validatedBy;
@@ -17,6 +18,27 @@ public class MintWorkLog
         this.workLength = workLength;
         this.logDate = logDate;
         this.description = description;
+    }
+
+    public MintWorkLog(long workID, EMIPlayer loggedBy, EMIPlayer validatedBy, int validated, String workLength, String logDate, String description)
+    {
+        this.loggedBy = loggedBy;
+        this.validatedBy = validatedBy;
+        this.workID = workID;
+        this.validated = validated;
+        this.workLength = workLength;
+        this.logDate = logDate;
+        this.description = description;
+    }
+
+    public long getWorkID()
+    {
+        return workID;
+    }
+
+    public void setWorkID(long workID)
+    {
+        this.workID = workID;
     }
 
     public EMIPlayer getLoggedBy()
@@ -39,22 +61,22 @@ public class MintWorkLog
         this.validatedBy = validatedBy;
     }
 
-    public boolean isValidated()
+    public int getValidated()
     {
         return validated;
     }
 
-    public void setValidated(boolean validated)
+    public void setValidated(int validated)
     {
         this.validated = validated;
     }
 
-    public int getWorkLength()
+    public String getWorkLength()
     {
         return workLength;
     }
 
-    public void setWorkLength(int workLength)
+    public void setWorkLength(String workLength)
     {
         this.workLength = workLength;
     }

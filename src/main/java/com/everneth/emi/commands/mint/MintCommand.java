@@ -6,11 +6,9 @@ import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.MintProjectManager;
 import com.everneth.emi.Utils;
-import com.everneth.emi.models.EMIPlayer;
-import com.everneth.emi.models.MintMaterialRequirement;
-import com.everneth.emi.models.MintProject;
-import com.everneth.emi.models.MintTaskRequirement;
+import com.everneth.emi.models.*;
 import com.everneth.emi.utils.PlayerUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -120,11 +118,51 @@ public class MintCommand extends BaseCommand {
 
     }
 
+    //TODO fix messages
+    //TODO add more time checks
     @Subcommand("log work")
+    @Syntax("<ProjectName> <TimeWorked> <Description>")
     @CommandPermission("emi.mint.log")
     public void onLogWork(Player player, String mintProject, String time, String[] description)
     {
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(mintProject);
 
+        if(project == null)
+        {
+            player.sendMessage(Utils.color("&cProject doesnt exist!"));
+            return;
+        }
+
+        String[] splitTime = time.split(":");
+
+        if(splitTime.length != 3)
+        {
+            player.sendMessage(Utils.color("&cIncorrect syntax for time, must have three times set up: 10:30:35 (HH:MM:SS)"));
+            return;
+        }
+
+        int[] numberTimes = new int[3];
+
+        try
+        {
+            numberTimes[0] = Integer.parseInt(splitTime[0]);
+            numberTimes[1] = Integer.parseInt(splitTime[1]);
+            numberTimes[2] = Integer.parseInt(splitTime[2]);
+        }
+        catch(NumberFormatException e)
+        {
+            Bukkit.getLogger().info("ERROR: MintCommand/onLogWork/isNumberCheck: " + e.toString());
+            return;
+        }
+
+        DbRow dbLoggedBy = PlayerUtils.getPlayerRow(player.getName());
+        EMIPlayer loggedBy = new EMIPlayer(dbLoggedBy.getString("player_uuid"), dbLoggedBy.getString("player_name"), dbLoggedBy.getInt("player_id"));
+        MintWorkLog log = new MintWorkLog(loggedBy, null, 0, time, Utils.getCurrentDate(), Utils.buildMessage(description, 0));
+
+        project.addLogWork(log);
+
+        player.sendMessage(Utils.color("&aSuccessfully logged your work done!"));
     }
 
     @Subcommand("material complete")
@@ -638,7 +676,7 @@ public class MintCommand extends BaseCommand {
 
     @Subcommand("validate")
     @CommandPermission("emi.validate")
-    public void onValidate(Player player, String mintProject)
+    public void onValidate(Player player)
     {
 
     }

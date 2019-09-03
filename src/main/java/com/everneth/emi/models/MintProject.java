@@ -211,6 +211,26 @@ public class MintProject
         }
     }
 
+    public void addLogWork(MintWorkLog log)
+    {
+        try
+        {
+            long logID = DB.executeInsert("INSERT INTO mint_task_log (project_id, logged_by, validated, work_length, log_date, description) VALUES (?, ?, ?, ?, ?, ?)",
+                    projectID,
+                    log.getLoggedBy().getId(),
+                    log.getValidated(),
+                    log.getWorkLength(),
+                    log.getLogDate(),
+                    log.getDescription());
+            log.setWorkID(logID);
+            workLog.put(logID, log);
+        }
+        catch(SQLException e)
+        {
+            Bukkit.getLogger().info("ERROR: MintProject/addLogWork: " + e.toString());
+        }
+    }
+
     public MintTaskRequirement getFocusedTask()
     {
         return focusedTask;

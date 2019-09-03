@@ -14,10 +14,7 @@ import com.everneth.emi.commands.par.CharterCommand;
 import com.everneth.emi.events.JoinEvent;
 import com.everneth.emi.events.LeaveEvent;
 import com.everneth.emi.events.bot.MessageReceivedListener;
-import com.everneth.emi.models.EMIPlayer;
-import com.everneth.emi.models.MintMaterialRequirement;
-import com.everneth.emi.models.MintProject;
-import com.everneth.emi.models.MintTaskRequirement;
+import com.everneth.emi.models.*;
 import com.everneth.emi.utils.PlayerUtils;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -249,6 +246,34 @@ public class EMI extends JavaPlugin {
                 {
                     project.setFocusedMaterial(material);
                 }
+            }
+
+            for(DbRow workLogRow : workLog)
+            {
+                if(!projectRow.getInt("project_id").equals(workLogRow.getInt("project_id")))
+                {
+                    continue;
+                }
+
+                DbRow loggedByRow = PlayerUtils.getPlayerRow(workLogRow.getInt("logged_by"));
+                EMIPlayer loggedBy = new EMIPlayer(loggedByRow.getString("player_uuid"), loggedByRow.getString("player_name"), loggedByRow.getInt("player_id"));
+                DbRow validatedByRow = PlayerUtils.getPlayerRow(workLogRow.getInt("validated_by"));
+                EMIPlayer validatedBy = null;
+
+                if(!validatedByRow.isEmpty())
+                {
+                    validatedBy = new EMIPlayer(validatedByRow.getString("player_uuid"), validatedByRow.getString("player_name"), validatedByRow.getInt("player_id"));
+                }
+
+                MintWorkLog log = new MintWorkLog(
+                        workLogRow.getInt("log_id"),
+                        loggedBy,
+                        validatedBy,
+                        workLogRow.getInt("validated"),
+                        workLogRow.getString("work_length"),
+                        workLogRow.get("log_date").toString(),
+                        workLogRow.getString("description"));
+                project.getWorkLog().put(log.getWorkID(), log);
             }
 
             manager.addProject(projectRow.getInt("project_id"), project);
