@@ -220,10 +220,11 @@ public class EMI extends JavaPlugin {
 
                 MintTask task = new MintTask(
                         taskRow.getInt("task_id"),
+                        taskRow.getInt("project_id"),
                         taskRow.getString("task"),
                         taskRow.getInt("complete"),
                         taskRow.getInt("focused"));
-                project.getTaskRequirements().put(task.getTaskID(), task);
+                project.getTaskRequirements().put(task.getId(), task);
 
                 if(task.getFocused() == 1)
                 {
@@ -240,11 +241,13 @@ public class EMI extends JavaPlugin {
 
                 MintMaterial material = new MintMaterial(
                         materialRow.getInt("material_id"),
+                        materialRow.getInt("project_id"),
                         materialRow.getString("material"),
                         materialRow.getInt("amount"),
+                        materialRow.getInt("collected"),
                         materialRow.getInt("complete"),
                         materialRow.getInt("focused"));
-                project.getMaterialRequirements().put(material.getMaterialID(), material);
+                project.getMaterialRequirements().put(material.getId(), material);
 
                 if(material.getFocused() == 1)
                 {
@@ -271,13 +274,14 @@ public class EMI extends JavaPlugin {
 
                 MintLogTask log = new MintLogTask(
                         workLogRow.getInt("log_id"),
+                        workLogRow.getInt("project_id"),
                         loggedBy,
                         validatedBy,
                         workLogRow.getInt("validated"),
-                        workLogRow.getString("work_length"),
+                        workLogRow.getInt("work_length"),
                         workLogRow.get("log_date").toString(),
                         workLogRow.getString("description"));
-                project.getWorkLog().put(log.getWorkID(), log);
+                project.getWorkLog().put(log.getId(), log);
             }
 
             manager.addProject(projectRow.getInt("project_id"), project);
