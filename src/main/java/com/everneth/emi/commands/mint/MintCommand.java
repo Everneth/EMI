@@ -183,7 +183,7 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        MintMaterial material = project.getMaterialRequirements().get(materialID);
+        MintMaterial material = project.getMaterials().get(materialID);
 
         if(material == null)
         {
@@ -234,7 +234,7 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        MintMaterial material = project.getMaterialRequirements().get(materialID);
+        MintMaterial material = project.getMaterials().get(materialID);
 
         if(material == null)
         {
@@ -260,7 +260,7 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        MintMaterial material = project.getMaterialRequirements().get(materialID);
+        MintMaterial material = project.getMaterials().get(materialID);
 
         if(material == null)
         {
@@ -282,7 +282,7 @@ public class MintCommand extends BaseCommand {
 
         MintMaterial formerMaterial = null;
 
-        for(MintMaterial mintMaterial : project.getMaterialRequirements().values())
+        for(MintMaterial mintMaterial : project.getMaterials().values())
         {
             if(mintMaterial.getFocused() == 1)
             {
@@ -309,14 +309,14 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        if(project.getMaterialRequirements().isEmpty())
+        if(project.getMaterials().isEmpty())
         {
             player.sendMessage("&cProject doesnt have any tasks to list!");
             return;
         }
 
         player.sendMessage(Utils.color("&aMaterials for project: &6" + project.getName()));
-        for(MintMaterial material : project.getMaterialRequirements().values())
+        for(MintMaterial material : project.getMaterials().values())
         {
             player.sendMessage(Utils.color("&8[&9" + material.getId()+ "&8] &a" + material.getMaterial() + " &e" + material.getTotal()));
         }
@@ -540,13 +540,13 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        if(project.getTaskRequirements().get(taskID) == null)
+        if(project.getTasks().get(taskID) == null)
         {
             player.sendMessage(Utils.color("&cTask in project &6" + project.getName() + " &cdoesnt exist!"));
             return;
         }
 
-        if(project.getTaskRequirements().get(taskID).getComplete() == 1)
+        if(project.getTasks().get(taskID).getComplete() == 1)
         {
             player.sendMessage(Utils.color("&cTask in project &6" + project.getName() + " &cis already complete!"));
             return;
@@ -590,7 +590,7 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        MintTask task = project.getTaskRequirements().get(taskID);
+        MintTask task = project.getTasks().get(taskID);
 
         if (task == null)
         {
@@ -616,7 +616,7 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        MintTask task = project.getTaskRequirements().get(taskID);
+        MintTask task = project.getTasks().get(taskID);
 
         if(task == null)
         {
@@ -638,7 +638,7 @@ public class MintCommand extends BaseCommand {
 
         MintTask formerTask = null;
 
-        for(MintTask mintTask : project.getTaskRequirements().values())
+        for(MintTask mintTask : project.getTasks().values())
         {
             if(mintTask.getFocused() == 1)
             {
@@ -665,14 +665,14 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        if(project.getTaskRequirements().isEmpty())
+        if(project.getTasks().isEmpty())
         {
             player.sendMessage(Utils.color("&cProject doesnt have any tasks to list!"));
             return;
         }
 
         player.sendMessage(Utils.color("&aTasks for project: &6" + project.getName()));
-        for(MintTask task : project.getTaskRequirements().values())
+        for(MintTask task : project.getTasks().values())
         {
             player.sendMessage(Utils.color("&8[&9" + task.getId() + "&8] &a" + task.getTask()));
         }

@@ -224,7 +224,7 @@ public class EMI extends JavaPlugin {
                         taskRow.getString("task"),
                         taskRow.getInt("complete"),
                         taskRow.getInt("focused"));
-                project.getTaskRequirements().put(task.getId(), task);
+                project.getTasks().put(task.getId(), task);
 
                 if(task.getFocused() == 1)
                 {
@@ -247,7 +247,7 @@ public class EMI extends JavaPlugin {
                         materialRow.getInt("collected"),
                         materialRow.getInt("complete"),
                         materialRow.getInt("focused"));
-                project.getMaterialRequirements().put(material.getId(), material);
+                project.getMaterials().put(material.getId(), material);
 
                 if(material.getFocused() == 1)
                 {
@@ -281,7 +281,7 @@ public class EMI extends JavaPlugin {
                         workLogRow.getInt("work_length"),
                         workLogRow.get("log_date").toString(),
                         workLogRow.getString("description"));
-                project.getWorkLog().put(log.getId(), log);
+                project.getTaskLog().put(log.getId(), log);
             }
 
             manager.addProject(projectRow.getInt("project_id"), project);
