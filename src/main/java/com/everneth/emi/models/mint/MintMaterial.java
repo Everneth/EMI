@@ -2,27 +2,55 @@ package com.everneth.emi.models.mint;
 
 public class MintMaterial
 {
+    private long id;
+    private long projectID;
     private String material;
-    private long materialID;
-    private int amount;
+    private int total;
+    private int collected;
     private int complete;
     private int focused;
 
-    public MintMaterial(long materialID, String material, int amount, int complete, int focused)
+    public MintMaterial(long id, long projectID, String material, int total, int collected, int complete, int focused)
     {
+        this.id = id;
+        this.projectID = projectID;
         this.material = material;
-        this.materialID = materialID;
-        this.amount = amount;
+        this.total = total;
+        this.collected = collected;
         this.complete = complete;
         this.focused = focused;
     }
 
-    public MintMaterial(String material, int amount, int complete, int focused)
+    public MintMaterial(long projectID, String material, int total, int collected, int complete, int focused)
     {
+        this.projectID = projectID;
         this.material = material;
-        this.amount = amount;
+        this.total = total;
+        this.collected = collected;
         this.complete = complete;
         this.focused = focused;
+    }
+
+    private boolean validated;
+
+    public long getId()
+    {
+        return id;
+    }
+
+    public void setId(long id)
+    {
+        this.id = id;
+    }
+
+    public long getProjectID()
+    {
+        return projectID;
+    }
+
+    public void setProjectID(long projectID)
+    {
+        this.projectID = projectID;
     }
 
     public String getMaterial()
@@ -35,24 +63,24 @@ public class MintMaterial
         this.material = material;
     }
 
-    public long getMaterialID()
+    public int getTotal()
     {
-        return materialID;
+        return total;
     }
 
-    public void setMaterialID(long materialID)
+    public void setTotal(int total)
     {
-        this.materialID = materialID;
+        this.total = total;
     }
 
-    public int getAmount()
+    public int getCollected()
     {
-        return amount;
+        return collected;
     }
 
-    public void setAmount(int amount)
+    public void setCollected(int collected)
     {
-        this.amount = amount;
+        this.collected = collected;
     }
 
     public int getComplete()
@@ -73,5 +101,15 @@ public class MintMaterial
     public void setFocused(int focused)
     {
         this.focused = focused;
+    }
+
+    public boolean isValidated()
+    {
+        return validated;
+    }
+
+    public void setValidated(boolean validated)
+    {
+        this.validated = validated;
     }
 }

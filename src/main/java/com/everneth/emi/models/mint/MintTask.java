@@ -2,24 +2,47 @@ package com.everneth.emi.models.mint;
 
 public class MintTask
 {
+    private long id;
+    private long projectID;
     private String task;
-    private long taskID;
     private int complete;
     private int focused;
 
-    public MintTask(long taskID, String task, int complete, int focused)
+    public MintTask(long id, long projectID, String task, int complete, int focused)
     {
-        this.taskID = taskID;
+        this.id = id;
+        this.projectID = projectID;
         this.task = task;
         this.complete = complete;
         this.focused = focused;
     }
 
-    public MintTask(String task, int complete, int focused)
+    public MintTask(long projectID, String task, int complete, int focused)
     {
+        this.projectID = projectID;
         this.task = task;
         this.complete = complete;
         this.focused = focused;
+    }
+
+    public long getId()
+    {
+        return id;
+    }
+
+    public void setId(long id)
+    {
+        this.id = id;
+    }
+
+    public long getProjectID()
+    {
+        return projectID;
+    }
+
+    public void setProjectID(long projectID)
+    {
+        this.projectID = projectID;
     }
 
     public String getTask()
@@ -30,16 +53,6 @@ public class MintTask
     public void setTask(String task)
     {
         this.task = task;
-    }
-
-    public long getTaskID()
-    {
-        return taskID;
-    }
-
-    public void setTaskID(long taskID)
-    {
-        this.taskID = taskID;
     }
 
     public int getComplete()

@@ -4,63 +4,76 @@ import com.everneth.emi.models.EMIPlayer;
 
 public class MIntLogTask
 {
-    private EMIPlayer loggedBy;
-    private EMIPlayer validatedBy;
-    private long workID;
+    private long id;
+    private long projectID;
+    private EMIPlayer logger;
+    private EMIPlayer validater;
     private int validated;
-    private String workLength;
+    private int timeWorked;
     private String logDate;
     private String description;
 
-    public MIntLogTask(EMIPlayer loggedBy, EMIPlayer validatedBy, int validated, String workLength, String logDate, String description)
+    public MIntLogTask(long id, long projectID, EMIPlayer logger, EMIPlayer validater, int validated, int timeWorked, String logDate, String description)
     {
-        this.loggedBy = loggedBy;
-        this.validatedBy = validatedBy;
+        this.id = id;
+        this.projectID = projectID;
+        this.logger = logger;
+        this.validater = validater;
         this.validated = validated;
-        this.workLength = workLength;
+        this.timeWorked = timeWorked;
         this.logDate = logDate;
         this.description = description;
     }
 
-    public MIntLogTask(long workID, EMIPlayer loggedBy, EMIPlayer validatedBy, int validated, String workLength, String logDate, String description)
+    public MIntLogTask(long projectID, EMIPlayer logger, EMIPlayer validater, int validated, int timeWorked, String logDate, String description)
     {
-        this.loggedBy = loggedBy;
-        this.validatedBy = validatedBy;
-        this.workID = workID;
+        this.projectID = projectID;
+        this.logger = logger;
+        this.validater = validater;
         this.validated = validated;
-        this.workLength = workLength;
+        this.timeWorked = timeWorked;
         this.logDate = logDate;
         this.description = description;
     }
 
-    public long getWorkID()
+    public long getId()
     {
-        return workID;
+        return id;
     }
 
-    public void setWorkID(long workID)
+    public void setId(long id)
     {
-        this.workID = workID;
+        this.id = id;
     }
 
-    public EMIPlayer getLoggedBy()
+    public long getProjectID()
     {
-        return loggedBy;
+        return projectID;
     }
 
-    public void setLoggedBy(EMIPlayer loggedBy)
+    public void setProjectID(long projectID)
     {
-        this.loggedBy = loggedBy;
+        this.projectID = projectID;
     }
 
-    public EMIPlayer getValidatedBy()
+    public EMIPlayer getLogger()
     {
-        return validatedBy;
+        return logger;
     }
 
-    public void setValidatedBy(EMIPlayer validatedBy)
+    public void setLogger(EMIPlayer logger)
     {
-        this.validatedBy = validatedBy;
+        this.logger = logger;
+    }
+
+    public EMIPlayer getValidater()
+    {
+        return validater;
+    }
+
+    public void setValidater(EMIPlayer validater)
+    {
+        this.validater = validater;
     }
 
     public int getValidated()
@@ -73,14 +86,14 @@ public class MIntLogTask
         this.validated = validated;
     }
 
-    public String getWorkLength()
+    public int getTimeWorked()
     {
-        return workLength;
+        return timeWorked;
     }
 
-    public void setWorkLength(String workLength)
+    public void setTimeWorked(int timeWorked)
     {
-        this.workLength = workLength;
+        this.timeWorked = timeWorked;
     }
 
     public String getLogDate()

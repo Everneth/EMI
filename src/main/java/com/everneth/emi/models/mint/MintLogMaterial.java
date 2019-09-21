@@ -1,77 +1,125 @@
 package com.everneth.emi.models.mint;
 
 import com.everneth.emi.models.EMIPlayer;
-import org.bukkit.Material;
 
 public class MintLogMaterial
 {
-    private EMIPlayer loggedBy;
-    private EMIPlayer validatedBy;
-    private boolean validated;
-    private Material material;
-    private int materialsCollected;
+    private long id;
+    private long projectID;
+    private long materialID;
+    private EMIPlayer logger;
+    private EMIPlayer validater;
+    private int validated;
+    private int materialCollected;
+    private int timeWorked;
     private String logDate;
     private String description;
 
-    public MintLogMaterial(EMIPlayer loggedBy, EMIPlayer validatedBy, boolean validated, Material material, int materialsCollected, String logDate, String description)
+    public MintLogMaterial(long id, long projectID, long materialID, EMIPlayer logger, EMIPlayer validater, int validated, int materialCollected, int timeWorked, String logDate, String description)
     {
-        this.loggedBy = loggedBy;
-        this.validatedBy = validatedBy;
+        this.id = id;
+        this.projectID = projectID;
+        this.materialID = materialID;
+        this.logger = logger;
+        this.validater = validater;
         this.validated = validated;
-        this.material = material;
-        this.materialsCollected = materialsCollected;
+        this.materialCollected = materialCollected;
+        this.timeWorked = timeWorked;
         this.logDate = logDate;
         this.description = description;
     }
 
-    public EMIPlayer getLoggedBy()
+    public MintLogMaterial(long projectID, long materialID, EMIPlayer logger, EMIPlayer validater, int validated, int materialCollected, int timeWorked, String logDate, String description)
     {
-        return loggedBy;
+        this.projectID = projectID;
+        this.materialID = materialID;
+        this.logger = logger;
+        this.validater = validater;
+        this.validated = validated;
+        this.materialCollected = materialCollected;
+        this.timeWorked = timeWorked;
+        this.logDate = logDate;
+        this.description = description;
     }
 
-    public void setLoggedBy(EMIPlayer loggedBy)
+    public long getId()
     {
-        this.loggedBy = loggedBy;
+        return id;
     }
 
-    public EMIPlayer getValidatedBy()
+    public void setId(long id)
     {
-        return validatedBy;
+        this.id = id;
     }
 
-    public void setValidatedBy(EMIPlayer validatedBy)
+    public long getProjectID()
     {
-        this.validatedBy = validatedBy;
+        return projectID;
     }
 
-    public boolean isValidated()
+    public void setProjectID(long projectID)
+    {
+        this.projectID = projectID;
+    }
+
+    public long getMaterialID()
+    {
+        return materialID;
+    }
+
+    public void setMaterialID(long materialID)
+    {
+        this.materialID = materialID;
+    }
+
+    public EMIPlayer getLogger()
+    {
+        return logger;
+    }
+
+    public void setLogger(EMIPlayer logger)
+    {
+        this.logger = logger;
+    }
+
+    public EMIPlayer getValidater()
+    {
+        return validater;
+    }
+
+    public void setValidater(EMIPlayer validater)
+    {
+        this.validater = validater;
+    }
+
+    public int getValidated()
     {
         return validated;
     }
 
-    public void setValidated(boolean validated)
+    public void setValidated(int validated)
     {
         this.validated = validated;
     }
 
-    public Material getMaterial()
+    public int getMaterialCollected()
     {
-        return material;
+        return materialCollected;
     }
 
-    public void setMaterial(Material material)
+    public void setMaterialCollected(int materialCollected)
     {
-        this.material = material;
+        this.materialCollected = materialCollected;
     }
 
-    public int getMaterialsCollected()
+    public int getTimeWorked()
     {
-        return materialsCollected;
+        return timeWorked;
     }
 
-    public void setMaterialsCollected(int materialsCollected)
+    public void setTimeWorked(int timeWorked)
     {
-        this.materialsCollected = materialsCollected;
+        this.timeWorked = timeWorked;
     }
 
     public String getLogDate()
