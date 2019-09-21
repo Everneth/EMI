@@ -2,7 +2,7 @@ package com.everneth.emi.models.mint;
 
 import com.everneth.emi.models.EMIPlayer;
 
-public class MIntLogTask
+public class MintLogTask
 {
     private long id;
     private long projectID;
@@ -13,7 +13,7 @@ public class MIntLogTask
     private String logDate;
     private String description;
 
-    public MIntLogTask(long id, long projectID, EMIPlayer logger, EMIPlayer validater, int validated, int timeWorked, String logDate, String description)
+    public MintLogTask(long id, long projectID, EMIPlayer logger, EMIPlayer validater, int validated, int timeWorked, String logDate, String description)
     {
         this.id = id;
         this.projectID = projectID;
@@ -25,7 +25,7 @@ public class MIntLogTask
         this.description = description;
     }
 
-    public MIntLogTask(long projectID, EMIPlayer logger, EMIPlayer validater, int validated, int timeWorked, String logDate, String description)
+    public MintLogTask(long projectID, EMIPlayer logger, EMIPlayer validater, int validated, int timeWorked, String logDate, String description)
     {
         this.projectID = projectID;
         this.logger = logger;

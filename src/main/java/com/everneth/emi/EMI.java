@@ -18,7 +18,7 @@ import com.everneth.emi.models.*;
 import com.everneth.emi.models.mint.MintMaterial;
 import com.everneth.emi.models.mint.MintProject;
 import com.everneth.emi.models.mint.MintTask;
-import com.everneth.emi.models.mint.MIntLogTask;
+import com.everneth.emi.models.mint.MintLogTask;
 import com.everneth.emi.utils.PlayerUtils;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -269,7 +269,7 @@ public class EMI extends JavaPlugin {
                     validatedBy = new EMIPlayer(validatedByRow.getString("player_uuid"), validatedByRow.getString("player_name"), validatedByRow.getInt("player_id"));
                 }
 
-                MIntLogTask log = new MIntLogTask(
+                MintLogTask log = new MintLogTask(
                         workLogRow.getInt("log_id"),
                         loggedBy,
                         validatedBy,
