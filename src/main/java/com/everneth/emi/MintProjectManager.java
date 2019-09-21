@@ -1,7 +1,7 @@
 package com.everneth.emi;
 
 import co.aikar.idb.DB;
-import com.everneth.emi.models.MintProject;
+import com.everneth.emi.models.mint.MintProject;
 import org.bukkit.Bukkit;
 
 import java.sql.SQLException;

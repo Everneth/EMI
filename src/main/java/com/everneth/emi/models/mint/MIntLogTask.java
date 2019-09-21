@@ -1,6 +1,8 @@
-package com.everneth.emi.models;
+package com.everneth.emi.models.mint;
 
-public class MintWorkLog
+import com.everneth.emi.models.EMIPlayer;
+
+public class MIntLogTask
 {
     private EMIPlayer loggedBy;
     private EMIPlayer validatedBy;
@@ -10,7 +12,7 @@ public class MintWorkLog
     private String logDate;
     private String description;
 
-    public MintWorkLog(EMIPlayer loggedBy, EMIPlayer validatedBy, int validated, String workLength, String logDate, String description)
+    public MIntLogTask(EMIPlayer loggedBy, EMIPlayer validatedBy, int validated, String workLength, String logDate, String description)
     {
         this.loggedBy = loggedBy;
         this.validatedBy = validatedBy;
@@ -20,7 +22,7 @@ public class MintWorkLog
         this.description = description;
     }
 
-    public MintWorkLog(long workID, EMIPlayer loggedBy, EMIPlayer validatedBy, int validated, String workLength, String logDate, String description)
+    public MIntLogTask(long workID, EMIPlayer loggedBy, EMIPlayer validatedBy, int validated, String workLength, String logDate, String description)
     {
         this.loggedBy = loggedBy;
         this.validatedBy = validatedBy;

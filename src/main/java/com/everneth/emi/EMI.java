@@ -15,6 +15,10 @@ import com.everneth.emi.events.JoinEvent;
 import com.everneth.emi.events.LeaveEvent;
 import com.everneth.emi.events.bot.MessageReceivedListener;
 import com.everneth.emi.models.*;
+import com.everneth.emi.models.mint.MintMaterial;
+import com.everneth.emi.models.mint.MintProject;
+import com.everneth.emi.models.mint.MintTask;
+import com.everneth.emi.models.mint.MIntLogTask;
 import com.everneth.emi.utils.PlayerUtils;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -214,7 +218,7 @@ public class EMI extends JavaPlugin {
                     continue;
                 }
 
-                MintTaskRequirement task = new MintTaskRequirement(
+                MintTask task = new MintTask(
                         taskRow.getInt("task_id"),
                         taskRow.getString("task"),
                         taskRow.getInt("complete"),
@@ -234,7 +238,7 @@ public class EMI extends JavaPlugin {
                     continue;
                 }
 
-                MintMaterialRequirement material = new MintMaterialRequirement(
+                MintMaterial material = new MintMaterial(
                         materialRow.getInt("material_id"),
                         materialRow.getString("material"),
                         materialRow.getInt("amount"),
@@ -265,7 +269,7 @@ public class EMI extends JavaPlugin {
                     validatedBy = new EMIPlayer(validatedByRow.getString("player_uuid"), validatedByRow.getString("player_name"), validatedByRow.getInt("player_id"));
                 }
 
-                MintWorkLog log = new MintWorkLog(
+                MIntLogTask log = new MIntLogTask(
                         workLogRow.getInt("log_id"),
                         loggedBy,
                         validatedBy,

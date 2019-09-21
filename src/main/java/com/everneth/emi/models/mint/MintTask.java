@@ -1,13 +1,13 @@
-package com.everneth.emi.models;
+package com.everneth.emi.models.mint;
 
-public class MintTaskRequirement
+public class MintTask
 {
     private String task;
     private long taskID;
     private int complete;
     private int focused;
 
-    public MintTaskRequirement(long taskID, String task, int complete, int focused)
+    public MintTask(long taskID, String task, int complete, int focused)
     {
         this.taskID = taskID;
         this.task = task;
@@ -15,7 +15,7 @@ public class MintTaskRequirement
         this.focused = focused;
     }
 
-    public MintTaskRequirement(String task, int complete, int focused)
+    public MintTask(String task, int complete, int focused)
     {
         this.task = task;
         this.complete = complete;

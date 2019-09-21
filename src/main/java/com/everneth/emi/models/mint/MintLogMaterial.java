@@ -1,8 +1,9 @@
-package com.everneth.emi.models;
+package com.everneth.emi.models.mint;
 
+import com.everneth.emi.models.EMIPlayer;
 import org.bukkit.Material;
 
-public class MintMaterialLog
+public class MintLogMaterial
 {
     private EMIPlayer loggedBy;
     private EMIPlayer validatedBy;
@@ -12,7 +13,7 @@ public class MintMaterialLog
     private String logDate;
     private String description;
 
-    public MintMaterialLog(EMIPlayer loggedBy, EMIPlayer validatedBy, boolean validated, Material material, int materialsCollected, String logDate, String description)
+    public MintLogMaterial(EMIPlayer loggedBy, EMIPlayer validatedBy, boolean validated, Material material, int materialsCollected, String logDate, String description)
     {
         this.loggedBy = loggedBy;
         this.validatedBy = validatedBy;

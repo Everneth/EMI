@@ -1,6 +1,6 @@
-package com.everneth.emi.models;
+package com.everneth.emi.models.mint;
 
-public class MintMaterialRequirement
+public class MintMaterial
 {
     private String material;
     private long materialID;
@@ -8,7 +8,7 @@ public class MintMaterialRequirement
     private int complete;
     private int focused;
 
-    public MintMaterialRequirement(long materialID, String material, int amount, int complete, int focused)
+    public MintMaterial(long materialID, String material, int amount, int complete, int focused)
     {
         this.material = material;
         this.materialID = materialID;
@@ -17,7 +17,7 @@ public class MintMaterialRequirement
         this.focused = focused;
     }
 
-    public MintMaterialRequirement(String material, int amount, int complete, int focused)
+    public MintMaterial(String material, int amount, int complete, int focused)
     {
         this.material = material;
         this.amount = amount;

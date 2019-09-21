@@ -1,7 +1,8 @@
-package com.everneth.emi.models;
+package com.everneth.emi.models.mint;
 
 import co.aikar.idb.DB;
 import com.everneth.emi.Utils;
+import com.everneth.emi.models.EMIPlayer;
 import org.bukkit.Bukkit;
 
 import java.sql.SQLException;
@@ -18,13 +19,13 @@ public class MintProject
     private int complete;
     private int focused;
     private String description;
-    private MintTaskRequirement focusedTask;
-    private MintMaterialRequirement focusedMaterial;
+    private MintTask focusedTask;
+    private MintMaterial focusedMaterial;
     private ArrayList<EMIPlayer> workers = new ArrayList<>();
-    private HashMap<Long, MintWorkLog> workLog = new HashMap<>();
-    private HashMap<Long, MintMaterialLog> materialLog = new HashMap<>();
-    private HashMap<Long, MintTaskRequirement> taskRequirements = new HashMap<>();
-    private HashMap<Long, MintMaterialRequirement> materialRequirements = new HashMap<>();
+    private HashMap<Long, MIntLogTask> workLog = new HashMap<>();
+    private HashMap<Long, MintLogMaterial> materialLog = new HashMap<>();
+    private HashMap<Long, MintTask> taskRequirements = new HashMap<>();
+    private HashMap<Long, MintMaterial> materialRequirements = new HashMap<>();
 
     public MintProject(EMIPlayer lead, String name, String startDate, String endDate, int complete, int focused, String description)
     {
@@ -79,7 +80,7 @@ public class MintProject
         }
     }
 
-    public void addTask(MintTaskRequirement task)
+    public void addTask(MintTask task)
     {
         try
         {
@@ -109,7 +110,7 @@ public class MintProject
         }
     }
 
-    public void switchTaskFocus(MintTaskRequirement newTask, MintTaskRequirement formerTask)
+    public void switchTaskFocus(MintTask newTask, MintTask formerTask)
     {
         try
         {
@@ -131,7 +132,7 @@ public class MintProject
         }
     }
 
-    public void deleteTask(MintTaskRequirement task)
+    public void deleteTask(MintTask task)
     {
         try
         {
@@ -145,7 +146,7 @@ public class MintProject
         }
     }
 
-    public void addMaterial(MintMaterialRequirement material)
+    public void addMaterial(MintMaterial material)
     {
         try
         {
@@ -175,7 +176,7 @@ public class MintProject
         }
     }
 
-    public void switchMaterialFocus(MintMaterialRequirement newMaterial, MintMaterialRequirement formerMaterial)
+    public void switchMaterialFocus(MintMaterial newMaterial, MintMaterial formerMaterial)
     {
         try
         {
@@ -197,7 +198,7 @@ public class MintProject
         }
     }
 
-    public void deleteMaterial(MintMaterialRequirement material)
+    public void deleteMaterial(MintMaterial material)
     {
         try
         {
@@ -211,7 +212,7 @@ public class MintProject
         }
     }
 
-    public void addLogWork(MintWorkLog log)
+    public void addLogWork(MIntLogTask log)
     {
         try
         {
@@ -231,22 +232,22 @@ public class MintProject
         }
     }
 
-    public MintTaskRequirement getFocusedTask()
+    public MintTask getFocusedTask()
     {
         return focusedTask;
     }
 
-    public void setFocusedTask(MintTaskRequirement focusedTask)
+    public void setFocusedTask(MintTask focusedTask)
     {
         this.focusedTask = focusedTask;
     }
 
-    public MintMaterialRequirement getFocusedMaterial()
+    public MintMaterial getFocusedMaterial()
     {
         return focusedMaterial;
     }
 
-    public void setFocusedMaterial(MintMaterialRequirement focusedMaterial)
+    public void setFocusedMaterial(MintMaterial focusedMaterial)
     {
         this.focusedMaterial = focusedMaterial;
     }
@@ -321,42 +322,42 @@ public class MintProject
         this.focused = focused;
     }
 
-    public HashMap<Long, MintWorkLog> getWorkLog()
+    public HashMap<Long, MIntLogTask> getWorkLog()
     {
         return workLog;
     }
 
-    public void setWorkLog(HashMap<Long, MintWorkLog> workLog)
+    public void setWorkLog(HashMap<Long, MIntLogTask> workLog)
     {
         this.workLog = workLog;
     }
 
-    public HashMap<Long, MintMaterialLog> getMaterialLog()
+    public HashMap<Long, MintLogMaterial> getMaterialLog()
     {
         return materialLog;
     }
 
-    public void setMaterialLog(HashMap<Long, MintMaterialLog> materialLog)
+    public void setMaterialLog(HashMap<Long, MintLogMaterial> materialLog)
     {
         this.materialLog = materialLog;
     }
 
-    public HashMap<Long, MintTaskRequirement> getTaskRequirements()
+    public HashMap<Long, MintTask> getTaskRequirements()
     {
         return taskRequirements;
     }
 
-    public void setTaskRequirements(HashMap<Long, MintTaskRequirement> taskRequirements)
+    public void setTaskRequirements(HashMap<Long, MintTask> taskRequirements)
     {
         this.taskRequirements = taskRequirements;
     }
 
-    public HashMap<Long, MintMaterialRequirement> getMaterialRequirements()
+    public HashMap<Long, MintMaterial> getMaterialRequirements()
     {
         return materialRequirements;
     }
 
-    public void setMaterialRequirements(HashMap<Long, MintMaterialRequirement> materialRequirements)
+    public void setMaterialRequirements(HashMap<Long, MintMaterial> materialRequirements)
     {
         this.materialRequirements = materialRequirements;
     }

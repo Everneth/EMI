@@ -7,6 +7,10 @@ import co.aikar.idb.DbRow;
 import com.everneth.emi.MintProjectManager;
 import com.everneth.emi.Utils;
 import com.everneth.emi.models.*;
+import com.everneth.emi.models.mint.MintMaterial;
+import com.everneth.emi.models.mint.MintProject;
+import com.everneth.emi.models.mint.MintTask;
+import com.everneth.emi.models.mint.MIntLogTask;
 import com.everneth.emi.utils.PlayerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -158,7 +162,7 @@ public class MintCommand extends BaseCommand {
 
         DbRow dbLoggedBy = PlayerUtils.getPlayerRow(player.getName());
         EMIPlayer loggedBy = new EMIPlayer(dbLoggedBy.getString("player_uuid"), dbLoggedBy.getString("player_name"), dbLoggedBy.getInt("player_id"));
-        MintWorkLog log = new MintWorkLog(loggedBy, null, 0, time, Utils.getCurrentDate(), Utils.buildMessage(description, 0));
+        MIntLogTask log = new MIntLogTask(loggedBy, null, 0, time, Utils.getCurrentDate(), Utils.buildMessage(description, 0));
 
         project.addLogWork(log);
 
@@ -179,7 +183,7 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        MintMaterialRequirement material = project.getMaterialRequirements().get(materialID);
+        MintMaterial material = project.getMaterialRequirements().get(materialID);
 
         if(material == null)
         {
@@ -210,7 +214,7 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        MintMaterialRequirement material = new MintMaterialRequirement(materialString, amount, 0, 0);
+        MintMaterial material = new MintMaterial(materialString, amount, 0, 0);
 
         project.addMaterial(material);
         player.sendMessage(Utils.color("&aSuccessfully added material to project!"));
@@ -230,7 +234,7 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        MintMaterialRequirement material = project.getMaterialRequirements().get(materialID);
+        MintMaterial material = project.getMaterialRequirements().get(materialID);
 
         if(material == null)
         {
@@ -256,7 +260,7 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        MintMaterialRequirement material = project.getMaterialRequirements().get(materialID);
+        MintMaterial material = project.getMaterialRequirements().get(materialID);
 
         if(material == null)
         {
@@ -276,13 +280,13 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        MintMaterialRequirement formerMaterial = null;
+        MintMaterial formerMaterial = null;
 
-        for(MintMaterialRequirement mintMaterialRequirement : project.getMaterialRequirements().values())
+        for(MintMaterial mintMaterial : project.getMaterialRequirements().values())
         {
-            if(mintMaterialRequirement.getFocused() == 1)
+            if(mintMaterial.getFocused() == 1)
             {
-                formerMaterial = mintMaterialRequirement;
+                formerMaterial = mintMaterial;
                 break;
             }
         }
@@ -312,7 +316,7 @@ public class MintCommand extends BaseCommand {
         }
 
         player.sendMessage(Utils.color("&aMaterials for project: &6" + project.getName()));
-        for(MintMaterialRequirement material : project.getMaterialRequirements().values())
+        for(MintMaterial material : project.getMaterialRequirements().values())
         {
             player.sendMessage(Utils.color("&8[&9" + material.getMaterialID() + "&8] &a" + material.getMaterial() + " &e" + material.getAmount()));
         }
@@ -567,7 +571,7 @@ public class MintCommand extends BaseCommand {
 
         String taskString = Utils.buildMessage(taskParts, 0);
 
-        MintTaskRequirement task = new MintTaskRequirement(taskString, 0, 0);
+        MintTask task = new MintTask(taskString, 0, 0);
 
         project.addTask(task);
         player.sendMessage(Utils.color("&aSuccessfully added task to project &6" + project.getName()));
@@ -586,7 +590,7 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        MintTaskRequirement task = project.getTaskRequirements().get(taskID);
+        MintTask task = project.getTaskRequirements().get(taskID);
 
         if (task == null)
         {
@@ -612,7 +616,7 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        MintTaskRequirement task = project.getTaskRequirements().get(taskID);
+        MintTask task = project.getTaskRequirements().get(taskID);
 
         if(task == null)
         {
@@ -632,13 +636,13 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        MintTaskRequirement formerTask = null;
+        MintTask formerTask = null;
 
-        for(MintTaskRequirement mintTaskRequirement : project.getTaskRequirements().values())
+        for(MintTask mintTask : project.getTaskRequirements().values())
         {
-            if(mintTaskRequirement.getFocused() == 1)
+            if(mintTask.getFocused() == 1)
             {
-                formerTask = mintTaskRequirement;
+                formerTask = mintTask;
                 break;
             }
         }
@@ -668,7 +672,7 @@ public class MintCommand extends BaseCommand {
         }
 
         player.sendMessage(Utils.color("&aTasks for project: &6" + project.getName()));
-        for(MintTaskRequirement task : project.getTaskRequirements().values())
+        for(MintTask task : project.getTaskRequirements().values())
         {
             player.sendMessage(Utils.color("&8[&9" + task.getTaskID() + "&8] &a" + task.getTask()));
         }
