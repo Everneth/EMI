@@ -70,10 +70,11 @@ public class MintProject
     {
         try
         {
-            DB.executeUpdate("UPDATE mint_project SET end_date = ?, complete = 1 WHERE project_id = ?",
+            DB.executeUpdate("UPDATE mint_project SET end_date = ?, complete = 1, focused = 0 WHERE project_id = ?",
                     Utils.getCurrentDate(),
                     id);
             complete = 1;
+            focused = 0;
         }
         catch (SQLException e)
         {
@@ -85,7 +86,8 @@ public class MintProject
     {
         try
         {
-            long taskID = DB.executeInsert("INSERT INTO mint_task (project_id, task, complete, focused) VALUES (?, ?, 0, 0)", id,
+            long taskID = DB.executeInsert("INSERT INTO mint_task (project_id, task, complete, focused) VALUES (?, ?, 0, 0)",
+                    id,
                     task.getTask());
             task.setId(taskID);
             tasks.put(taskID, task);
@@ -100,9 +102,10 @@ public class MintProject
     {
         try
         {
-            DB.executeUpdate("UPDATE mint_task SET complete = 1 WHERE task_id = ?",
+            DB.executeUpdate("UPDATE mint_task SET complete = 1, focused = 0 WHERE task_id = ?",
                     taskID);
             tasks.get(taskID).setComplete(1);
+            tasks.get(taskID).setFocused(0);
         }
         catch(SQLException e)
         {
@@ -129,6 +132,21 @@ public class MintProject
         catch(SQLException e)
         {
             Bukkit.getLogger().info("ERROR: MintProject/switchTaskFocus: " + e.toString());
+        }
+    }
+
+    public void unFocusTask(MintTask task)
+    {
+        try
+        {
+            DB.executeUpdate("UPDATE mint_task SET focused = 0 WHERE task_id = ?",
+                    task.getId());
+            task.setFocused(0);
+            focusedTask = null;
+        }
+        catch(SQLException e)
+        {
+            Bukkit.getLogger().info("ERROR: MintProject/unFocusTask: " + e.toString());
         }
     }
 

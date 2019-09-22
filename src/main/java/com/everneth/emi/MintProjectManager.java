@@ -102,7 +102,7 @@ public class MintProjectManager
     {
         try
         {
-            DB.executeUpdate("UPDATE mint_project SET focused = 1 WHERE project_id = ?",
+            DB.executeUpdate("UPDATE mint_project SET focused = 0 WHERE project_id = ?",
                     project.getId());
             project.setFocused(0);
         }
