@@ -36,6 +36,7 @@ public class MintCommand extends BaseCommand {
     // TODO: Annotations & Calls
     private String message;
     private int playerId;
+    private String mintProjectTag = "&7[&dMint&5Pro&7] ";
 
     @Subcommand("motd")
     @CommandPermission("emi.mint.motd")
@@ -162,7 +163,7 @@ public class MintCommand extends BaseCommand {
 
         DbRow dbLoggedBy = PlayerUtils.getPlayerRow(player.getName());
         EMIPlayer loggedBy = new EMIPlayer(dbLoggedBy.getString("player_uuid"), dbLoggedBy.getString("player_name"), dbLoggedBy.getInt("player_id"));
-        MintLogTask log = new MintLogTask(project.getId(), loggedBy, null, 0, 0, Utils.getCurrentDate(), Utils.buildMessage(description, 0));
+        MintLogTask log = new MintLogTask(project.getId(), loggedBy, null, 0, 0, Utils.getCurrentDate(), Utils.buildMessage(description, 0, false));
 
         project.addLogWork(log);
 
@@ -322,7 +323,7 @@ public class MintCommand extends BaseCommand {
         }
     }
 
-    //TODO fix messages and add validation check
+    //TODO Add tab-complete to mintProject
     @Subcommand("project complete")
     @Syntax("<ProjectName>")
     @CommandPermission("emi.mint.project.complete")
@@ -333,51 +334,57 @@ public class MintCommand extends BaseCommand {
 
         if(project == null)
         {
-            player.sendMessage(Utils.color("&cProject doesnt exist!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() != 0)
         {
-            player.sendMessage(Utils.color("&cProject has already been marked for completion"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject has already been completed!"));
+            return;
+        }
+
+        if(!project.getMaterialLogValidation().isEmpty() && !project.getTaskLogValidation().isEmpty())
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject can't be completed because not all of the logs have been validated!"));
             return;
         }
         project.completeProject();
-        player.sendMessage(Utils.color("&aProject has been marked for completion!"));
+        player.sendMessage(Utils.color(mintProjectTag + "&aProject completed!"));
     }
 
-    //TODO fix messages
+    //TODO add tab-complete for lead
     @Subcommand("project create")
     @Syntax("<ProjectName> <PlayerLead> <Description>")
     @CommandPermission("emi.mint.project.create")
-    public void onProjectAdd(Player player, String projectName, String projectLead, String[] description)
+    public void onProjectCreate(Player player, String name, String lead, String[] description)
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
-        MintProject project = manager.getProject(projectName);
+        MintProject project = manager.getProject(name);
 
         if(project != null)
         {
-            player.sendMessage(Utils.color("&cProject already exist!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
-        DbRow dbPlayerLead = PlayerUtils.getPlayerRow(projectLead);
+        DbRow dbPlayerLead = PlayerUtils.getPlayerRow(lead);
 
         if(dbPlayerLead.isEmpty())
         {
-            player.sendMessage("&cUnrecognized player, did you spell it correctly?");
+            player.sendMessage(Utils.color(mintProjectTag + "&cUnrecognized player, did you spell the name correctly?"));
             return;
         }
 
         EMIPlayer playerLead = new EMIPlayer(dbPlayerLead.getString("player_uuid"), dbPlayerLead.getString("player_name"), dbPlayerLead.getInt("player_id"));
 
-        project = new MintProject(playerLead, projectName, Utils.getCurrentDate(), null, 0, 0, Utils.buildMessage(description, 0));
+        project = new MintProject(playerLead, name, Utils.getCurrentDate(), null, 0, 0, Utils.buildMessage(description, 0, false));
 
         manager.addProject(project);
-        player.sendMessage(Utils.color("&cSuccessfully added the project &6" + project.getName()));
+        player.sendMessage(Utils.color(mintProjectTag + "&aSuccessfully created the project!"));
     }
 
-    //TODO fix messages and check for completed projects
+    //TODO add tab-complete for projects
     @Subcommand("project focus")
     @Syntax("<ProjectName>")
     @CommandPermission("emi.mint.project.focus")
@@ -388,19 +395,20 @@ public class MintCommand extends BaseCommand {
 
         if(project == null)
         {
-            player.sendMessage(Utils.color("&cProject doesnt exist!"));
-            return;
-        }
-
-        if(project.getFocused() == 1)
-        {
-            player.sendMessage(Utils.color("&cProject is already focused!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color("&cProject is already complete and therefore cant be set as focused!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject can't be focused because it's complete!"));
+            return;
+        }
+
+        if(project.getFocused() == 1)
+        {
+            manager.unFocus(project);
+            player.sendMessage(Utils.color(mintProjectTag + "&aProject has been unfocused!"));
             return;
         }
 
@@ -416,10 +424,10 @@ public class MintCommand extends BaseCommand {
         }
 
         manager.switchFocus(project, formerProject);
-        player.sendMessage(Utils.color("&aProject has been marked as focused!"));
+        player.sendMessage(Utils.color(mintProjectTag + "&aProject has been focused!"));
     }
 
-    // TODO fix messages and add tasks/materials
+    // TODO add tab-complete for projectName and add check for project completion
     @Subcommand("project info")
     @Syntax("<ProjectName>")
     @CommandPermission("emi.mint.info")
@@ -430,7 +438,7 @@ public class MintCommand extends BaseCommand {
 
         if(project == null)
         {
-            player.sendMessage(Utils.color("&cCouldn't find the project &6" + projectName));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
@@ -438,19 +446,25 @@ public class MintCommand extends BaseCommand {
 
         if(endDate == null)
         {
-            endDate = "Current";
+            endDate = "now";
         }
 
-        player.sendMessage(Utils.color("&aInformation for project: &6" + project.getName() + "&7 " + project.getFocused() + " " + project.getComplete() + "\n" +
-                "&aProject lead: &6" + project.getLead().getName() + "\n" +
-                "&aProject description: &6" + project.getDescription() + "\n" +
-                "&aFocused Task: &6" + project.getFocusedTask().getTask() + "\n" +
-                "&aFocused Material: &6" + project.getFocusedMaterial().getMaterial() + "&7-&e" + project.getFocusedMaterial().getTotal() + "\n" +
+        ArrayList<String> workers = new ArrayList<>();
+
+        for(EMIPlayer emiPlayer : project.getWorkers())
+        {
+            workers.add(emiPlayer.getName());
+        }
+
+        player.sendMessage(Utils.color(mintProjectTag + "&aInformation for project: &6" + project.getName() + " &aby &6" + project.getLead().getName() + "\n" +
                 "&aDates: &6" + project.getStartDate() + " &7- &6" + endDate + "\n" +
-                "&aWorkers: &6" + project.getWorkers().toString()));
+                "&aDescription: &6" + project.getDescription() + "\n" +
+                "&aFocused task: &6" + project.getFocusedTask().getTask() + "\n" +
+                "&aFocused material: &6" + project.getFocusedMaterial().getMaterial() + "&7(&9need &6" + (project.getFocusedMaterial().getTotal() - project.getFocusedMaterial().getCollected()) + "&7) \n" +
+                "&aWorkers: &6" + Utils.buildMessage(workers.toArray(new String[0]), 0, true)));
     }
 
-    //TODO Fix messages
+    //TODO add tab-complete for mintProject
     @Subcommand("project join")
     @Syntax("<ProjectName>")
     @CommandPermission("emi.mint.project.join")
@@ -461,7 +475,7 @@ public class MintCommand extends BaseCommand {
 
         if(project == null)
         {
-            player.sendMessage(Utils.color("&cProject &6" + mintProject + " &cdoesn't exist!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
@@ -469,20 +483,17 @@ public class MintCommand extends BaseCommand {
         {
             if(emiPlayer.getUniqueId().equalsIgnoreCase(player.getUniqueId().toString()))
             {
-                player.sendMessage(Utils.color("&cYou have already joined this project."));
+                player.sendMessage(Utils.color(mintProjectTag + "&cYou're already part of this project."));
                 return;
             }
         }
 
-        DbRow playerRow = PlayerUtils.getPlayerRow(player.getName());
-        EMIPlayer emiPlayer = new EMIPlayer(playerRow.getString("player_uuid"), playerRow.getString("player_name"), playerRow.getInt("player_id"));
+        EMIPlayer emiPlayer = PlayerUtils.getEMIPlayer(player.getName());
 
         project.addWorker(emiPlayer);
-        player.sendMessage(Utils.color("&aSuccessfully joined the project: &6" + project.getName()));
+        player.sendMessage(Utils.color(mintProjectTag + "&aSuccessfully joined the project!"));
     }
 
-    //TODO fix messages
-    //TODO add null check to info message
     @Subcommand("project list")
     @CommandPermission("emi.mint.project.list")
     public void onProjectList(Player player)
@@ -491,12 +502,12 @@ public class MintCommand extends BaseCommand {
 
         if(manager.getProjects().isEmpty())
         {
-            player.sendMessage(Utils.color("&cNo projects have been added!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cNo projects to list!"));
             return;
         }
 
-        ArrayList<String> currentProjects = new ArrayList<>();
         String focusedProject = null;
+        ArrayList<String> currentProjects = new ArrayList<>();
         ArrayList<String> completeProjects = new ArrayList<>();
 
         for(MintProject project : manager.getProjects().values())
@@ -514,9 +525,33 @@ public class MintCommand extends BaseCommand {
                 currentProjects.add(project.getName());
             }
         }
-        player.sendMessage(Utils.color("&aFocused Project: &6 " + focusedProject + "\n" +
-                "&aOnGoing Projects: &6" + currentProjects.toString() + "\n" +
-                "&aComplete Projects: &6" + completeProjects.toString()));
+
+        if(focusedProject != null)
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&aFocused Project: &6" + focusedProject));
+        }
+        else
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&aFocused Project: &cNothing focused."));
+        }
+
+        if(currentProjects.isEmpty())
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&aCurrent Projects: &cNo current projects."));
+        }
+        else
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&aCurrent Projects: " + Utils.buildMessage(currentProjects.toArray(new String[0]), 0, true)));
+        }
+
+        if(completeProjects.isEmpty())
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&aComplete Projects: &cNo complete projects."));
+        }
+        else
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&aComplete Projects: " + Utils.buildMessage(completeProjects.toArray(new String[0]), 0, true)));
+        }
     }
 
     @Subcommand("project work")
@@ -569,7 +604,7 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        String taskString = Utils.buildMessage(taskParts, 0);
+        String taskString = Utils.buildMessage(taskParts, 0, false);
 
         MintTask task = new MintTask(project.getId(), taskString, 0, 0);
 

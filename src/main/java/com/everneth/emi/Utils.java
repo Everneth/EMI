@@ -2,6 +2,7 @@ package com.everneth.emi;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -32,11 +33,23 @@ public class Utils
         Bukkit.broadcastMessage(Utils.color("&8[&4BugTest&8]" + "&7 " + message));
     }
 
-    public static String buildMessage(String[] parts, int start)
+    public static String buildMessage(String[] parts, int start, boolean separater)
     {
         StringBuilder message = new StringBuilder();
         for(int count = start; count < parts.length; count++)
         {
+            if(separater)
+            {
+                if(count == parts.length)
+                {
+                    message.append(parts[count] + " ");
+                }
+                else
+                {
+                    message.append(parts[count] + ", ");
+                }
+                continue;
+            }
             message.append(parts[count] + " ");
         }
         return message.toString();

@@ -71,7 +71,8 @@ public class MintProject
         try
         {
             DB.executeUpdate("UPDATE mint_project SET end_date = ?, complete = 1 WHERE project_id = ?",
-                    Utils.getCurrentDate(), id);
+                    Utils.getCurrentDate(),
+                    id);
             complete = 1;
         }
         catch (SQLException e)
