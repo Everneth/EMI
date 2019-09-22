@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 public class MintProject
 {
-    private long projectID;
+    private long id;
     private EMIPlayer lead;
     private String name;
     private String startDate;
@@ -40,9 +40,9 @@ public class MintProject
         this.description = description;
     }
 
-    public MintProject(long projectID, EMIPlayer lead, String name, String startDate, String endDate, int complete, int focused, String description)
+    public MintProject(long id, EMIPlayer lead, String name, String startDate, String endDate, int complete, int focused, String description)
     {
-        this.projectID = projectID;
+        this.id = id;
         this.lead = lead;
         this.name = name;
         this.startDate = startDate;
@@ -52,18 +52,17 @@ public class MintProject
         this.description = description;
     }
 
-    public void addWorker(EMIPlayer emiPlayer)
+    public void addWorker(EMIPlayer worker)
     {
         try
         {
-            DB.executeInsert("INSERT INTO mint_project_join_log (player_id, project_id, join_date) VALUES (?, ?, ?)",
-                    emiPlayer.getId(),
-                    projectID, Utils.getCurrentDate());
-            workers.add(emiPlayer);
+            DB.executeInsert("INSERT INTO mint_log_join (player_id, project_id, join_date) VALUES (?, ?, ?)",
+                    worker.getId(), id, Utils.getCurrentDate());
+            workers.add(worker);
         }
         catch (SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/addPlayer: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/addWorker: " + e.toString());
         }
     }
 
@@ -72,8 +71,7 @@ public class MintProject
         try
         {
             DB.executeUpdate("UPDATE mint_project SET end_date = ?, complete = 1 WHERE project_id = ?",
-                    Utils.getCurrentDate(),
-                    projectID);
+                    Utils.getCurrentDate(), id);
             complete = 1;
         }
         catch (SQLException e)
@@ -86,8 +84,7 @@ public class MintProject
     {
         try
         {
-            long taskID = DB.executeInsert("INSERT INTO mint_task_requirements (project_id, task, complete, focused) VALUES (?, ?, 0, 0)",
-                    projectID,
+            long taskID = DB.executeInsert("INSERT INTO mint_task (project_id, task, complete, focused) VALUES (?, ?, 0, 0)", id,
                     task.getTask());
             task.setId(taskID);
             tasks.put(taskID, task);
@@ -102,7 +99,7 @@ public class MintProject
     {
         try
         {
-            DB.executeUpdate("UPDATE mint_task_requirements SET complete = 1 WHERE task_id = ?",
+            DB.executeUpdate("UPDATE mint_task SET complete = 1 WHERE task_id = ?",
                     taskID);
             tasks.get(taskID).setComplete(1);
         }
@@ -118,12 +115,12 @@ public class MintProject
         {
             if(formerTask != null)
             {
-                DB.executeUpdate("UPDATE mint_task_requirements SET focused = 0 WHERE task_id = ?",
+                DB.executeUpdate("UPDATE mint_task SET focused = 0 WHERE task_id = ?",
                         formerTask.getId());
                 formerTask.setFocused(0);
             }
 
-            DB.executeUpdate("UPDATE mint_task_requirements SET focused = 1 WHERE task_id = ?",
+            DB.executeUpdate("UPDATE mint_task SET focused = 1 WHERE task_id = ?",
                     newTask.getId());
             newTask.setFocused(1);
             focusedTask = newTask;
@@ -138,7 +135,7 @@ public class MintProject
     {
         try
         {
-            DB.executeUpdate("DELETE FROM mint_task_requirements WHERE task_id = ?",
+            DB.executeUpdate("DELETE FROM mint_task WHERE task_id = ?",
                     task.getId());
             tasks.remove(task.getId());
         }
@@ -152,8 +149,7 @@ public class MintProject
     {
         try
         {
-            long materialID = DB.executeInsert("INSERT INTO mint_material_requirements (project_id, material, amount, complete, focused) VALUES (?, ?, ?, 0, 0)",
-                    projectID,
+            long materialID = DB.executeInsert("INSERT INTO mint_material (project_id, material, total, collected, complete, focused) VALUES (?, ?, ?, 0, 0, 0)", id,
                     material.getMaterial(),
                     material.getTotal());
             material.setId(materialID);
@@ -169,7 +165,7 @@ public class MintProject
     {
         try
         {
-            DB.executeUpdate("UPDATE mint_material_requirements SET complete = 1 WHERE material_id = ?",
+            DB.executeUpdate("UPDATE mint_material SET complete = 1 WHERE material_id = ?",
                     materials.get(materialID).getId());
         }
         catch(SQLException e)
@@ -184,12 +180,12 @@ public class MintProject
         {
             if(formerMaterial != null)
             {
-                DB.executeUpdate("UPDATE mint_material_requirements SET focused = 0 WHERE material_id = ?",
+                DB.executeUpdate("UPDATE mint_material SET focused = 0 WHERE material_id = ?",
                         formerMaterial.getId());
                 formerMaterial.setFocused(0);
             }
 
-            DB.executeUpdate("UPDATE mint_material_requirements SET focused = 1 WHERE material_id = ?",
+            DB.executeUpdate("UPDATE mint_material SET focused = 1 WHERE material_id = ?",
                     newMaterial.getId());
             newMaterial.setFocused(1);
             focusedMaterial = newMaterial;
@@ -204,7 +200,7 @@ public class MintProject
     {
         try
         {
-            DB.executeUpdate("DELETE FROM mint_material_requirements WHERE material_id = ?",
+            DB.executeUpdate("DELETE FROM mint_material WHERE material_id = ?",
                     material.getId());
             materials.remove(material.getId());
         }
@@ -218,8 +214,7 @@ public class MintProject
     {
         try
         {
-            long logID = DB.executeInsert("INSERT INTO mint_task_log (project_id, logged_by, validated, work_length, log_date, description) VALUES (?, ?, ?, ?, ?, ?)",
-                    projectID,
+            long logID = DB.executeInsert("INSERT INTO mint_log_task (project_id, logged_by, validated, time_worked, log_date, description) VALUES (?, ?, ?, ?, ?, ?)", id,
                     log.getLogger().getId(),
                     log.getValidated(),
                     log.getTimeWorked(),
@@ -234,14 +229,14 @@ public class MintProject
         }
     }
 
-    public long getProjectID()
+    public long getId()
     {
-        return projectID;
+        return id;
     }
 
-    public void setProjectID(long projectID)
+    public void setId(long id)
     {
-        this.projectID = projectID;
+        this.id = id;
     }
 
     public EMIPlayer getLead()

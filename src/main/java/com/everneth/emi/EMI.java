@@ -164,11 +164,11 @@ public class EMI extends JavaPlugin {
         try
         {
             projects = new ArrayList<>(DB.getResults("SELECT * FROM mint_project"));
-            tasks = new ArrayList<>(DB.getResults("SELECT * FROM mint_task_requirements"));
-            materials = new ArrayList<>(DB.getResults("SELECT * FROM mint_material_requirements"));
-            workLog = new ArrayList<>(DB.getResults("SELECT * FROM mint_task_log"));
-            materialLog = new ArrayList<>(DB.getResults("SELECT * FROM mint_material_log"));
-            workers = new ArrayList<>(DB.getResults("SELECT * FROM mint_project_join_log"));
+            tasks = new ArrayList<>(DB.getResults("SELECT * FROM mint_task"));
+            materials = new ArrayList<>(DB.getResults("SELECT * FROM mint_material"));
+            workLog = new ArrayList<>(DB.getResults("SELECT * FROM mint_log_task"));
+            materialLog = new ArrayList<>(DB.getResults("SELECT * FROM mint_log_material"));
+            workers = new ArrayList<>(DB.getResults("SELECT * FROM mint_log_join"));
         }
         catch(SQLException e)
         {
@@ -178,7 +178,7 @@ public class EMI extends JavaPlugin {
 
         for(DbRow projectRow : projects)
         {
-            DbRow playerRow = PlayerUtils.getPlayerRow(projectRow.getInt("project_lead"));
+            DbRow playerRow = PlayerUtils.getPlayerRow(projectRow.getInt("lead"));
             EMIPlayer playerLead = new EMIPlayer(playerRow.getString("player_uuid"), playerRow.getString("player_name"), playerRow.getInt("player_id"));
             Timestamp endDateTime = projectRow.get("end_date");
             String endDate = null;
@@ -191,7 +191,7 @@ public class EMI extends JavaPlugin {
             MintProject project = new MintProject(
                     projectRow.getInt("project_id"),
                     playerLead,
-                    projectRow.getString("project_name"),
+                    projectRow.getString("name"),
                     projectRow.get("start_date").toString(),
                     endDate,
                     projectRow.getInt("complete"),
@@ -243,7 +243,7 @@ public class EMI extends JavaPlugin {
                         materialRow.getInt("material_id"),
                         materialRow.getInt("project_id"),
                         materialRow.getString("material"),
-                        materialRow.getInt("amount"),
+                        materialRow.getInt("total"),
                         materialRow.getInt("collected"),
                         materialRow.getInt("complete"),
                         materialRow.getInt("focused"));
@@ -278,7 +278,7 @@ public class EMI extends JavaPlugin {
                         loggedBy,
                         validatedBy,
                         workLogRow.getInt("validated"),
-                        workLogRow.getInt("work_length"),
+                        workLogRow.getInt("time_worked"),
                         workLogRow.get("log_date").toString(),
                         workLogRow.getString("description"));
                 project.getTaskLog().put(log.getId(), log);

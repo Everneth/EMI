@@ -162,7 +162,7 @@ public class MintCommand extends BaseCommand {
 
         DbRow dbLoggedBy = PlayerUtils.getPlayerRow(player.getName());
         EMIPlayer loggedBy = new EMIPlayer(dbLoggedBy.getString("player_uuid"), dbLoggedBy.getString("player_name"), dbLoggedBy.getInt("player_id"));
-        MintLogTask log = new MintLogTask(project.getProjectID(), loggedBy, null, 0, 0, Utils.getCurrentDate(), Utils.buildMessage(description, 0));
+        MintLogTask log = new MintLogTask(project.getId(), loggedBy, null, 0, 0, Utils.getCurrentDate(), Utils.buildMessage(description, 0));
 
         project.addLogWork(log);
 
@@ -214,7 +214,7 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        MintMaterial material = new MintMaterial(project.getProjectID(), materialString, amount, 0, 0, 0);
+        MintMaterial material = new MintMaterial(project.getId(), materialString, amount, 0, 0, 0);
 
         project.addMaterial(material);
         player.sendMessage(Utils.color("&aSuccessfully added material to project!"));
@@ -571,7 +571,7 @@ public class MintCommand extends BaseCommand {
 
         String taskString = Utils.buildMessage(taskParts, 0);
 
-        MintTask task = new MintTask(project.getProjectID(), taskString, 0, 0);
+        MintTask task = new MintTask(project.getId(), taskString, 0, 0);
 
         project.addTask(task);
         player.sendMessage(Utils.color("&aSuccessfully added task to project &6" + project.getName()));

@@ -54,21 +54,26 @@ public class MintProjectManager
 
         try
         {
-            projectID = DB.executeInsert("INSERT INTO mint_project (project_lead, project_name, start_date, complete, focused, description) VALUES (?, ?, ?, ?, ?, ?)",
+//            projectID = DB.executeInsert("INSERT INTO mint_project (project_lead, project_name, start_date, complete, focused, description) VALUES (?, ?, ?, ?, ?, ?)",
+//                    mintProject.getLead().getId(),
+//                    mintProject.getName(),
+//                    mintProject.getStartDate(),
+//                    mintProject.getComplete(),
+//                    mintProject.getFocused(),
+//                    mintProject.getDescription());
+            projectID = DB.executeInsert("INSERT INTO mint_project VALUES (?, ?, ?, ?, 0, 0, ?)",
                     mintProject.getLead().getId(),
                     mintProject.getName(),
                     mintProject.getStartDate(),
-                    mintProject.getComplete(),
-                    mintProject.getFocused(),
+                    null,
                     mintProject.getDescription());
         }
         catch (SQLException e)
         {
             Bukkit.getLogger().info("MintProjectManager/addProject(MintProject) ERROR: " + e.toString());
-            Bukkit.getLogger().info("MintProjectManager/addProject(MintProject) ERROR: " + mintProject.toString());
             return;
         }
-        mintProject.setProjectID(projectID);
+        mintProject.setId(projectID);
         projects.put(projectID, mintProject);
     }
 
@@ -79,11 +84,11 @@ public class MintProjectManager
             if(formerFocus != null)
             {
                 DB.executeUpdate("UPDATE mint_project SET focused = 0 WHERE project_id = ?",
-                        formerFocus.getProjectID());
+                        formerFocus.getId());
                 formerFocus.setFocused(0);
             }
             DB.executeUpdate("UPDATE mint_project SET focused = 1 WHERE project_id = ?",
-                    newFocus.getProjectID());
+                    newFocus.getId());
             newFocus.setFocused(1);
         }
         catch (SQLException e)
