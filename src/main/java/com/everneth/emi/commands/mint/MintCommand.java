@@ -124,8 +124,7 @@ public class MintCommand extends BaseCommand {
 
     }
 
-    //TODO fix messages
-    //TODO add more time checks
+    //TODO add tab-complete
     @Subcommand("log task")
     @Syntax("<Project> <TimeWorked> <Description>")
     @CommandPermission("emi.mint.task")
@@ -136,39 +135,29 @@ public class MintCommand extends BaseCommand {
 
         if(project == null)
         {
-            player.sendMessage(Utils.color("&cProject doesnt exist!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
-        String[] splitTime = time.split(":");
-
-        if(splitTime.length != 3)
+        if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color("&cIncorrect syntax for time, must have three times set up: 10:30:35 (HH:MM:SS)"));
+            player.sendMessage(Utils.color(mintProjectTag + "&Log can't be sent because the project is complete!"));
             return;
         }
 
-        int[] numberTimes = new int[3];
+        int timeWorked = processTimeString(time);
 
-        try
+        if(timeWorked == -1)
         {
-            numberTimes[0] = Integer.parseInt(splitTime[0]);
-            numberTimes[1] = Integer.parseInt(splitTime[1]);
-            numberTimes[2] = Integer.parseInt(splitTime[2]);
-        }
-        catch(NumberFormatException e)
-        {
-            Bukkit.getLogger().info("ERROR: MintCommand/onLogWork/isNumberCheck: " + e.toString());
+            player.sendMessage(Utils.color(mintProjectTag + "&cInvalid time format, must be HOURS:MINUTES (00:00)."));
             return;
         }
 
-        DbRow dbLoggedBy = PlayerUtils.getPlayerRow(player.getName());
-        EMIPlayer loggedBy = new EMIPlayer(dbLoggedBy.getString("player_uuid"), dbLoggedBy.getString("player_name"), dbLoggedBy.getInt("player_id"));
-        MintLogTask log = new MintLogTask(project.getId(), loggedBy, null, 0, 0, Utils.getCurrentDate(), Utils.buildMessage(description, 0, false));
+        EMIPlayer logger = PlayerUtils.getEMIPlayer(player.getName());
+        MintLogTask log = new MintLogTask(project.getId(), logger, null, 0, timeWorked, Utils.getCurrentDate(), Utils.buildMessage(description, 0, false));
 
-        project.addLogWork(log);
-
-        player.sendMessage(Utils.color("&aSuccessfully logged your work done!"));
+        project.addTaskLog(log);
+        player.sendMessage(Utils.color(mintProjectTag + "&aTask log submitted for validation!"));
     }
 
     //TODO add tab-complete
@@ -786,5 +775,30 @@ public class MintCommand extends BaseCommand {
     public void onValidate(Player player)
     {
 
+    }
+
+    private int processTimeString(String time)
+    {
+        String[] timeSplit = time.split(":");
+
+        if(timeSplit.length != 2)
+        {
+            return -1;
+        }
+
+        int hours;
+        int minutes;
+
+        try
+        {
+             hours = Integer.parseInt(timeSplit[0]);
+             minutes = Integer.parseInt(timeSplit[0]);
+        }
+        catch(NumberFormatException e)
+        {
+            Bukkit.getLogger().info("ERROR: MintCommand/processTimeString: " + e.toString());
+            return -1;
+        }
+        return ((hours*60) + minutes);
     }
 }

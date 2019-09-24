@@ -243,22 +243,23 @@ public class MintProject
         }
     }
 
-    public void addLogWork(MintLogTask log)
+    public void addTaskLog(MintLogTask log)
     {
         try
         {
-            long logID = DB.executeInsert("INSERT INTO mint_log_task (project_id, logged_by, validated, time_worked, log_date, description) VALUES (?, ?, ?, ?, ?, ?)", id,
+            long logID = DB.executeInsert("INSERT INTO mint_log_task VALUES (?, ?, ?, 0, ?, ?, ?)",
+                    id,
                     log.getLogger().getId(),
-                    log.getValidated(),
+                    null,
                     log.getTimeWorked(),
                     log.getLogDate(),
                     log.getDescription());
             log.setId(logID);
-            taskLog.put(logID, log);
+            taskLogValidation.put(logID, log);
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/addLogWork: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/addTaskLog: " + e.toString());
         }
     }
 
