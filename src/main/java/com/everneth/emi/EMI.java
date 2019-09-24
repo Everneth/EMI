@@ -15,10 +15,7 @@ import com.everneth.emi.events.JoinEvent;
 import com.everneth.emi.events.LeaveEvent;
 import com.everneth.emi.events.bot.MessageReceivedListener;
 import com.everneth.emi.models.*;
-import com.everneth.emi.models.mint.MintMaterial;
-import com.everneth.emi.models.mint.MintProject;
-import com.everneth.emi.models.mint.MintTask;
-import com.everneth.emi.models.mint.MintLogTask;
+import com.everneth.emi.models.mint.*;
 import com.everneth.emi.utils.PlayerUtils;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -157,7 +154,7 @@ public class EMI extends JavaPlugin {
         ArrayList<DbRow> projects;
         ArrayList<DbRow> tasks;
         ArrayList<DbRow> materials;
-        ArrayList<DbRow> workLog;
+        ArrayList<DbRow> taskLog;
         ArrayList<DbRow> materialLog;
         ArrayList<DbRow> workers;
 
@@ -166,7 +163,7 @@ public class EMI extends JavaPlugin {
             projects = new ArrayList<>(DB.getResults("SELECT * FROM mint_project"));
             tasks = new ArrayList<>(DB.getResults("SELECT * FROM mint_task"));
             materials = new ArrayList<>(DB.getResults("SELECT * FROM mint_material"));
-            workLog = new ArrayList<>(DB.getResults("SELECT * FROM mint_log_task"));
+            taskLog = new ArrayList<>(DB.getResults("SELECT * FROM mint_log_task"));
             materialLog = new ArrayList<>(DB.getResults("SELECT * FROM mint_log_material"));
             workers = new ArrayList<>(DB.getResults("SELECT * FROM mint_log_join"));
         }
@@ -178,7 +175,7 @@ public class EMI extends JavaPlugin {
 
         for(DbRow projectRow : projects)
         {
-            DbRow playerRow = PlayerUtils.getPlayerRow(projectRow.getInt("lead"));
+            DbRow playerRow = PlayerUtils.getPlayerRow(projectRow.getInt("leader"));
             EMIPlayer playerLead = new EMIPlayer(playerRow.getString("player_uuid"), playerRow.getString("player_name"), playerRow.getInt("player_id"));
             Timestamp endDateTime = projectRow.get("end_date");
             String endDate = null;
@@ -255,16 +252,16 @@ public class EMI extends JavaPlugin {
                 }
             }
 
-            for(DbRow workLogRow : workLog)
+            for(DbRow taskLogRow : taskLog)
             {
-                if(!projectRow.getInt("project_id").equals(workLogRow.getInt("project_id")))
+                if(!projectRow.getInt("project_id").equals(taskLogRow.getInt("project_id")))
                 {
                     continue;
                 }
 
-                DbRow loggedByRow = PlayerUtils.getPlayerRow(workLogRow.getInt("logged_by"));
+                DbRow loggedByRow = PlayerUtils.getPlayerRow(taskLogRow.getInt("logged_by"));
                 EMIPlayer loggedBy = new EMIPlayer(loggedByRow.getString("player_uuid"), loggedByRow.getString("player_name"), loggedByRow.getInt("player_id"));
-                DbRow validatedByRow = PlayerUtils.getPlayerRow(workLogRow.getInt("validated_by"));
+                DbRow validatedByRow = PlayerUtils.getPlayerRow(taskLogRow.getInt("validated_by"));
                 EMIPlayer validatedBy = null;
 
                 if(!validatedByRow.isEmpty())
@@ -273,21 +270,65 @@ public class EMI extends JavaPlugin {
                 }
 
                 MintLogTask log = new MintLogTask(
-                        workLogRow.getInt("log_id"),
-                        workLogRow.getInt("project_id"),
+                        taskLogRow.getInt("log_id"),
+                        taskLogRow.getInt("project_id"),
                         loggedBy,
                         validatedBy,
-                        workLogRow.getInt("validated"),
-                        workLogRow.getInt("time_worked"),
-                        workLogRow.get("log_date").toString(),
-                        workLogRow.getString("description"));
-                project.getTaskLog().put(log.getId(), log);
+                        taskLogRow.getInt("validated"),
+                        taskLogRow.getInt("time_worked"),
+                        taskLogRow.get("log_date").toString(),
+                        taskLogRow.getString("description"));
+
+                if(log.getValidated() == 1)
+                {
+                    project.getTaskLog().put(log.getId(), log);
+                }
+                else
+                {
+                    project.getTaskLogValidation().put(log.getId(), log);
+                }
             }
 
+            for(DbRow materialLogRow : materialLog)
+            {
+                if(!projectRow.getInt("project_id").equals(materialLogRow.getInt("project_id")))
+                {
+                    continue;
+                }
+
+                DbRow loggedByRow = PlayerUtils.getPlayerRow(materialLogRow.getInt("logged_by"));
+                EMIPlayer loggedBy = new EMIPlayer(loggedByRow.getString("player_uuid"), loggedByRow.getString("player_name"), loggedByRow.getInt("player_id"));
+                DbRow validatedByRow = PlayerUtils.getPlayerRow(materialLogRow.getInt("validated_by"));
+                EMIPlayer validatedBy = null;
+
+                if(!validatedByRow.isEmpty())
+                {
+                    validatedBy = new EMIPlayer(validatedByRow.getString("player_uuid"), validatedByRow.getString("player_name"), validatedByRow.getInt("player_id"));
+                }
+
+                MintLogMaterial log = new MintLogMaterial(
+                        materialLogRow.getInt("log_id"),
+                        materialLogRow.getInt("project_id"),
+                        materialLogRow.getInt("material_id"),
+                        loggedBy,
+                        validatedBy,
+                        materialLogRow.getInt("validated"),
+                        materialLogRow.getInt("material_collected"),
+                        materialLogRow.getInt("time_worked"),
+                        materialLogRow.get("log_date"),
+                        materialLogRow.getString("description"));
+
+                if(log.getValidated() == 1)
+                {
+                    project.getMaterialLog().put(log.getId(), log);
+                }
+                else
+                {
+                    project.getMaterialLogValidation().put(log.getId(), log);
+                }
+            }
             manager.addProject(projectRow.getInt("project_id"), project);
         }
-
-
     }
 
     public static EMI getPlugin()
