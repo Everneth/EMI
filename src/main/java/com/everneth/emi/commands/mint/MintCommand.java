@@ -418,7 +418,7 @@ public class MintCommand extends BaseCommand {
         player.sendMessage(Utils.color(mintProjectTag + "&aProject completed!"));
     }
 
-    //TODO add tab-complete for lead, add complete check
+    //TODO add tab-complete
     @Subcommand("project create")
     @Syntax("<Project> <PlayerLead> <Description>")
     @CommandPermission("emi.mint.project.create")
@@ -449,7 +449,7 @@ public class MintCommand extends BaseCommand {
         player.sendMessage(Utils.color(mintProjectTag + "&aSuccessfully created the project!"));
     }
 
-    //TODO add tab-complete for projects, add complete check
+    //TODO add tab-complete
     @Subcommand("project focus")
     @Syntax("<Project>")
     @CommandPermission("emi.mint.project.focus")
@@ -492,7 +492,7 @@ public class MintCommand extends BaseCommand {
         player.sendMessage(Utils.color(mintProjectTag + "&aProject has been focused!"));
     }
 
-    // TODO add tab-complete for projectName and add check for project completion
+    // TODO add tab-complete
     @Subcommand("project info")
     @Syntax("<Project>")
     @CommandPermission("emi.mint.info")
@@ -508,10 +508,22 @@ public class MintCommand extends BaseCommand {
         }
 
         String endDate = project.getEndDate();
+        String focusedTask = project.getFocusedTask().getTask();
+        String focusedMaterial = project.getFocusedMaterial().getMaterial();
 
         if(endDate == null)
         {
             endDate = "now";
+        }
+
+        if(focusedTask == null)
+        {
+            focusedTask = "Nothing right now";
+        }
+
+        if(focusedMaterial == null)
+        {
+            focusedMaterial = "Nothing right now";
         }
 
         ArrayList<String> workers = new ArrayList<>();
@@ -524,8 +536,8 @@ public class MintCommand extends BaseCommand {
         player.sendMessage(Utils.color(mintProjectTag + "&aInformation for project: &6" + project.getName() + " &aby &6" + project.getLead().getName() + "\n" +
                 "&aDates: &6" + project.getStartDate() + " &7- &6" + endDate + "\n" +
                 "&aDescription: &6" + project.getDescription() + "\n" +
-                "&aFocused task: &6" + project.getFocusedTask().getTask() + "\n" +
-                "&aFocused material: &6" + project.getFocusedMaterial().getMaterial() + "&7(&9need &6" + (project.getFocusedMaterial().getTotal() - project.getFocusedMaterial().getCollected()) + "&7) \n" +
+                "&aFocused task: &6" + focusedTask + "\n" +
+                "&aFocused material: &6" + focusedMaterial + "&7(&9need &6" + (project.getFocusedMaterial().getTotal() - project.getFocusedMaterial().getCollected()) + "&7) \n" +
                 "&aWorkers: &6" + Utils.buildMessage(workers.toArray(new String[0]), 0, true)));
     }
 
