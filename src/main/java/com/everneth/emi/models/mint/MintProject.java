@@ -263,6 +263,29 @@ public class MintProject
         }
     }
 
+    public void addMaterialLog(MintLogMaterial log)
+    {
+        try
+        {
+            long logID = DB.executeInsert("INSERT INTO mint_log_material VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?)",
+                    id,
+                    log.getMaterialID(),
+                    log.getLogger(),
+                    null,
+                    log.getMaterialCollected(),
+                    log.getTimeWorked(),
+                    log.getLogDate(),
+                    log.getDescription());
+            log.setId(logID);
+            materialLogValidation.put(logID, log);
+            updateMaterial(log.getMaterialID(), log.getMaterialCollected());
+        }
+        catch(SQLException e)
+        {
+            Bukkit.getLogger().info("ERROR: MintProject/addMaterialLog: " + e.toString());
+        }
+    }
+
     public MintMaterial getMaterial(String name)
     {
         for(MintMaterial material : materials.values())
@@ -287,6 +310,30 @@ public class MintProject
         catch(SQLException e)
         {
             Bukkit.getLogger().info("ERROR: MintProject/unFocusMaterial: " + e.toString());
+        }
+    }
+
+    private void updateMaterial(long materialID, int collected)
+    {
+        MintMaterial material = materials.get(materialID);
+
+        int totalCollected = (material.getCollected() + collected);
+
+        if(totalCollected <= material.getTotal())
+        {
+            return;
+        }
+
+        try
+        {
+            DB.executeUpdate("UPDATE mint_material set collected = ?",
+                    totalCollected);
+            material.setCollected(totalCollected);
+            completeMaterial(materialID);
+        }
+        catch(SQLException e)
+        {
+            Bukkit.getLogger().info("ERROR: MintProject/updateMaterial: " + e.toString());
         }
     }
 

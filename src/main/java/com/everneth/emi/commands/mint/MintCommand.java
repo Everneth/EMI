@@ -7,10 +7,7 @@ import co.aikar.idb.DbRow;
 import com.everneth.emi.MintProjectManager;
 import com.everneth.emi.Utils;
 import com.everneth.emi.models.*;
-import com.everneth.emi.models.mint.MintMaterial;
-import com.everneth.emi.models.mint.MintProject;
-import com.everneth.emi.models.mint.MintTask;
-import com.everneth.emi.models.mint.MintLogTask;
+import com.everneth.emi.models.mint.*;
 import com.everneth.emi.utils.PlayerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -116,12 +113,54 @@ public class MintCommand extends BaseCommand {
         }
     }
 
+    //TODO add tab-complete
     @Subcommand("log material")
-    @Syntax("<Project> <TimeWorked> <Material> <Amount> <Description>")
+    @Syntax("<Project> <Material> <TimeWorked> <Amount> <Description>")
     @CommandPermission("emi.mint.log")
-    public void onLogMaterial(Player player, String mintProject, String time, String material, int amount, String[] description)
+    public void onLogMaterial(Player player, String mintProject, String materialString, String time, int amount, String[] description)
     {
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(mintProject);
 
+        if(project == null)
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            return;
+        }
+
+        if(project.getComplete() == 1)
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&Log can't be sent because the project is complete!"));
+            return;
+        }
+
+        MintMaterial material = project.getMaterial(materialString);
+
+        if(material == null)
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial isn't associated with this project."));
+            return;
+        }
+
+        if(material.getComplete() == 1)
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial has already been completed!"));
+            return;
+        }
+
+        int timeWorked = processTimeString(time);
+
+        if(timeWorked == -1)
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&cInvalid time format, must be HOURS:MINUTES (00:00)."));
+            return;
+        }
+
+        EMIPlayer logger = PlayerUtils.getEMIPlayer(player.getName());
+        MintLogMaterial log = new MintLogMaterial(project.getId(), material.getId(), logger, null, 0, amount, timeWorked, Utils.getCurrentDate(), Utils.buildMessage(description, 0, false));
+
+        project.addMaterialLog(log);
+        player.sendMessage(Utils.color(mintProjectTag + "&aMaterial log submitted for validation!"));
     }
 
     //TODO add tab-complete
