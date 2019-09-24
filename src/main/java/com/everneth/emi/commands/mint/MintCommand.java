@@ -541,7 +541,7 @@ public class MintCommand extends BaseCommand {
                 "&aWorkers: &6" + Utils.buildMessage(workers.toArray(new String[0]), 0, true)));
     }
 
-    //TODO add tab-complete for mintProject, add complete check
+    //TODO add tab-complete
     @Subcommand("project join")
     @Syntax("<Project>")
     @CommandPermission("emi.mint.project.join")
@@ -553,6 +553,12 @@ public class MintCommand extends BaseCommand {
         if(project == null)
         {
             player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            return;
+        }
+
+        if(project.getComplete() == 1)
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&cCan't join project because it's complete!"));
             return;
         }
 
@@ -635,7 +641,56 @@ public class MintCommand extends BaseCommand {
     @CommandPermission("emi.mint.project.work")
     public void onWork(Player player, String mintProject)
     {
-        //TODO Compete when finished with task and materials commands
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(mintProject);
+
+        if(project == null)
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            return;
+        }
+
+        if(project.getComplete() == 1)
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&cNo work for this project because it's complete!"));
+            return;
+        }
+
+        player.sendMessage(Utils.color(mintProjectTag + "&aWork needed:"));
+
+        int totalLoops = 0;
+
+        for(MintMaterial material : project.getMaterials().values())
+        {
+            if(totalLoops == 3)
+            {
+                break;
+            }
+
+            if(material.getComplete() == 1)
+            {
+                continue;
+            }
+            player.sendMessage(Utils.color("&7[&9Material&7] &a" + material.getMaterial() + " &8[&a" + material.getCollected() + "&8/&2" + material.getTotal() + "&8]"));
+            totalLoops++;
+        }
+
+        totalLoops = 0;
+
+        for(MintTask task : project.getTasks().values())
+        {
+            if(totalLoops == 3)
+            {
+                break;
+            }
+
+            if(task.getComplete() == 1)
+            {
+                continue;
+            }
+            player.sendMessage(Utils.color("&7[Task&7] &a" + task.getTask()));
+            totalLoops++;
+        }
     }
 
     @Subcommand("task complete")
