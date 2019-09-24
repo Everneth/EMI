@@ -3,6 +3,7 @@ package com.everneth.emi.models.mint;
 import co.aikar.idb.DB;
 import com.everneth.emi.Utils;
 import com.everneth.emi.models.EMIPlayer;
+import javafx.scene.control.TreeItem;
 import org.bukkit.Bukkit;
 
 import java.sql.SQLException;
@@ -106,6 +107,11 @@ public class MintProject
                     taskID);
             tasks.get(taskID).setComplete(1);
             tasks.get(taskID).setFocused(0);
+
+            if(focusedTask.getId() == taskID)
+            {
+                focusedTask = null;
+            }
         }
         catch(SQLException e)
         {
@@ -168,7 +174,8 @@ public class MintProject
     {
         try
         {
-            long materialID = DB.executeInsert("INSERT INTO mint_material (project_id, material, total, collected, complete, focused) VALUES (?, ?, ?, 0, 0, 0)", id,
+            long materialID = DB.executeInsert("INSERT INTO mint_material (project_id, material, total, collected, complete, focused) VALUES (?, ?, ?, 0, 0, 0)",
+                    id,
                     material.getMaterial(),
                     material.getTotal());
             material.setId(materialID);
@@ -184,8 +191,15 @@ public class MintProject
     {
         try
         {
-            DB.executeUpdate("UPDATE mint_material SET complete = 1 WHERE material_id = ?",
+            DB.executeUpdate("UPDATE mint_material SET complete = 1, focused = 0 WHERE material_id = ?",
                     materials.get(materialID).getId());
+            materials.get(materialID).setComplete(1);
+            materials.get(materialID).setFocused(0);
+
+            if(focusedMaterial.getId() == materialID)
+            {
+                focusedMaterial = null;
+            }
         }
         catch(SQLException e)
         {
@@ -245,6 +259,33 @@ public class MintProject
         catch(SQLException e)
         {
             Bukkit.getLogger().info("ERROR: MintProject/addLogWork: " + e.toString());
+        }
+    }
+
+    public MintMaterial getMaterial(String name)
+    {
+        for(MintMaterial material : materials.values())
+        {
+            if(material.getMaterial().equalsIgnoreCase(name))
+            {
+                return material;
+            }
+        }
+        return null;
+    }
+
+    public void unFocusMaterial(MintMaterial material)
+    {
+        try
+        {
+            DB.executeUpdate("UPDATE mint_material set focused = 0 WHERE material_id = ?",
+                    material.getId());
+            material.setFocused(0);
+            focusedMaterial = null;
+        }
+        catch(SQLException e)
+        {
+            Bukkit.getLogger().info("ERROR: MintProject/unFocusMaterial: " + e.toString());
         }
     }
 

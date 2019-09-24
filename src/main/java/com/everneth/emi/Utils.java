@@ -33,14 +33,14 @@ public class Utils
         Bukkit.broadcastMessage(Utils.color("&8[&4BugTest&8]" + "&7 " + message));
     }
 
-    public static String buildMessage(String[] parts, int start, boolean separater)
+    public static String buildMessage(String[] parts, int start, boolean separator)
     {
         StringBuilder message = new StringBuilder();
         for(int count = start; count < parts.length; count++)
         {
-            if(separater)
+            if(separator)
             {
-                if(count == parts.length)
+                if(count + 1 == parts.length)
                 {
                     message.append(parts[count] + " ");
                 }

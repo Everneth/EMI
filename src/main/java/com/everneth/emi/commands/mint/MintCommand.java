@@ -57,7 +57,6 @@ public class MintCommand extends BaseCommand {
         }
     }
 
-
     @Subcommand("motd set")
     @CommandPermission("emi.mint.motd.set")
     public void onSet(CommandSender sender, String motd)
@@ -90,6 +89,7 @@ public class MintCommand extends BaseCommand {
             sender.sendMessage(Utils.color(Utils.chatTag + " &aMint MOTD has been updated!"));
         }
     }
+
     @Subcommand("motd clear")
     @CommandPermission("emi.mint.motd.set")
     public void onClear(CommandSender sender)
@@ -117,6 +117,7 @@ public class MintCommand extends BaseCommand {
     }
 
     @Subcommand("log material")
+    @Syntax("<Project> <TimeWorked> <Material> <Amount> <Description>")
     @CommandPermission("emi.mint.log")
     public void onLogMaterial(Player player, String mintProject, String time, String material, int amount, String[] description)
     {
@@ -125,10 +126,10 @@ public class MintCommand extends BaseCommand {
 
     //TODO fix messages
     //TODO add more time checks
-    @Subcommand("log work")
-    @Syntax("<ProjectName> <TimeWorked> <Description>")
-    @CommandPermission("emi.mint.log")
-    public void onLogWork(Player player, String mintProject, String time, String[] description)
+    @Subcommand("log task")
+    @Syntax("<Project> <TimeWorked> <Description>")
+    @CommandPermission("emi.mint.task")
+    public void onLogTask(Player player, String mintProject, String time, String[] description)
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
         MintProject project = manager.getProject(mintProject);
@@ -170,114 +171,143 @@ public class MintCommand extends BaseCommand {
         player.sendMessage(Utils.color("&aSuccessfully logged your work done!"));
     }
 
+    //TODO add tab-complete
     @Subcommand("material complete")
-    @Syntax("<ProjectName> <MaterialID>")
+    @Syntax("<Project> <Material>")
     @CommandPermission("emi.material.complete")
-    public void onMaterialComplete(Player player, String mintProject, long materialID)
+    public void onMaterialComplete(Player player, String mintProject, String materialString)
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
         MintProject project = manager.getProject(mintProject);
 
         if(project == null)
         {
-            player.sendMessage(Utils.color("&cProject doesnt exist!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
-        MintMaterial material = project.getMaterials().get(materialID);
+        if(project.getComplete() == 1)
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&Material can't be completed because the project is complete!"));
+            return;
+        }
+
+        MintMaterial material = project.getMaterial(materialString);
 
         if(material == null)
         {
-            player.sendMessage(Utils.color("&cMaterialID isnt associated with any material in this project."));
+            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial isn't associated with any in this project."));
             return;
         }
 
         if(material.getComplete() == 1)
         {
-            player.sendMessage(Utils.color("&cMaterial is already set to focused!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial has already been completed!"));
             return;
         }
-        project.completeMaterial(materialID);
-        player.sendMessage(Utils.color("&aSuccessfully marked the material as complete!"));
+        project.completeMaterial(material.getId());
+        player.sendMessage(Utils.color(mintProjectTag + "&aMaterial Completed!"));
     }
 
+    //TODO add tab-complete
     @Subcommand("material add")
-    @Syntax("<ProjectName> <MaterialName> <Amount>")
+    @Syntax("<Project> <Material> <Amount>")
     @CommandPermission("emi.material.add")
     public void onMaterialCreate(Player player, String mintProject, String materialString, int amount)
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
         MintProject project = manager.getProject(mintProject);
 
-        if (project == null)
+        if(project == null)
         {
-            player.sendMessage(Utils.color("&cProject doesnt exist!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            return;
+        }
+
+        if(project.getComplete() == 1)
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&Material can't be completed because the project is complete!"));
             return;
         }
 
         MintMaterial material = new MintMaterial(project.getId(), materialString, amount, 0, 0, 0);
 
         project.addMaterial(material);
-        player.sendMessage(Utils.color("&aSuccessfully added material to project!"));
+        player.sendMessage(Utils.color(mintProjectTag + "&aMaterial added!"));
     }
 
+    //TODO add tab-complete
     @Subcommand("material delete")
-    @Syntax("<ProjectName> <MaterialID>")
+    @Syntax("<Project> <Material>")
     @CommandPermission("emi.material.delete")
-    public void onMaterialDelete(Player player, String mintProject, long materialID)
+    public void onMaterialDelete(Player player, String mintProject, String materialString)
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
         MintProject project = manager.getProject(mintProject);
 
-        if (project == null)
+        if(project == null)
         {
-            player.sendMessage(Utils.color("&cProject doesnt exist!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
-        MintMaterial material = project.getMaterials().get(materialID);
+        if(project.getComplete() == 1)
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&Material can't be completed because the project is complete!"));
+            return;
+        }
+
+        MintMaterial material = project.getMaterial(materialString);
 
         if(material == null)
         {
-            player.sendMessage(Utils.color("&cMaterial doesnt exist"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial isn't associated with any in this project."));
             return;
         }
 
         project.deleteMaterial(material);
-        player.sendMessage(Utils.color("&aSuccessfully deleted material!"));
+        player.sendMessage(Utils.color(mintProjectTag + "&aMaterial deleted!"));
     }
 
+    //TODO add tab-complete
     @Subcommand("material focus")
-    @Syntax("<ProjectName> <MaterialID>")
+    @Syntax("<Project> <Material>")
     @CommandPermission("emi.material.focus")
-    public void onMaterialFocus(Player player, String mintProject, long materialID)
+    public void onMaterialFocus(Player player, String mintProject, String materialString)
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
         MintProject project = manager.getProject(mintProject);
 
-        if (project == null)
+        if(project == null)
         {
-            player.sendMessage(Utils.color("&cProject doesnt exist!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
-        MintMaterial material = project.getMaterials().get(materialID);
+        if(project.getComplete() == 1)
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&Material can't be completed because the project is complete!"));
+            return;
+        }
+
+        MintMaterial material = project.getMaterial(materialString);
 
         if(material == null)
         {
-            player.sendMessage(Utils.color("&cMaterial doesnt exist"));
-            return;
-        }
-
-        if(material.getFocused() == 1)
-        {
-            player.sendMessage(Utils.color("&cMaterial is already set to focused!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial isn't associated with any in this project."));
             return;
         }
 
         if(material.getComplete() == 1)
         {
-            player.sendMessage(Utils.color("&cMaterial cant be set to focus because it's complete"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial can't be focused because the material is complete!"));
+            return;
+        }
+
+        if(material.getFocused() == 1)
+        {
+            project.unFocusMaterial(material);
+            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial has been unfocused!"));
             return;
         }
 
@@ -293,11 +323,12 @@ public class MintCommand extends BaseCommand {
         }
 
         project.switchMaterialFocus(material, formerMaterial);
-        player.sendMessage(Utils.color("&aSuccessfully set material to focused!"));
+        player.sendMessage(Utils.color(mintProjectTag + "&aMaterial focused!"));
     }
 
+    //TODO add tab-complete
     @Subcommand("material list")
-    @Syntax("<ProjectName>")
+    @Syntax("<Project>")
     @CommandPermission("emi.mint.material.list")
     public void onMaterialList(Player player, String mintProject)
     {
@@ -306,26 +337,32 @@ public class MintCommand extends BaseCommand {
 
         if(project == null)
         {
-            player.sendMessage(Utils.color("&cProject doesnt exist!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            return;
+        }
+
+        if(project.getComplete() == 1)
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&Material can't be completed because the project is complete!"));
             return;
         }
 
         if(project.getMaterials().isEmpty())
         {
-            player.sendMessage("&cProject doesnt have any tasks to list!");
+            player.sendMessage(Utils.color(mintProjectTag + "&cNo materials to list."));
             return;
         }
 
-        player.sendMessage(Utils.color("&aMaterials for project: &6" + project.getName()));
+        player.sendMessage(Utils.color(mintProjectTag + "&aMaterials:"));
         for(MintMaterial material : project.getMaterials().values())
         {
-            player.sendMessage(Utils.color("&8[&9" + material.getId()+ "&8] &a" + material.getMaterial() + " &e" + material.getTotal()));
+            player.sendMessage(Utils.color("&7[&9*&7] &a" + material.getMaterial() + "&7(&aNeed &6" + (material.getTotal()-material.getCollected()) + " &amore&7)"));
         }
     }
 
     //TODO Add tab-complete to mintProject, add complete check
     @Subcommand("project complete")
-    @Syntax("<ProjectName>")
+    @Syntax("<Project>")
     @CommandPermission("emi.mint.project.complete")
     public void onProjectComplete(Player player, String mintProject)
     {
@@ -355,7 +392,7 @@ public class MintCommand extends BaseCommand {
 
     //TODO add tab-complete for lead, add complete check
     @Subcommand("project create")
-    @Syntax("<ProjectName> <PlayerLead> <Description>")
+    @Syntax("<Project> <PlayerLead> <Description>")
     @CommandPermission("emi.mint.project.create")
     public void onProjectCreate(Player player, String name, String lead, String[] description)
     {
@@ -386,7 +423,7 @@ public class MintCommand extends BaseCommand {
 
     //TODO add tab-complete for projects, add complete check
     @Subcommand("project focus")
-    @Syntax("<ProjectName>")
+    @Syntax("<Project>")
     @CommandPermission("emi.mint.project.focus")
     public void onProjectFocus(Player player, String projectName)
     {
@@ -429,7 +466,7 @@ public class MintCommand extends BaseCommand {
 
     // TODO add tab-complete for projectName and add check for project completion
     @Subcommand("project info")
-    @Syntax("<ProjectName>")
+    @Syntax("<Project>")
     @CommandPermission("emi.mint.info")
     public void onProjectInfo(Player player, String projectName)
     {
@@ -466,7 +503,7 @@ public class MintCommand extends BaseCommand {
 
     //TODO add tab-complete for mintProject, add complete check
     @Subcommand("project join")
-    @Syntax("<ProjectName>")
+    @Syntax("<Project>")
     @CommandPermission("emi.mint.project.join")
     public void onProjectJoin(Player player, String mintProject)
     {
@@ -562,7 +599,7 @@ public class MintCommand extends BaseCommand {
     }
 
     @Subcommand("task complete")
-    @Syntax("<ProjectName> <taskID>")
+    @Syntax("<Project> <taskID>")
     @CommandPermission("emi.task.complete")
     public void onTaskComplete(Player player, String mintProject, long taskID)
     {
@@ -597,7 +634,7 @@ public class MintCommand extends BaseCommand {
     }
 
     @Subcommand("task add")
-    @Syntax("<ProjectName> <Task>")
+    @Syntax("<Project> <Task>")
     @CommandPermission("emi.task.add")
     public void onTaskCreate(Player player, String mintProject, String[] taskParts)
     {
@@ -655,7 +692,7 @@ public class MintCommand extends BaseCommand {
     }
 
     @Subcommand("task focus")
-    @Syntax("<ProjectName> <taskID>")
+    @Syntax("<Project> <taskID>")
     @CommandPermission("emi.task.focus")
     public void onTaskFocus(Player player, String mintProject, long taskID)
     {
@@ -711,7 +748,7 @@ public class MintCommand extends BaseCommand {
     }
 
     @Subcommand("task list")
-    @Syntax("<ProjectName>")
+    @Syntax("<Project>")
     @CommandPermission("emi.task.list")
     public void onTaskList(Player player, String mintProject)
     {
