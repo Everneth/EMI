@@ -384,7 +384,7 @@ public class MintCommand extends BaseCommand {
         player.sendMessage(Utils.color(mintProjectTag + "&aMaterials:"));
         for(MintMaterial material : project.getMaterials().values())
         {
-            player.sendMessage(Utils.color("&7[&9*&7] &a" + material.getMaterial() + "&7(&aNeed &6" + (material.getTotal()-material.getCollected()) + " &amore&7)"));
+            player.sendMessage(Utils.color("&7[&9*&7] &a" + material.getMaterial() + "&8[&a" + material.getCollected() + "&8/&2" + (material.getTotal()-material.getCollected()) + "&8]"));
         }
     }
 
@@ -420,16 +420,16 @@ public class MintCommand extends BaseCommand {
 
     //TODO add tab-complete
     @Subcommand("project create")
-    @Syntax("<Project> <PlayerLead> <Description>")
+    @Syntax("<Project> <Lead> <Description>")
     @CommandPermission("emi.mint.project.create")
-    public void onProjectCreate(Player player, String name, String lead, String[] description)
+    public void onProjectCreate(Player player, String projectName, String lead, String[] description)
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
-        MintProject project = manager.getProject(name);
+        MintProject project = manager.getProject(projectName);
 
         if(project != null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject already exist!"));
             return;
         }
 
@@ -443,7 +443,7 @@ public class MintCommand extends BaseCommand {
 
         EMIPlayer playerLead = new EMIPlayer(dbPlayerLead.getString("player_uuid"), dbPlayerLead.getString("player_name"), dbPlayerLead.getInt("player_id"));
 
-        project = new MintProject(playerLead, name, Utils.getCurrentDate(), null, 0, 0, Utils.buildMessage(description, 0, false));
+        project = new MintProject(playerLead, projectName, Utils.getCurrentDate(), null, 0, 0, Utils.buildMessage(description, 0, false));
 
         manager.addProject(project);
         player.sendMessage(Utils.color(mintProjectTag + "&aSuccessfully created the project!"));
@@ -508,22 +508,24 @@ public class MintCommand extends BaseCommand {
         }
 
         String endDate = project.getEndDate();
-        String focusedTask = project.getFocusedTask().getTask();
-        String focusedMaterial = project.getFocusedMaterial().getMaterial();
+        String focusedTaskString = "Nothing focused!";
+        String focusedMaterialString = "Nothing focused!";
+        MintTask focusedTask = project.getFocusedTask();
+        MintMaterial focusedMaterial = project.getFocusedMaterial();
 
         if(endDate == null)
         {
             endDate = "now";
         }
 
-        if(focusedTask == null)
+        if(focusedTask != null)
         {
-            focusedTask = "Nothing right now";
+            focusedTaskString = focusedTask.getTask();
         }
 
-        if(focusedMaterial == null)
+        if(focusedMaterial != null)
         {
-            focusedMaterial = "Nothing right now";
+            focusedMaterialString = (focusedMaterial.getMaterial() + "&7(&9need &6" + (project.getFocusedMaterial().getTotal() - project.getFocusedMaterial().getCollected()) + "&7");
         }
 
         ArrayList<String> workers = new ArrayList<>();
@@ -534,10 +536,10 @@ public class MintCommand extends BaseCommand {
         }
 
         player.sendMessage(Utils.color(mintProjectTag + "&aInformation for project: &6" + project.getName() + " &aby &6" + project.getLead().getName() + "\n" +
-                "&aDates: &6" + project.getStartDate() + " &7- &6" + endDate + "\n" +
+                "&aDates: &6" + project.getStartDate() + " &ato &6" + endDate + "\n" +
                 "&aDescription: &6" + project.getDescription() + "\n" +
-                "&aFocused task: &6" + focusedTask + "\n" +
-                "&aFocused material: &6" + focusedMaterial + "&7(&9need &6" + (project.getFocusedMaterial().getTotal() - project.getFocusedMaterial().getCollected()) + "&7) \n" +
+                "&aFocused task: &6" + focusedTaskString + "\n" +
+                "&aFocused material: &6" + focusedMaterialString + "\n" +
                 "&aWorkers: &6" + Utils.buildMessage(workers.toArray(new String[0]), 0, true)));
     }
 
@@ -898,7 +900,7 @@ public class MintCommand extends BaseCommand {
         try
         {
              hours = Integer.parseInt(timeSplit[0]);
-             minutes = Integer.parseInt(timeSplit[0]);
+             minutes = Integer.parseInt(timeSplit[1]);
         }
         catch(NumberFormatException e)
         {
