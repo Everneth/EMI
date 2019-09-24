@@ -384,7 +384,7 @@ public class MintCommand extends BaseCommand {
         player.sendMessage(Utils.color(mintProjectTag + "&aMaterials:"));
         for(MintMaterial material : project.getMaterials().values())
         {
-            player.sendMessage(Utils.color("&7[&9*&7] &a" + material.getMaterial() + "&8[&a" + material.getCollected() + "&8/&2" + (material.getTotal()-material.getCollected()) + "&8]"));
+            player.sendMessage(Utils.color("&7[&9*&7] &a" + material.getMaterial() + " &8[&a" + material.getCollected() + "&8/&2" + (material.getTotal()-material.getCollected()) + "&8]"));
         }
     }
 
@@ -447,6 +447,7 @@ public class MintCommand extends BaseCommand {
 
         manager.addProject(project);
         player.sendMessage(Utils.color(mintProjectTag + "&aSuccessfully created the project!"));
+        this.onProjectJoin(player, projectName);
     }
 
     //TODO add tab-complete
@@ -525,7 +526,7 @@ public class MintCommand extends BaseCommand {
 
         if(focusedMaterial != null)
         {
-            focusedMaterialString = (focusedMaterial.getMaterial() + "&7(&9need &6" + (project.getFocusedMaterial().getTotal() - project.getFocusedMaterial().getCollected()) + "&7");
+            focusedMaterialString = (focusedMaterial.getMaterial() + " &8[&a" + focusedMaterial.getCollected() + "&8/&2" + (focusedMaterial.getTotal()-focusedMaterial.getCollected()) + "&8]");
         }
 
         ArrayList<String> workers = new ArrayList<>();
@@ -535,7 +536,7 @@ public class MintCommand extends BaseCommand {
             workers.add(emiPlayer.getName());
         }
 
-        player.sendMessage(Utils.color(mintProjectTag + "&aInformation for project: &6" + project.getName() + " &aby &6" + project.getLead().getName() + "\n" +
+        player.sendMessage(Utils.color(mintProjectTag + "&aInformation for project: &6" + project.getName() + " &aby &6" + project.getLeader().getName() + "\n" +
                 "&aDates: &6" + project.getStartDate() + " &ato &6" + endDate + "\n" +
                 "&aDescription: &6" + project.getDescription() + "\n" +
                 "&aFocused task: &6" + focusedTaskString + "\n" +

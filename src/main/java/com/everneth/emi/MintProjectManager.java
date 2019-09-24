@@ -53,7 +53,7 @@ public class MintProjectManager
         try
         {
             long projectID = DB.executeInsert("INSERT INTO mint_project (leader, name, start_date, end_date, complete, focused, description) VALUES (?, ?, ?, ?, 0, 0, ?)",
-                    mintProject.getLead().getId(),
+                    mintProject.getLeader().getId(),
                     mintProject.getName(),
                     mintProject.getStartDate(),
                     null,

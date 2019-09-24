@@ -261,12 +261,16 @@ public class EMI extends JavaPlugin {
 
                 DbRow loggedByRow = PlayerUtils.getPlayerRow(taskLogRow.getInt("logged_by"));
                 EMIPlayer loggedBy = new EMIPlayer(loggedByRow.getString("player_uuid"), loggedByRow.getString("player_name"), loggedByRow.getInt("player_id"));
-                DbRow validatedByRow = PlayerUtils.getPlayerRow(taskLogRow.getInt("validated_by"));
-                EMIPlayer validatedBy = null;
+                EMIPlayer validatedBy;
 
-                if(!validatedByRow.isEmpty())
+                try
                 {
+                    DbRow validatedByRow = PlayerUtils.getPlayerRow(taskLogRow.getInt("validated_by"));
                     validatedBy = new EMIPlayer(validatedByRow.getString("player_uuid"), validatedByRow.getString("player_name"), validatedByRow.getInt("player_id"));
+                }
+                catch (NullPointerException e)
+                {
+                    validatedBy = null;
                 }
 
                 MintLogTask log = new MintLogTask(
@@ -298,12 +302,16 @@ public class EMI extends JavaPlugin {
 
                 DbRow loggedByRow = PlayerUtils.getPlayerRow(materialLogRow.getInt("logged_by"));
                 EMIPlayer loggedBy = new EMIPlayer(loggedByRow.getString("player_uuid"), loggedByRow.getString("player_name"), loggedByRow.getInt("player_id"));
-                DbRow validatedByRow = PlayerUtils.getPlayerRow(materialLogRow.getInt("validated_by"));
-                EMIPlayer validatedBy = null;
+                EMIPlayer validatedBy;
 
-                if(!validatedByRow.isEmpty())
+                try
                 {
+                    DbRow validatedByRow = PlayerUtils.getPlayerRow(materialLogRow.getInt("validated_by"));
                     validatedBy = new EMIPlayer(validatedByRow.getString("player_uuid"), validatedByRow.getString("player_name"), validatedByRow.getInt("player_id"));
+                }
+                catch (NullPointerException e)
+                {
+                    validatedBy = null;
                 }
 
                 MintLogMaterial log = new MintLogMaterial(
@@ -315,7 +323,7 @@ public class EMI extends JavaPlugin {
                         materialLogRow.getInt("validated"),
                         materialLogRow.getInt("material_collected"),
                         materialLogRow.getInt("time_worked"),
-                        materialLogRow.get("log_date"),
+                        materialLogRow.get("log_date").toString(),
                         materialLogRow.getString("description"));
 
                 if(log.getValidated() == 1)

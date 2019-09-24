@@ -3,7 +3,6 @@ package com.everneth.emi.models.mint;
 import co.aikar.idb.DB;
 import com.everneth.emi.Utils;
 import com.everneth.emi.models.EMIPlayer;
-import javafx.scene.control.TreeItem;
 import org.bukkit.Bukkit;
 
 import java.sql.SQLException;
@@ -13,15 +12,15 @@ import java.util.HashMap;
 public class MintProject
 {
     private long id;
-    private EMIPlayer lead;
+    private EMIPlayer leader;
     private String name;
     private String startDate;
     private String endDate;
     private int complete;
     private int focused;
     private String description;
-    private MintTask focusedTask;
-    private MintMaterial focusedMaterial;
+    private MintTask focusedTask = null;
+    private MintMaterial focusedMaterial = null;
     private ArrayList<EMIPlayer> workers = new ArrayList<>();
     private HashMap<Long, MintLogTask> taskLog = new HashMap<>();
     private HashMap<Long, MintLogTask> taskLogValidation = new HashMap<>();
@@ -30,9 +29,9 @@ public class MintProject
     private HashMap<Long, MintTask> tasks = new HashMap<>();
     private HashMap<Long, MintMaterial> materials = new HashMap<>();
 
-    public MintProject(EMIPlayer lead, String name, String startDate, String endDate, int complete, int focused, String description)
+    public MintProject(EMIPlayer leader, String name, String startDate, String endDate, int complete, int focused, String description)
     {
-        this.lead = lead;
+        this.leader = leader;
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -41,10 +40,10 @@ public class MintProject
         this.description = description;
     }
 
-    public MintProject(long id, EMIPlayer lead, String name, String startDate, String endDate, int complete, int focused, String description)
+    public MintProject(long id, EMIPlayer leader, String name, String startDate, String endDate, int complete, int focused, String description)
     {
         this.id = id;
-        this.lead = lead;
+        this.leader = leader;
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -196,6 +195,11 @@ public class MintProject
             materials.get(materialID).setComplete(1);
             materials.get(materialID).setFocused(0);
 
+            if(focusedMaterial == null)
+            {
+                return;
+            }
+
             if(focusedMaterial.getId() == materialID)
             {
                 focusedMaterial = null;
@@ -267,10 +271,10 @@ public class MintProject
     {
         try
         {
-            long logID = DB.executeInsert("INSERT INTO mint_log_material VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?)",
+            long logID = DB.executeInsert("INSERT INTO mint_log_material (project_id, material_id, logged_by, validated_by, validated, material_collected, time_worked, log_date, description) VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?)",
                     id,
                     log.getMaterialID(),
-                    log.getLogger(),
+                    log.getLogger().getId(),
                     null,
                     log.getMaterialCollected(),
                     log.getTimeWorked(),
@@ -316,24 +320,22 @@ public class MintProject
     private void updateMaterial(long materialID, int collected)
     {
         MintMaterial material = materials.get(materialID);
-
         int totalCollected = (material.getCollected() + collected);
-
-        if(totalCollected <= material.getTotal())
-        {
-            return;
-        }
 
         try
         {
             DB.executeUpdate("UPDATE mint_material set collected = ?",
                     totalCollected);
             material.setCollected(totalCollected);
-            completeMaterial(materialID);
         }
         catch(SQLException e)
         {
             Bukkit.getLogger().info("ERROR: MintProject/updateMaterial: " + e.toString());
+        }
+
+        if(totalCollected >= material.getTotal())
+        {
+            completeMaterial(materialID);
         }
     }
 
@@ -347,14 +349,14 @@ public class MintProject
         this.id = id;
     }
 
-    public EMIPlayer getLead()
+    public EMIPlayer getLeader()
     {
-        return lead;
+        return leader;
     }
 
-    public void setLead(EMIPlayer lead)
+    public void setLeader(EMIPlayer leader)
     {
-        this.lead = lead;
+        this.leader = leader;
     }
 
     public String getName()
@@ -510,6 +512,6 @@ public class MintProject
     @Override
     public String toString()
     {
-        return "MintProject{" + "lead=" + lead + ", name='" + name + '\'' + ", startDate='" + startDate + '\'' + ", endDate='" + endDate + '\'' + ", complete=" + complete + ", focused=" + focused + ", description='" + description + '\'' + ", workLog=" + taskLog + ", materialLog=" + materialLog + ", taskRequirements=" + tasks + ", materialRequirements=" + materials + '}';
+        return "MintProject{" + "lead=" + leader + ", name='" + name + '\'' + ", startDate='" + startDate + '\'' + ", endDate='" + endDate + '\'' + ", complete=" + complete + ", focused=" + focused + ", description='" + description + '\'' + ", workLog=" + taskLog + ", materialLog=" + materialLog + ", taskRequirements=" + tasks + ", materialRequirements=" + materials + '}';
     }
 }
