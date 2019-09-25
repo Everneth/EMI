@@ -9,6 +9,11 @@ import com.everneth.emi.Utils;
 import com.everneth.emi.models.*;
 import com.everneth.emi.models.mint.*;
 import com.everneth.emi.utils.PlayerUtils;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -148,7 +153,7 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        int timeWorked = processTimeString(time);
+        int timeWorked = encodeTime(time);
 
         if(timeWorked == -1)
         {
@@ -184,7 +189,7 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        int timeWorked = processTimeString(time);
+        int timeWorked = encodeTime(time);
 
         if(timeWorked == -1)
         {
@@ -384,7 +389,7 @@ public class MintCommand extends BaseCommand {
         player.sendMessage(Utils.color(mintProjectTag + "&aMaterials:"));
         for(MintMaterial material : project.getMaterials().values())
         {
-            player.sendMessage(Utils.color("&7[&9*&7] &a" + material.getMaterial() + " &8[&a" + material.getCollected() + "&8/&2" + (material.getTotal()-material.getCollected()) + "&8]"));
+            player.sendMessage(Utils.color("&7[&9*&7] &a" + material.getMaterial() + " &8[&a" + material.getCollected() + "&8/&2" + material.getTotal() + "&8]"));
         }
     }
 
@@ -880,13 +885,130 @@ public class MintCommand extends BaseCommand {
     }
 
     @Subcommand("validate")
+    @Syntax("<Project>")
     @CommandPermission("emi.validate")
-    public void onValidate(Player player)
+    public void onValidate(Player player, String mintProject)
     {
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(mintProject);
 
+        if(project == null)
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            return;
+        }
+
+        if(project.getComplete() == 1)
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&cNothing to validate because project is complete!"));
+            return;
+        }
+
+        if(project.getValidateMaterial().containsKey(player.getUniqueId()) || project.getValidateTask().containsKey(player.getUniqueId()))
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&cYou already have a validation log to answer."));
+            return;
+        }
+
+        if(project.getMaterialLogValidation().isEmpty() && project.getTaskLogValidation().isEmpty())
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&cNo logs to validate."));
+            return;
+        }
+
+        if(!project.getMaterialLogValidation().isEmpty())
+        {
+            MintLogMaterial materialLog = project.getMaterialLogValidation().values().iterator().next();
+            project.getValidateMaterial().put(player.getUniqueId(), materialLog);
+            project.getMaterialLogValidation().remove(materialLog.getId());
+            player.spigot().sendMessage(buildValidationMessage(mintProject));
+            player.sendMessage(Utils.color(mintProjectTag + "&6" + materialLog.getLogger().getName() +
+                    " &agathered &6" + materialLog.getMaterialCollected() + " " + project.getMaterials().get(materialLog.getMaterialID()).getMaterial() +
+                    " &ain the time of &6" + decodeTime(materialLog.getTimeWorked()) +
+                    " &aon the date of: &6" + decodeDate(materialLog.getLogDate()) + "."));
+            return;
+        }
+
+        if(!project.getTaskLogValidation().isEmpty())
+        {
+            MintLogTask taskLog = project.getTaskLogValidation().values().iterator().next();
+            project.getValidateTask().put(player.getUniqueId(), taskLog);
+            project.getTaskLogValidation().remove(taskLog.getId());
+            player.spigot().sendMessage(buildValidationMessage(mintProject));
+            player.sendMessage(Utils.color(mintProjectTag + "&6" + taskLog.getLogger().getName() +
+                    " &aworked on: &6" + taskLog.getDescription() +
+                    " &ain the time of &6" + decodeTime(taskLog.getTimeWorked()) +
+                    " &aon the date of: &6" + decodeDate(taskLog.getLogDate()) + "."));
+        }
     }
 
-    private int processTimeString(String time)
+    @Subcommand("validateyes")
+    @CommandPermission("emi.validate")
+    @Private
+    public void onValidateYes(Player player, String mintProject)
+    {
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(mintProject);
+        EMIPlayer validator = PlayerUtils.getEMIPlayer(player.getName());
+
+        if(project.getValidateMaterial().containsKey(player.getUniqueId()))
+        {
+            project.validateMaterial(project.getValidateMaterial().get(player.getUniqueId()), true, validator);
+        }
+
+        if(project.getValidateTask().containsKey(player.getUniqueId()))
+        {
+            project.validateTask(project.getValidateTask().get(player.getUniqueId()), true, validator);
+        }
+
+        player.sendMessage(Utils.color(mintProjectTag + "&aLog has been validated"));
+    }
+
+    @Subcommand("validateno")
+    @CommandPermission("emi.validate")
+    @Private
+    public void onValidateNo(Player player, String mintProject)
+    {
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(mintProject);
+        EMIPlayer validator = PlayerUtils.getEMIPlayer(player.getName());
+
+        if(project.getValidateMaterial().containsKey(player.getUniqueId()))
+        {
+            project.validateMaterial(project.getValidateMaterial().get(player.getUniqueId()), false, validator);
+        }
+
+        if(project.getValidateTask().containsKey(player.getUniqueId()))
+        {
+            project.validateTask(project.getValidateTask().get(player.getUniqueId()), false, validator);
+        }
+
+        player.sendMessage(Utils.color(mintProjectTag + "&aLog has been rejected"));
+    }
+
+    private TextComponent buildValidationMessage(String mintProject)
+    {
+        TextComponent messageYes = new TextComponent(Utils.color("&aYes"));
+        messageYes.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mint validateyes " + mintProject));
+        messageYes.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to validate this log").color(ChatColor.DARK_GREEN).create()));
+
+        TextComponent messageNo = new TextComponent(Utils.color("&cNo"));
+        messageNo.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mint validateno " + mintProject));
+        messageNo.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to deny the log").color(ChatColor.DARK_RED).create()));
+
+        TextComponent messagePart1 = new TextComponent(Utils.color(mintProjectTag + "&6Review the log and validate either &7["));
+        TextComponent messagePart2 = new TextComponent(Utils.color("&7] &6or &7["));
+        TextComponent messagePart3 = new TextComponent(Utils.color("&7]"));
+
+        messagePart1.addExtra(messageYes);
+        messagePart1.addExtra(messagePart2);
+        messagePart1.addExtra(messageNo);
+        messagePart1.addExtra(messagePart3);
+
+        return messagePart1;
+    }
+
+    private int encodeTime(String time)
     {
         String[] timeSplit = time.split(":");
 
@@ -909,5 +1031,20 @@ public class MintCommand extends BaseCommand {
             return -1;
         }
         return ((hours*60) + minutes);
+    }
+
+    private String decodeTime(int time)
+    {
+        String hours = String.valueOf(time / 60);
+        String minutes = String.valueOf(time % 60);
+
+        return (hours + " hours " + minutes + " minutes");
+    }
+
+    private String decodeDate(String date)
+    {
+        String[] dateSplit = date.split(" ");
+
+        return dateSplit[0];
     }
 }

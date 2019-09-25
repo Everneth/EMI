@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 
 public class MintProject
 {
@@ -28,6 +29,8 @@ public class MintProject
     private HashMap<Long, MintLogMaterial> materialLogValidation = new HashMap<>();
     private HashMap<Long, MintTask> tasks = new HashMap<>();
     private HashMap<Long, MintMaterial> materials = new HashMap<>();
+    private HashMap<UUID, MintLogMaterial> validateMaterial = new HashMap<>();
+    private HashMap<UUID, MintLogTask> validateTask = new HashMap<>();
 
     public MintProject(EMIPlayer leader, String name, String startDate, String endDate, int complete, int focused, String description)
     {
@@ -251,7 +254,7 @@ public class MintProject
     {
         try
         {
-            long logID = DB.executeInsert("INSERT INTO mint_log_task VALUES (?, ?, ?, 0, ?, ?, ?)",
+            long logID = DB.executeInsert("INSERT INTO mint_log_task (project_id, logged_by, validated_by, validated, time_worked, log_date, description) VALUES (?, ?, ?, 0, ?, ?, ?)",
                     id,
                     log.getLogger().getId(),
                     null,
@@ -324,8 +327,9 @@ public class MintProject
 
         try
         {
-            DB.executeUpdate("UPDATE mint_material set collected = ?",
-                    totalCollected);
+            DB.executeUpdate("UPDATE mint_material set collected = ? WHERE material_id = ?",
+                    totalCollected,
+                    material.getId());
             material.setCollected(totalCollected);
         }
         catch(SQLException e)
@@ -337,6 +341,86 @@ public class MintProject
         {
             completeMaterial(materialID);
         }
+    }
+
+    public void validateMaterial(MintLogMaterial mintLogMaterial, boolean validated, EMIPlayer validator)
+    {
+        MintMaterial mintMaterial = materials.get(mintLogMaterial.getMaterialID());
+        if(!validated)
+        {
+            try
+            {
+                DB.executeUpdate("DELETE FROM mint_log_material WHERE log_id = ?",
+                        mintLogMaterial.getId());
+
+                DB.executeUpdate("UPDATE mint_material set collected = ? WHERE material_id = ?",
+                        (mintMaterial.getCollected() - mintLogMaterial.getMaterialCollected()),
+                        mintMaterial.getId());
+                mintMaterial.setCollected(mintMaterial.getCollected() - mintLogMaterial.getMaterialCollected());
+            }
+            catch(SQLException e)
+            {
+                Bukkit.getLogger().info("ERROR: MintProject/validateMaterial/No: " + e.toString());
+                return;
+            }
+        }
+        else
+        {
+            try
+            {
+                DB.executeUpdate("UPDATE mint_log_material set validated_by = ?, validated = 1 WHERE log_id = ?",
+                        validator.getId(),
+                        mintLogMaterial.getId());
+            }
+            catch(SQLException e)
+            {
+                Bukkit.getLogger().info("ERROR: MintProject/validateMaterial/Yes: " + e.toString());
+                return;
+            }
+            mintLogMaterial.setValidater(validator);
+            mintLogMaterial.setValidated(1);
+            materialLog.put(mintLogMaterial.getId(), mintLogMaterial);
+        }
+
+        validateMaterial.remove(UUID.fromString(validator.getUniqueId()));
+        materialLogValidation.remove(mintLogMaterial.getId());
+    }
+
+    public void validateTask(MintLogTask mintLogTask, boolean validated, EMIPlayer validator)
+    {
+        if(!validated)
+        {
+            try
+            {
+                DB.executeUpdate("DELETE FROM mint_log_task WHERE log_id = ?",
+                        mintLogTask.getId());
+            }
+            catch(SQLException e)
+            {
+                Bukkit.getLogger().info("ERROR: MintProject/validateTask/No: " + e.toString());
+                return;
+            }
+        }
+        else
+        {
+            try
+            {
+                DB.executeUpdate("UPDATE mint_log_task set validated_by = ?, validated = 1 WHERE log_id = ?",
+                        validator.getId(),
+                        mintLogTask.getId());
+            }
+            catch(SQLException e)
+            {
+                Bukkit.getLogger().info("ERROR: MintProject/validateTask/Yes: " + e.toString());
+                return;
+            }
+            mintLogTask.setValidater(validator);
+            mintLogTask.setValidated(1);
+            taskLog.put(mintLogTask.getId(), mintLogTask);
+        }
+
+        validateTask.remove(UUID.fromString(validator.getUniqueId()));
+        taskLogValidation.remove(mintLogTask.getId());
     }
 
     public long getId()
@@ -507,6 +591,26 @@ public class MintProject
     public void setMaterials(HashMap<Long, MintMaterial> materials)
     {
         this.materials = materials;
+    }
+
+    public HashMap<UUID, MintLogMaterial> getValidateMaterial()
+    {
+        return validateMaterial;
+    }
+
+    public void setValidateMaterial(HashMap<UUID, MintLogMaterial> validateMaterial)
+    {
+        this.validateMaterial = validateMaterial;
+    }
+
+    public HashMap<UUID, MintLogTask> getValidateTask()
+    {
+        return validateTask;
+    }
+
+    public void setValidateTask(HashMap<UUID, MintLogTask> validateTask)
+    {
+        this.validateTask = validateTask;
     }
 
     @Override
