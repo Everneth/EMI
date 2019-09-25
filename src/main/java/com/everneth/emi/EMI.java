@@ -83,6 +83,20 @@ public class EMI extends JavaPlugin {
     public void onDisable() {
         getLogger().info("Ministry Interface stopped.");
         DB.close();
+
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        for(MintProject project : manager.getProjects().values())
+        {
+            for(MintLogMaterial logMaterial : project.getValidateMaterial().values())
+            {
+                project.getMaterialLogValidation().put(logMaterial.getId(), logMaterial);
+            }
+
+            for(MintLogTask logTask : project.getValidateTask().values())
+            {
+                project.getTaskLogValidation().put(logTask.getId(), logTask);
+            }
+        }
     }
 
     private void registerCommands()
