@@ -21,6 +21,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  *     Class: MintCommand
@@ -120,9 +121,9 @@ public class MintCommand extends BaseCommand {
 
     //TODO add tab-complete
     @Subcommand("log material")
-    @Syntax("<Project> <Material> <TimeWorked> <Amount> <Description>")
+    @Syntax("<Project> <Material> <Amount> <TimeWorked> <Description>")
     @CommandPermission("emi.mint.log")
-    public void onLogMaterial(Player player, String mintProject, String materialString, String time, int amount, String[] description)
+    public void onLogMaterial(Player player, String mintProject, String materialString, int amount, String time, String[] description)
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
         MintProject project = manager.getProject(mintProject);
@@ -135,7 +136,7 @@ public class MintCommand extends BaseCommand {
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&Log can't be sent because the project is complete!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cLog can't be sent because the project is complete!"));
             return;
         }
 
@@ -185,7 +186,7 @@ public class MintCommand extends BaseCommand {
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&Log can't be sent because the project is complete!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cLog can't be sent because the project is complete!"));
             return;
         }
 
@@ -221,7 +222,7 @@ public class MintCommand extends BaseCommand {
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&Material can't be completed because the project is complete!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial can't be completed because the project is complete!"));
             return;
         }
 
@@ -259,7 +260,7 @@ public class MintCommand extends BaseCommand {
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&Material can't be completed because the project is complete!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial can't be completed because the project is complete!"));
             return;
         }
 
@@ -286,7 +287,7 @@ public class MintCommand extends BaseCommand {
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&Material can't be completed because the project is complete!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial can't be completed because the project is complete!"));
             return;
         }
 
@@ -319,7 +320,7 @@ public class MintCommand extends BaseCommand {
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&Material can't be completed because the project is complete!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial can't be focused because the project is complete!"));
             return;
         }
 
@@ -376,7 +377,7 @@ public class MintCommand extends BaseCommand {
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&Material can't be completed because the project is complete!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial can't be completed because the project is complete!"));
             return;
         }
 
@@ -440,7 +441,7 @@ public class MintCommand extends BaseCommand {
 
         DbRow dbPlayerLead = PlayerUtils.getPlayerRow(lead);
 
-        if(dbPlayerLead.isEmpty())
+        if(dbPlayerLead == null || dbPlayerLead.isEmpty())
         {
             player.sendMessage(Utils.color(mintProjectTag + "&cUnrecognized player, did you spell the name correctly?"));
             return;
@@ -524,6 +525,8 @@ public class MintCommand extends BaseCommand {
             endDate = "now";
         }
 
+        endDate = decodeDate(endDate);
+
         if(focusedTask != null)
         {
             focusedTaskString = focusedTask.getTask();
@@ -542,7 +545,7 @@ public class MintCommand extends BaseCommand {
         }
 
         player.sendMessage(Utils.color(mintProjectTag + "&aInformation for project: &6" + project.getName() + " &aby &6" + project.getLeader().getName() + "\n" +
-                "&aDates: &6" + project.getStartDate() + " &ato &6" + endDate + "\n" +
+                "&aDates: &6" + decodeDate(project.getStartDate()) + " &ato &6" + endDate + "\n" +
                 "&aDescription: &6" + project.getDescription() + "\n" +
                 "&aFocused task: &6" + focusedTaskString + "\n" +
                 "&aFocused material: &6" + focusedMaterialString + "\n" +
@@ -646,6 +649,7 @@ public class MintCommand extends BaseCommand {
     }
 
     @Subcommand("project work")
+    @Syntax("<Project>")
     @CommandPermission("emi.mint.project.work")
     public void onWork(Player player, String mintProject)
     {
@@ -667,6 +671,7 @@ public class MintCommand extends BaseCommand {
         player.sendMessage(Utils.color(mintProjectTag + "&aWork needed:"));
 
         int totalLoops = 0;
+        boolean isThereWork = false;
 
         for(MintMaterial material : project.getMaterials().values())
         {
@@ -681,6 +686,7 @@ public class MintCommand extends BaseCommand {
             }
             player.sendMessage(Utils.color("&7[&9Material&7] &a" + material.getMaterial() + " &8[&a" + material.getCollected() + "&8/&2" + material.getTotal() + "&8]"));
             totalLoops++;
+            isThereWork = true;
         }
 
         totalLoops = 0;
@@ -698,6 +704,12 @@ public class MintCommand extends BaseCommand {
             }
             player.sendMessage(Utils.color("&7[Task&7] &a" + task.getTask()));
             totalLoops++;
+            isThereWork = true;
+        }
+
+        if(!isThereWork)
+        {
+            player.sendMessage(Utils.color("&cThere is no work available for this project."));
         }
     }
 
@@ -723,7 +735,7 @@ public class MintCommand extends BaseCommand {
 
         if(project.getTasks().get(taskID) == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&TaskID isnt associated with any tasks."));
+            player.sendMessage(Utils.color(mintProjectTag + "&cTaskID isnt associated with any tasks."));
             return;
         }
 
@@ -764,6 +776,7 @@ public class MintCommand extends BaseCommand {
     }
 
     @Subcommand("task delete")
+    @Syntax("<Project> <TaskID>")
     @CommandPermission("emi.task.delete")
     public void onTaskDelete(Player player, String mintProject, long taskID)
     {
@@ -784,9 +797,9 @@ public class MintCommand extends BaseCommand {
 
         MintTask task = project.getTasks().get(taskID);
 
-        if (task == null)
+        if(task == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&TaskID isnt associated with any tasks."));
+            player.sendMessage(Utils.color(mintProjectTag + "&cTaskID isnt associated with any tasks."));
             return;
         }
 
@@ -818,7 +831,7 @@ public class MintCommand extends BaseCommand {
 
         if(task == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&TaskID isnt associated with any tasks."));
+            player.sendMessage(Utils.color(mintProjectTag + "&cTaskID isnt associated with any tasks."));
             return;
         }
 
@@ -943,6 +956,7 @@ public class MintCommand extends BaseCommand {
     }
 
     @Subcommand("validateyes")
+    @Syntax("<Project>")
     @CommandPermission("emi.validate")
     @Private
     public void onValidateYes(Player player, String mintProject)
@@ -955,16 +969,21 @@ public class MintCommand extends BaseCommand {
         {
             project.validateMaterial(project.getValidateMaterial().get(player.getUniqueId()), true, validator);
         }
-
-        if(project.getValidateTask().containsKey(player.getUniqueId()))
+        else if(project.getValidateTask().containsKey(player.getUniqueId()))
         {
             project.validateTask(project.getValidateTask().get(player.getUniqueId()), true, validator);
+        }
+        else
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&cNo logs have been queued for you."));
+            return;
         }
 
         player.sendMessage(Utils.color(mintProjectTag + "&aLog has been validated"));
     }
 
     @Subcommand("validateno")
+    @Syntax("<Project>")
     @CommandPermission("emi.validate")
     @Private
     public void onValidateNo(Player player, String mintProject)
@@ -977,10 +996,14 @@ public class MintCommand extends BaseCommand {
         {
             project.validateMaterial(project.getValidateMaterial().get(player.getUniqueId()), false, validator);
         }
-
-        if(project.getValidateTask().containsKey(player.getUniqueId()))
+        else if(project.getValidateTask().containsKey(player.getUniqueId()))
         {
             project.validateTask(project.getValidateTask().get(player.getUniqueId()), false, validator);
+        }
+        else
+        {
+            player.sendMessage(Utils.color(mintProjectTag + "&cNo logs have been queued for you."));
+            return;
         }
 
         player.sendMessage(Utils.color(mintProjectTag + "&aLog has been rejected"));
@@ -996,7 +1019,7 @@ public class MintCommand extends BaseCommand {
         messageNo.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mint validateno " + mintProject));
         messageNo.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to deny the log").color(ChatColor.DARK_RED).create()));
 
-        TextComponent messagePart1 = new TextComponent(Utils.color(mintProjectTag + "&6Review the log and validate either &7["));
+        TextComponent messagePart1 = new TextComponent(Utils.color(mintProjectTag + "&6Do you want to validate this log? &7["));
         TextComponent messagePart2 = new TextComponent(Utils.color("&7] &6or &7["));
         TextComponent messagePart3 = new TextComponent(Utils.color("&7]"));
 
@@ -1030,6 +1053,12 @@ public class MintCommand extends BaseCommand {
             Bukkit.getLogger().info("ERROR: MintCommand/processTimeString: " + e.toString());
             return -1;
         }
+
+        if(hours > 99 || minutes > 59)
+        {
+            return -1;
+        }
+
         return ((hours*60) + minutes);
     }
 

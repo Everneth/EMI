@@ -110,6 +110,11 @@ public class MintProject
             tasks.get(taskID).setComplete(1);
             tasks.get(taskID).setFocused(0);
 
+            if(focusedTask == null)
+            {
+                return;
+            }
+
             if(focusedTask.getId() == taskID)
             {
                 focusedTask = null;
