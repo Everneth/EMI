@@ -21,7 +21,6 @@ import org.bukkit.plugin.Plugin;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.UUID;
 
 /**
  *     Class: MintCommand
@@ -144,7 +143,7 @@ public class MintCommand extends BaseCommand {
 
         if(material == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial isn't associated with this project."));
+            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial isn't associated with this project!"));
             return;
         }
 
@@ -158,7 +157,7 @@ public class MintCommand extends BaseCommand {
 
         if(timeWorked == -1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cInvalid time format, must be HOURS:MINUTES (00:00)."));
+            player.sendMessage(Utils.color(mintProjectTag + "&cInvalid time format, must be HOURS:MINUTES (00:00)!"));
             return;
         }
 
@@ -172,7 +171,7 @@ public class MintCommand extends BaseCommand {
     //TODO add tab-complete
     @Subcommand("log task")
     @Syntax("<Project> <TimeWorked> <Description>")
-    @CommandPermission("emi.mint.task")
+    @CommandPermission("emi.mint.log")
     public void onLogTask(Player player, String mintProject, String time, String[] description)
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
@@ -194,7 +193,7 @@ public class MintCommand extends BaseCommand {
 
         if(timeWorked == -1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cInvalid time format, must be HOURS:MINUTES (00:00)."));
+            player.sendMessage(Utils.color(mintProjectTag + "&cInvalid time format, must be HOURS:MINUTES (00:00)!"));
             return;
         }
 
@@ -208,7 +207,7 @@ public class MintCommand extends BaseCommand {
     //TODO add tab-complete
     @Subcommand("material complete")
     @Syntax("<Project> <Material>")
-    @CommandPermission("emi.material.complete")
+    @CommandPermission("emi.mint.material.complete")
     public void onMaterialComplete(Player player, String mintProject, String materialString)
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
@@ -230,7 +229,7 @@ public class MintCommand extends BaseCommand {
 
         if(material == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial isn't associated with any in this project."));
+            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial isn't associated with any in this project!"));
             return;
         }
 
@@ -246,7 +245,7 @@ public class MintCommand extends BaseCommand {
     //TODO add tab-complete
     @Subcommand("material add")
     @Syntax("<Project> <Material> <Amount>")
-    @CommandPermission("emi.material.add")
+    @CommandPermission("emi.mint.material.add")
     public void onMaterialCreate(Player player, String mintProject, String materialString, int amount)
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
@@ -260,7 +259,7 @@ public class MintCommand extends BaseCommand {
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial can't be completed because the project is complete!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial can't be added because the project is complete!"));
             return;
         }
 
@@ -273,7 +272,7 @@ public class MintCommand extends BaseCommand {
     //TODO add tab-complete
     @Subcommand("material delete")
     @Syntax("<Project> <Material>")
-    @CommandPermission("emi.material.delete")
+    @CommandPermission("emi.mint.material.delete")
     public void onMaterialDelete(Player player, String mintProject, String materialString)
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
@@ -287,7 +286,7 @@ public class MintCommand extends BaseCommand {
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial can't be completed because the project is complete!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial can't be deleted because the project is complete!"));
             return;
         }
 
@@ -295,7 +294,7 @@ public class MintCommand extends BaseCommand {
 
         if(material == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial isn't associated with any in this project."));
+            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial isn't associated with any in this project!"));
             return;
         }
 
@@ -306,7 +305,7 @@ public class MintCommand extends BaseCommand {
     //TODO add tab-complete
     @Subcommand("material focus")
     @Syntax("<Project> <Material>")
-    @CommandPermission("emi.material.focus")
+    @CommandPermission("emi.mint.material.focus")
     public void onMaterialFocus(Player player, String mintProject, String materialString)
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
@@ -328,7 +327,7 @@ public class MintCommand extends BaseCommand {
 
         if(material == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial isn't associated with any in this project."));
+            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial isn't associated with any in this project!"));
             return;
         }
 
@@ -341,7 +340,7 @@ public class MintCommand extends BaseCommand {
         if(material.getFocused() == 1)
         {
             project.unFocusMaterial(material);
-            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial has been unfocused!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial unfocused!"));
             return;
         }
 
@@ -375,15 +374,9 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        if(project.getComplete() == 1)
-        {
-            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial can't be completed because the project is complete!"));
-            return;
-        }
-
         if(project.getMaterials().isEmpty())
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cNo materials to list."));
+            player.sendMessage(Utils.color(mintProjectTag + "&cNo materials to list!"));
             return;
         }
 
@@ -468,7 +461,7 @@ public class MintCommand extends BaseCommand {
 
         if(project != null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject already exist!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject already exists!"));
             return;
         }
 
@@ -486,7 +479,7 @@ public class MintCommand extends BaseCommand {
 
         manager.addProject(project);
         player.sendMessage(Utils.color(mintProjectTag + "&aSuccessfully created the project!"));
-        this.onProjectJoin(player, projectName);
+        player.performCommand("mint project join " + project.getName());
     }
 
     //TODO add tab-complete
@@ -513,7 +506,7 @@ public class MintCommand extends BaseCommand {
         if(project.getFocused() == 1)
         {
             manager.unFocus(project);
-            player.sendMessage(Utils.color(mintProjectTag + "&aProject has been unfocused!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&aProject unfocused!"));
             return;
         }
 
@@ -529,13 +522,13 @@ public class MintCommand extends BaseCommand {
         }
 
         manager.switchFocus(project, formerProject);
-        player.sendMessage(Utils.color(mintProjectTag + "&aProject has been focused!"));
+        player.sendMessage(Utils.color(mintProjectTag + "&aProject focused!"));
     }
 
     // TODO add tab-complete
     @Subcommand("project info")
     @Syntax("<Project>")
-    @CommandPermission("emi.mint.info")
+    @CommandPermission("emi.mint.project.info")
     public void onProjectInfo(Player player, String projectName)
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
@@ -548,8 +541,8 @@ public class MintCommand extends BaseCommand {
         }
 
         String endDate = project.getEndDate();
-        String focusedTaskString = "Nothing focused!";
-        String focusedMaterialString = "Nothing focused!";
+        String focusedTaskString = "";
+        String focusedMaterialString = "";
         MintTask focusedTask = project.getFocusedTask();
         MintMaterial focusedMaterial = project.getFocusedMaterial();
 
@@ -577,7 +570,7 @@ public class MintCommand extends BaseCommand {
             workers.add(emiPlayer.getName());
         }
 
-        player.sendMessage(Utils.color(mintProjectTag + "&aInformation for project: &6" + project.getName() + " &aby &6" + project.getLeader().getName() + "\n" +
+        player.sendMessage(Utils.color(mintProjectTag + "&aInformation for &6" + project.getName() + " &aby &6" + project.getLeader().getName() + "\n" +
                 "&aDates: &6" + decodeDate(project.getStartDate()) + " &ato &6" + endDate + "\n" +
                 "&aDescription: &6" + project.getDescription() + "\n" +
                 "&aFocused task: &6" + focusedTaskString + "\n" +
@@ -610,7 +603,7 @@ public class MintCommand extends BaseCommand {
         {
             if(emiPlayer.getUniqueId().equalsIgnoreCase(player.getUniqueId().toString()))
             {
-                player.sendMessage(Utils.color(mintProjectTag + "&cYou're already part of this project."));
+                player.sendMessage(Utils.color(mintProjectTag + "&cYou're already part of this project!"));
                 return;
             }
         }
@@ -732,13 +725,13 @@ public class MintCommand extends BaseCommand {
 
         if(!isThereWork)
         {
-            player.sendMessage(Utils.color("&cThere is no work available for this project."));
+            player.sendMessage(Utils.color("&cThere's no work available for this project!"));
         }
     }
 
     @Subcommand("task complete")
     @Syntax("<Project> <taskID>")
-    @CommandPermission("emi.task.complete")
+    @CommandPermission("emi.mint.task.complete")
     public void onTaskComplete(Player player, String mintProject, long taskID)
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
@@ -758,7 +751,7 @@ public class MintCommand extends BaseCommand {
 
         if(project.getTasks().get(taskID) == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cTaskID isnt associated with any tasks."));
+            player.sendMessage(Utils.color(mintProjectTag + "&cTaskID isnt associated with any tasks!"));
             return;
         }
 
@@ -773,7 +766,7 @@ public class MintCommand extends BaseCommand {
 
     @Subcommand("task add")
     @Syntax("<Project> <Task>")
-    @CommandPermission("emi.task.add")
+    @CommandPermission("emi.mint.task.add")
     public void onTaskCreate(Player player, String mintProject, String[] taskParts)
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
@@ -787,7 +780,7 @@ public class MintCommand extends BaseCommand {
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cTask cant be added becasue the project is complete!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cTask cant be added because the project is complete!"));
             return;
         }
 
@@ -800,7 +793,7 @@ public class MintCommand extends BaseCommand {
 
     @Subcommand("task delete")
     @Syntax("<Project> <TaskID>")
-    @CommandPermission("emi.task.delete")
+    @CommandPermission("emi.mint.task.delete")
     public void onTaskDelete(Player player, String mintProject, long taskID)
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
@@ -822,7 +815,7 @@ public class MintCommand extends BaseCommand {
 
         if(task == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cTaskID isnt associated with any tasks."));
+            player.sendMessage(Utils.color(mintProjectTag + "&cTaskID isnt associated with any tasks!"));
             return;
         }
 
@@ -832,7 +825,7 @@ public class MintCommand extends BaseCommand {
 
     @Subcommand("task focus")
     @Syntax("<Project> <taskID>")
-    @CommandPermission("emi.task.focus")
+    @CommandPermission("emi.mint.task.focus")
     public void onTaskFocus(Player player, String mintProject, long taskID)
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
@@ -867,7 +860,7 @@ public class MintCommand extends BaseCommand {
         if(task.getFocused() == 1)
         {
             project.unFocusTask(task);
-            player.sendMessage(Utils.color(mintProjectTag + "&cTask has been unfocused!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cTask unfocused!"));
             return;
         }
 
@@ -888,7 +881,7 @@ public class MintCommand extends BaseCommand {
 
     @Subcommand("task list")
     @Syntax("<Project>")
-    @CommandPermission("emi.task.list")
+    @CommandPermission("emi.mint.task.list")
     public void onTaskList(Player player, String mintProject)
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
@@ -902,7 +895,7 @@ public class MintCommand extends BaseCommand {
 
         if(project.getTasks().isEmpty())
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cNo tasks to list."));
+            player.sendMessage(Utils.color(mintProjectTag + "&cNo tasks to list!"));
             return;
         }
 
@@ -930,7 +923,7 @@ public class MintCommand extends BaseCommand {
 
         if(focusedTask != null)
         {
-            if(player.hasPermission("emi.mint.view.taskID"))
+            if(player.hasPermission("emi.mint.view.taskid"))
             {
                 player.sendMessage(Utils.color("&aFocused: &7[&9" + focusedTask.getId() + "&7] &6" + focusedTask.getTask()));
             }
@@ -942,7 +935,7 @@ public class MintCommand extends BaseCommand {
 
         if(!currentTasks.isEmpty())
         {
-            if(player.hasPermission("emi.mint.view.taskID"))
+            if(player.hasPermission("emi.mint.view.taskid"))
             {
                 player.sendMessage(Utils.color("&aCurrent: " + buildTaskList(currentTasks, true)));
             }
@@ -954,7 +947,7 @@ public class MintCommand extends BaseCommand {
 
         if(!completeTasks.isEmpty())
         {
-            if(player.hasPermission("emi.mint.view.taskID"))
+            if(player.hasPermission("emi.mint.view.taskid"))
             {
                 player.sendMessage(Utils.color("&aComplete: " + buildTaskList(completeTasks, true)));
             }
@@ -967,7 +960,7 @@ public class MintCommand extends BaseCommand {
 
     @Subcommand("validate")
     @Syntax("<Project>")
-    @CommandPermission("emi.validate")
+    @CommandPermission("emi.mint.validate")
     public void onValidate(Player player, String mintProject)
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
@@ -985,22 +978,41 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        if(project.getValidateMaterial().containsKey(player.getUniqueId()) || project.getValidateTask().containsKey(player.getUniqueId()))
+        if(project.getQueuedValidateMaterial().containsKey(player.getUniqueId()) || project.getQueuedValidateTask().containsKey(player.getUniqueId()))
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cYou already have a validation log to answer."));
-            return;
+            if(project.getQueuedValidateMaterial().containsKey(player.getUniqueId()))
+            {
+                MintLogMaterial mintLogMaterial = project.getQueuedValidateMaterial().get(player.getUniqueId());
+                player.spigot().sendMessage(buildValidationMessage(mintProject));
+                player.sendMessage(Utils.color(mintProjectTag + "&6" + mintLogMaterial.getLogger().getName() +
+                        " &agathered &6" + mintLogMaterial.getMaterialCollected() + " " + project.getMaterials().get(mintLogMaterial.getMaterialID()).getMaterial() +
+                        " &ain the time of &6" + decodeTime(mintLogMaterial.getTimeWorked()) +
+                        " &aon the date of: &6" + decodeDate(mintLogMaterial.getLogDate()) + "."));
+                return;
+            }
+
+            if(project.getQueuedValidateTask().containsKey(player.getUniqueId()))
+            {
+                MintLogTask mintLogTask = project.getQueuedValidateTask().get(player.getUniqueId());
+                player.spigot().sendMessage(buildValidationMessage(mintProject));
+                player.sendMessage(Utils.color(mintProjectTag + "&6" + mintLogTask.getLogger().getName() +
+                        " &aworked on: &6" + mintLogTask.getDescription() +
+                        " &ain the time of &6" + decodeTime(mintLogTask.getTimeWorked()) +
+                        " &aon the date of: &6" + decodeDate(mintLogTask.getLogDate()) + "."));
+                return;
+            }
         }
 
         if(project.getMaterialLogValidation().isEmpty() && project.getTaskLogValidation().isEmpty())
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cNo logs to validate."));
+            player.sendMessage(Utils.color(mintProjectTag + "&cNo logs to validate!"));
             return;
         }
 
         if(!project.getMaterialLogValidation().isEmpty())
         {
             MintLogMaterial materialLog = project.getMaterialLogValidation().values().iterator().next();
-            project.getValidateMaterial().put(player.getUniqueId(), materialLog);
+            project.getQueuedValidateMaterial().put(player.getUniqueId(), materialLog);
             project.getMaterialLogValidation().remove(materialLog.getId());
             player.spigot().sendMessage(buildValidationMessage(mintProject));
             player.sendMessage(Utils.color(mintProjectTag + "&6" + materialLog.getLogger().getName() +
@@ -1013,7 +1025,7 @@ public class MintCommand extends BaseCommand {
         if(!project.getTaskLogValidation().isEmpty())
         {
             MintLogTask taskLog = project.getTaskLogValidation().values().iterator().next();
-            project.getValidateTask().put(player.getUniqueId(), taskLog);
+            project.getQueuedValidateTask().put(player.getUniqueId(), taskLog);
             project.getTaskLogValidation().remove(taskLog.getId());
             player.spigot().sendMessage(buildValidationMessage(mintProject));
             player.sendMessage(Utils.color(mintProjectTag + "&6" + taskLog.getLogger().getName() +
@@ -1025,7 +1037,7 @@ public class MintCommand extends BaseCommand {
 
     @Subcommand("validateyes")
     @Syntax("<Project>")
-    @CommandPermission("emi.validate")
+    @CommandPermission("emi.mint.validate")
     @Private
     public void onValidateYes(Player player, String mintProject)
     {
@@ -1033,26 +1045,26 @@ public class MintCommand extends BaseCommand {
         MintProject project = manager.getProject(mintProject);
         EMIPlayer validator = PlayerUtils.getEMIPlayer(player.getName());
 
-        if(project.getValidateMaterial().containsKey(player.getUniqueId()))
+        if(project.getQueuedValidateMaterial().containsKey(player.getUniqueId()))
         {
-            project.validateMaterial(project.getValidateMaterial().get(player.getUniqueId()), true, validator);
+            project.validateMaterial(project.getQueuedValidateMaterial().get(player.getUniqueId()), true, validator);
         }
-        else if(project.getValidateTask().containsKey(player.getUniqueId()))
+        else if(project.getQueuedValidateTask().containsKey(player.getUniqueId()))
         {
-            project.validateTask(project.getValidateTask().get(player.getUniqueId()), true, validator);
+            project.validateTask(project.getQueuedValidateTask().get(player.getUniqueId()), true, validator);
         }
         else
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cNo logs have been queued for you."));
+            player.sendMessage(Utils.color(mintProjectTag + "&cNo logs have been queued for you!"));
             return;
         }
 
-        player.sendMessage(Utils.color(mintProjectTag + "&aLog has been approved"));
+        player.sendMessage(Utils.color(mintProjectTag + "&aLog has been approved!"));
     }
 
     @Subcommand("validateno")
     @Syntax("<Project>")
-    @CommandPermission("emi.validate")
+    @CommandPermission("emi.mint.validate")
     @Private
     public void onValidateNo(Player player, String mintProject)
     {
@@ -1060,21 +1072,21 @@ public class MintCommand extends BaseCommand {
         MintProject project = manager.getProject(mintProject);
         EMIPlayer validator = PlayerUtils.getEMIPlayer(player.getName());
 
-        if(project.getValidateMaterial().containsKey(player.getUniqueId()))
+        if(project.getQueuedValidateMaterial().containsKey(player.getUniqueId()))
         {
-            project.validateMaterial(project.getValidateMaterial().get(player.getUniqueId()), false, validator);
+            project.validateMaterial(project.getQueuedValidateMaterial().get(player.getUniqueId()), false, validator);
         }
-        else if(project.getValidateTask().containsKey(player.getUniqueId()))
+        else if(project.getQueuedValidateTask().containsKey(player.getUniqueId()))
         {
-            project.validateTask(project.getValidateTask().get(player.getUniqueId()), false, validator);
+            project.validateTask(project.getQueuedValidateTask().get(player.getUniqueId()), false, validator);
         }
         else
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cNo logs have been queued for you."));
+            player.sendMessage(Utils.color(mintProjectTag + "&cNo logs have been queued for you!"));
             return;
         }
 
-        player.sendMessage(Utils.color(mintProjectTag + "&aLog has been rejected"));
+        player.sendMessage(Utils.color(mintProjectTag + "&aLog has been rejected!"));
     }
 
     private TextComponent buildValidationMessage(String mintProject)

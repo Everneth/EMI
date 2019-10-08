@@ -29,8 +29,8 @@ public class MintProject
     private HashMap<Long, MintLogMaterial> materialLogValidation = new HashMap<>();
     private HashMap<Long, MintTask> tasks = new HashMap<>();
     private HashMap<Long, MintMaterial> materials = new HashMap<>();
-    private HashMap<UUID, MintLogMaterial> validateMaterial = new HashMap<>();
-    private HashMap<UUID, MintLogTask> validateTask = new HashMap<>();
+    private HashMap<UUID, MintLogMaterial> queuedValidateMaterial = new HashMap<>();
+    private HashMap<UUID, MintLogTask> queuedValidateTask = new HashMap<>();
 
     public MintProject(EMIPlayer leader, String name, String startDate, String endDate, int complete, int focused, String description)
     {
@@ -387,7 +387,7 @@ public class MintProject
             materialLog.put(mintLogMaterial.getId(), mintLogMaterial);
         }
 
-        validateMaterial.remove(UUID.fromString(validator.getUniqueId()));
+        queuedValidateMaterial.remove(UUID.fromString(validator.getUniqueId()));
         materialLogValidation.remove(mintLogMaterial.getId());
     }
 
@@ -424,7 +424,7 @@ public class MintProject
             taskLog.put(mintLogTask.getId(), mintLogTask);
         }
 
-        validateTask.remove(UUID.fromString(validator.getUniqueId()));
+        queuedValidateTask.remove(UUID.fromString(validator.getUniqueId()));
         taskLogValidation.remove(mintLogTask.getId());
     }
 
@@ -598,24 +598,24 @@ public class MintProject
         this.materials = materials;
     }
 
-    public HashMap<UUID, MintLogMaterial> getValidateMaterial()
+    public HashMap<UUID, MintLogMaterial> getQueuedValidateMaterial()
     {
-        return validateMaterial;
+        return queuedValidateMaterial;
     }
 
-    public void setValidateMaterial(HashMap<UUID, MintLogMaterial> validateMaterial)
+    public void setQueuedValidateMaterial(HashMap<UUID, MintLogMaterial> queuedValidateMaterial)
     {
-        this.validateMaterial = validateMaterial;
+        this.queuedValidateMaterial = queuedValidateMaterial;
     }
 
-    public HashMap<UUID, MintLogTask> getValidateTask()
+    public HashMap<UUID, MintLogTask> getQueuedValidateTask()
     {
-        return validateTask;
+        return queuedValidateTask;
     }
 
-    public void setValidateTask(HashMap<UUID, MintLogTask> validateTask)
+    public void setQueuedValidateTask(HashMap<UUID, MintLogTask> queuedValidateTask)
     {
-        this.validateTask = validateTask;
+        this.queuedValidateTask = queuedValidateTask;
     }
 
     @Override

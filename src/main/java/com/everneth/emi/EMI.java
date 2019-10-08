@@ -87,12 +87,12 @@ public class EMI extends JavaPlugin {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
         for(MintProject project : manager.getProjects().values())
         {
-            for(MintLogMaterial logMaterial : project.getValidateMaterial().values())
+            for(MintLogMaterial logMaterial : project.getQueuedValidateMaterial().values())
             {
                 project.getMaterialLogValidation().put(logMaterial.getId(), logMaterial);
             }
 
-            for(MintLogTask logTask : project.getValidateTask().values())
+            for(MintLogTask logTask : project.getQueuedValidateTask().values())
             {
                 project.getTaskLogValidation().put(logTask.getId(), logTask);
             }
