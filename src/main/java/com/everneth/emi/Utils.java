@@ -35,24 +35,24 @@ public class Utils
 
     public static String buildMessage(String[] parts, int start, boolean separator)
     {
-        StringBuilder message = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         for(int count = start; count < parts.length; count++)
         {
             if(separator)
             {
                 if(count + 1 == parts.length)
                 {
-                    message.append(parts[count] + " ");
+                    builder.append(parts[count]).append(" ");
                 }
                 else
                 {
-                    message.append(parts[count] + ", ");
+                    builder.append(parts[count]).append(", ");
                 }
                 continue;
             }
-            message.append(parts[count] + " ");
+            builder.append(parts[count]).append(" ");
         }
-        return message.toString();
+        return builder.toString();
     }
 
     public static String getCurrentDate()

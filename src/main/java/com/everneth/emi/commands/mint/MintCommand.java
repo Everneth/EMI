@@ -387,10 +387,43 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        player.sendMessage(Utils.color(mintProjectTag + "&aMaterials:"));
+        MintMaterial focusedMaterial = null;
+        ArrayList<MintMaterial> currentMaterials = new ArrayList<>();
+        ArrayList<MintMaterial> completeMaterials = new ArrayList<>();
+
         for(MintMaterial material : project.getMaterials().values())
         {
-            player.sendMessage(Utils.color("&7[&9*&7] &a" + material.getMaterial() + " &8[&a" + material.getCollected() + "&8/&2" + material.getTotal() + "&8]"));
+            if(material.getFocused() == 1)
+            {
+                focusedMaterial = material;
+            }
+            else if(material.getComplete() == 1)
+            {
+                completeMaterials.add(material);
+            }
+            else
+            {
+                currentMaterials.add(material);
+            }
+        }
+
+        player.sendMessage(Utils.color(mintProjectTag + "&aMaterials for &6" + project.getName()));
+
+        player.sendMessage(Utils.color(mintProjectTag + "&aMaterials:"));
+
+        if(focusedMaterial != null)
+        {
+            player.sendMessage(Utils.color("&aFocused: &6" + focusedMaterial.getMaterial() + "&8[&a" + focusedMaterial.getCollected() + "&8/&2" + focusedMaterial.getTotal() + "&8]"));
+        }
+
+        if(!currentMaterials.isEmpty())
+        {
+            player.sendMessage(Utils.color("&aCurrent: &6" + buildMaterialList(currentMaterials)));
+        }
+
+        if(!completeMaterials.isEmpty())
+        {
+            player.sendMessage(Utils.color("&aComplete: &6" + buildMaterialList(completeMaterials)));
         }
     }
 
@@ -620,31 +653,21 @@ public class MintCommand extends BaseCommand {
             }
         }
 
+        player.sendMessage(Utils.color(mintProjectTag + "&6Projects:"));
+
         if(focusedProject != null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&aFocused Project: &6" + focusedProject));
-        }
-        else
-        {
-            player.sendMessage(Utils.color(mintProjectTag + "&aFocused Project: &cNothing focused."));
+            player.sendMessage(Utils.color("&aFocused: &6" + focusedProject));
         }
 
-        if(currentProjects.isEmpty())
+        if(!currentProjects.isEmpty())
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&aCurrent Projects: &cNo current projects."));
-        }
-        else
-        {
-            player.sendMessage(Utils.color(mintProjectTag + "&aCurrent Projects: " + Utils.buildMessage(currentProjects.toArray(new String[0]), 0, true)));
+            player.sendMessage(Utils.color("&aCurrent: &6" + Utils.buildMessage(currentProjects.toArray(new String[0]), 0, true)));
         }
 
-        if(completeProjects.isEmpty())
+        if(!completeProjects.isEmpty())
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&aComplete Projects: &cNo complete projects."));
-        }
-        else
-        {
-            player.sendMessage(Utils.color(mintProjectTag + "&aComplete Projects: " + Utils.buildMessage(completeProjects.toArray(new String[0]), 0, true)));
+            player.sendMessage(Utils.color("&aComplete Projects: &6" + Utils.buildMessage(completeProjects.toArray(new String[0]), 0, true)));
         }
     }
 
@@ -883,16 +906,61 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        player.sendMessage(Utils.color(mintProjectTag + "&aTasks:"));
+        MintTask focusedTask = null;
+        ArrayList<MintTask> currentTasks = new ArrayList<>();
+        ArrayList<MintTask> completeTasks = new ArrayList<>();
+
         for(MintTask task : project.getTasks().values())
         {
-            if(player.hasPermission("emi.mint.view.taskID"))
+            if(task.getFocused() == 1)
             {
-                player.sendMessage(Utils.color("&7[&9" + task.getId() + "&7] &a" + task.getTask()));
+                focusedTask = task;
+            }
+            else if(task.getComplete() == 1)
+            {
+                completeTasks.add(task);
             }
             else
             {
-                player.sendMessage(Utils.color("&7[&9*&7] &a" + task.getTask()));
+                currentTasks.add(task);
+            }
+        }
+
+        player.sendMessage(Utils.color(mintProjectTag + "&aTasks for &6" + project.getName()));
+
+        if(focusedTask != null)
+        {
+            if(player.hasPermission("emi.mint.view.taskID"))
+            {
+                player.sendMessage(Utils.color("&aFocused: &7[&9" + focusedTask.getId() + "&7] &6" + focusedTask.getTask()));
+            }
+            else
+            {
+                player.sendMessage(Utils.color("&aFocused: &7[&9*&7] &6" + focusedTask.getTask()));
+            }
+        }
+
+        if(!currentTasks.isEmpty())
+        {
+            if(player.hasPermission("emi.mint.view.taskID"))
+            {
+                player.sendMessage(Utils.color("&aCurrent: " + buildTaskList(currentTasks, true)));
+            }
+            else
+            {
+                player.sendMessage(Utils.color("&aCurrent: " + buildTaskList(currentTasks, false)));
+            }
+        }
+
+        if(!completeTasks.isEmpty())
+        {
+            if(player.hasPermission("emi.mint.view.taskID"))
+            {
+                player.sendMessage(Utils.color("&aComplete: " + buildTaskList(completeTasks, true)));
+            }
+            else
+            {
+                player.sendMessage(Utils.color("&aComplete: " + buildTaskList(completeTasks, false)));
             }
         }
     }
@@ -979,7 +1047,7 @@ public class MintCommand extends BaseCommand {
             return;
         }
 
-        player.sendMessage(Utils.color(mintProjectTag + "&aLog has been validated"));
+        player.sendMessage(Utils.color(mintProjectTag + "&aLog has been approved"));
     }
 
     @Subcommand("validateno")
@@ -1075,5 +1143,41 @@ public class MintCommand extends BaseCommand {
         String[] dateSplit = date.split(" ");
 
         return dateSplit[0];
+    }
+
+    private String buildTaskList(ArrayList<MintTask> tasks, boolean hasPermission)
+    {
+        StringBuilder builder = new StringBuilder();
+
+        for(MintTask task : tasks)
+        {
+            if(hasPermission)
+            {
+                builder.append("&7[&9").append(task.getId()).append("&7] &6").append(task.getTask().trim()).append(" ");
+            }
+            else
+            {
+                builder.append("&7[&9*&7] &6").append(task.getTask().trim()).append(" ");
+            }
+        }
+        return builder.toString();
+    }
+
+    private String buildMaterialList(ArrayList<MintMaterial> materials)
+    {
+        StringBuilder builder = new StringBuilder();
+
+        for(MintMaterial material : materials)
+        {
+            if(material.getComplete() == 1)
+            {
+                builder.append("&6").append(material.getMaterial()).append("&8[&2").append(material.getTotal()).append("&8] ");
+            }
+            else
+            {
+                builder.append("&6").append(material.getMaterial()).append("&8[&a").append(material.getCollected()).append("&8/&2").append(material.getTotal()).append("&8] ");
+            }
+        }
+        return builder.toString();
     }
 }
