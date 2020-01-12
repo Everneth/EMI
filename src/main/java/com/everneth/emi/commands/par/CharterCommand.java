@@ -140,7 +140,7 @@ public class CharterCommand extends BaseCommand {
 
         if(points.isEmpty())
         {
-            sender.sendMessage("&9[Charter] &3No charter point history found. Excellent citizenship!");
+            sender.sendMessage(Utils.color("&9[Charter] &3No charter point history found. Excellent citizenship!"));
         }
         else {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
