@@ -1,7 +1,7 @@
 package com.everneth.emi;
 
 import co.aikar.idb.DB;
-import com.everneth.emi.models.mint.MintProject;
+import com.everneth.emi.models.devop.DevopProject;
 import org.bukkit.Bukkit;
 
 import java.sql.SQLException;
@@ -11,7 +11,7 @@ public class MintProjectManager
 {
     private static MintProjectManager mintProjectManager;
     private MintProjectManager() {}
-    private HashMap<Long, MintProject> projects = new HashMap<>();
+    private HashMap<Long, DevopProject> projects = new HashMap<>();
     public static MintProjectManager getMintProjectManager()
     {
         if(mintProjectManager == null)
@@ -21,9 +21,9 @@ public class MintProjectManager
         return mintProjectManager;
     }
 
-    public MintProject getProject(String projectName)
+    public DevopProject getProject(String projectName)
     {
-        for(MintProject project : projects.values())
+        for(DevopProject project : projects.values())
         {
             if(projectName.equalsIgnoreCase(project.getName()))
             {
@@ -33,33 +33,33 @@ public class MintProjectManager
         return null;
     }
 
-    public MintProject getProject(long projectID)
+    public DevopProject getProject(long projectID)
     {
         return projects.get(projectID);
     }
 
-    public HashMap<Long, MintProject> getProjects()
+    public HashMap<Long, DevopProject> getProjects()
     {
         return projects;
     }
 
-    public void addProject(long projectID, MintProject project)
+    public void addProject(long projectID, DevopProject project)
     {
         projects.put(projectID, project);
     }
 
-    public void addProject(MintProject mintProject)
+    public void addProject(DevopProject devopProject)
     {
         try
         {
             long projectID = DB.executeInsert("INSERT INTO mint_project (leader, name, start_date, end_date, complete, focused, description) VALUES (?, ?, ?, ?, 0, 0, ?)",
-                    mintProject.getLeader().getId(),
-                    mintProject.getName(),
-                    mintProject.getStartDate(),
+                    devopProject.getLeader().getId(),
+                    devopProject.getName(),
+                    devopProject.getStartDate(),
                     null,
-                    mintProject.getDescription());
-            mintProject.setId(projectID);
-            projects.put(projectID, mintProject);
+                    devopProject.getDescription());
+            devopProject.setId(projectID);
+            projects.put(projectID, devopProject);
         }
         catch (SQLException e)
         {
@@ -67,7 +67,7 @@ public class MintProjectManager
         }
     }
 
-    public void switchFocus(MintProject newFocus, MintProject formerFocus)
+    public void switchFocus(DevopProject newFocus, DevopProject formerFocus)
     {
         try
         {
@@ -95,7 +95,7 @@ public class MintProjectManager
         }
     }
 
-    public void unFocus(MintProject project)
+    public void unFocus(DevopProject project)
     {
         try
         {
