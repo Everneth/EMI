@@ -1,4 +1,4 @@
-package com.everneth.emi.models.mint;
+package com.everneth.emi.models.devop;
 
 import co.aikar.idb.DB;
 import com.everneth.emi.Utils;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class MintProject
+public class DevopProject
 {
     private long id;
     private EMIPlayer leader;
@@ -20,19 +20,19 @@ public class MintProject
     private int complete;
     private int focused;
     private String description;
-    private MintTask focusedTask = null;
-    private MintMaterial focusedMaterial = null;
+    private DevopTask focusedTask = null;
+    private DevopMaterial focusedMaterial = null;
     private ArrayList<EMIPlayer> workers = new ArrayList<>();
-    private HashMap<Long, MintLogTask> taskLog = new HashMap<>();
-    private HashMap<Long, MintLogTask> taskLogValidation = new HashMap<>();
-    private HashMap<Long, MintLogMaterial> materialLog = new HashMap<>();
-    private HashMap<Long, MintLogMaterial> materialLogValidation = new HashMap<>();
-    private HashMap<Long, MintTask> tasks = new HashMap<>();
-    private HashMap<Long, MintMaterial> materials = new HashMap<>();
-    private HashMap<UUID, MintLogMaterial> queuedValidateMaterial = new HashMap<>();
-    private HashMap<UUID, MintLogTask> queuedValidateTask = new HashMap<>();
+    private HashMap<Long, DevopLogTask> taskLog = new HashMap<>();
+    private HashMap<Long, DevopLogTask> taskLogValidation = new HashMap<>();
+    private HashMap<Long, DevopLogMaterial> materialLog = new HashMap<>();
+    private HashMap<Long, DevopLogMaterial> materialLogValidation = new HashMap<>();
+    private HashMap<Long, DevopTask> tasks = new HashMap<>();
+    private HashMap<Long, DevopMaterial> materials = new HashMap<>();
+    private HashMap<UUID, DevopLogMaterial> queuedValidateMaterial = new HashMap<>();
+    private HashMap<UUID, DevopLogTask> queuedValidateTask = new HashMap<>();
 
-    public MintProject(EMIPlayer leader, String name, String startDate, String endDate, int complete, int focused, String description)
+    public DevopProject(EMIPlayer leader, String name, String startDate, String endDate, int complete, int focused, String description)
     {
         this.leader = leader;
         this.name = name;
@@ -43,7 +43,7 @@ public class MintProject
         this.description = description;
     }
 
-    public MintProject(long id, EMIPlayer leader, String name, String startDate, String endDate, int complete, int focused, String description)
+    public DevopProject(long id, EMIPlayer leader, String name, String startDate, String endDate, int complete, int focused, String description)
     {
         this.id = id;
         this.leader = leader;
@@ -85,7 +85,7 @@ public class MintProject
         }
     }
 
-    public void addTask(MintTask task)
+    public void addTask(DevopTask task)
     {
         try
         {
@@ -126,7 +126,7 @@ public class MintProject
         }
     }
 
-    public void switchTaskFocus(MintTask newTask, MintTask formerTask)
+    public void switchTaskFocus(DevopTask newTask, DevopTask formerTask)
     {
         try
         {
@@ -148,7 +148,7 @@ public class MintProject
         }
     }
 
-    public void unFocusTask(MintTask task)
+    public void unFocusTask(DevopTask task)
     {
         try
         {
@@ -163,7 +163,7 @@ public class MintProject
         }
     }
 
-    public void deleteTask(MintTask task)
+    public void deleteTask(DevopTask task)
     {
         try
         {
@@ -177,7 +177,7 @@ public class MintProject
         }
     }
 
-    public void addMaterial(MintMaterial material)
+    public void addMaterial(DevopMaterial material)
     {
         try
         {
@@ -219,7 +219,7 @@ public class MintProject
         }
     }
 
-    public void switchMaterialFocus(MintMaterial newMaterial, MintMaterial formerMaterial)
+    public void switchMaterialFocus(DevopMaterial newMaterial, DevopMaterial formerMaterial)
     {
         try
         {
@@ -241,7 +241,7 @@ public class MintProject
         }
     }
 
-    public void deleteMaterial(MintMaterial material)
+    public void deleteMaterial(DevopMaterial material)
     {
         try
         {
@@ -255,7 +255,7 @@ public class MintProject
         }
     }
 
-    public void addTaskLog(MintLogTask log)
+    public void addTaskLog(DevopLogTask log)
     {
         try
         {
@@ -275,7 +275,7 @@ public class MintProject
         }
     }
 
-    public void addMaterialLog(MintLogMaterial log)
+    public void addMaterialLog(DevopLogMaterial log)
     {
         try
         {
@@ -298,9 +298,9 @@ public class MintProject
         }
     }
 
-    public MintMaterial getMaterial(String name)
+    public DevopMaterial getMaterial(String name)
     {
-        for(MintMaterial material : materials.values())
+        for(DevopMaterial material : materials.values())
         {
             if(material.getMaterial().equalsIgnoreCase(name))
             {
@@ -310,7 +310,7 @@ public class MintProject
         return null;
     }
 
-    public void unFocusMaterial(MintMaterial material)
+    public void unFocusMaterial(DevopMaterial material)
     {
         try
         {
@@ -327,7 +327,7 @@ public class MintProject
 
     private void updateMaterial(long materialID, int collected)
     {
-        MintMaterial material = materials.get(materialID);
+        DevopMaterial material = materials.get(materialID);
         int totalCollected = (material.getCollected() + collected);
 
         try
@@ -348,20 +348,20 @@ public class MintProject
         }
     }
 
-    public void validateMaterial(MintLogMaterial mintLogMaterial, boolean validated, EMIPlayer validator)
+    public void validateMaterial(DevopLogMaterial devopLogMaterial, boolean validated, EMIPlayer validator)
     {
-        MintMaterial mintMaterial = materials.get(mintLogMaterial.getMaterialID());
+        DevopMaterial devopMaterial = materials.get(devopLogMaterial.getMaterialID());
         if(!validated)
         {
             try
             {
                 DB.executeUpdate("DELETE FROM mint_log_material WHERE log_id = ?",
-                        mintLogMaterial.getId());
+                        devopLogMaterial.getId());
 
                 DB.executeUpdate("UPDATE mint_material set collected = ? WHERE material_id = ?",
-                        (mintMaterial.getCollected() - mintLogMaterial.getMaterialCollected()),
-                        mintMaterial.getId());
-                mintMaterial.setCollected(mintMaterial.getCollected() - mintLogMaterial.getMaterialCollected());
+                        (devopMaterial.getCollected() - devopLogMaterial.getMaterialCollected()),
+                        devopMaterial.getId());
+                devopMaterial.setCollected(devopMaterial.getCollected() - devopLogMaterial.getMaterialCollected());
             }
             catch(SQLException e)
             {
@@ -375,30 +375,30 @@ public class MintProject
             {
                 DB.executeUpdate("UPDATE mint_log_material set validated_by = ?, validated = 1 WHERE log_id = ?",
                         validator.getId(),
-                        mintLogMaterial.getId());
+                        devopLogMaterial.getId());
             }
             catch(SQLException e)
             {
                 Bukkit.getLogger().info("ERROR: MintProject/validateMaterial/Yes: " + e.toString());
                 return;
             }
-            mintLogMaterial.setValidater(validator);
-            mintLogMaterial.setValidated(1);
-            materialLog.put(mintLogMaterial.getId(), mintLogMaterial);
+            devopLogMaterial.setValidater(validator);
+            devopLogMaterial.setValidated(1);
+            materialLog.put(devopLogMaterial.getId(), devopLogMaterial);
         }
 
         queuedValidateMaterial.remove(UUID.fromString(validator.getUniqueId()));
-        materialLogValidation.remove(mintLogMaterial.getId());
+        materialLogValidation.remove(devopLogMaterial.getId());
     }
 
-    public void validateTask(MintLogTask mintLogTask, boolean validated, EMIPlayer validator)
+    public void validateTask(DevopLogTask devopLogTask, boolean validated, EMIPlayer validator)
     {
         if(!validated)
         {
             try
             {
                 DB.executeUpdate("DELETE FROM mint_log_task WHERE log_id = ?",
-                        mintLogTask.getId());
+                        devopLogTask.getId());
             }
             catch(SQLException e)
             {
@@ -412,20 +412,20 @@ public class MintProject
             {
                 DB.executeUpdate("UPDATE mint_log_task set validated_by = ?, validated = 1 WHERE log_id = ?",
                         validator.getId(),
-                        mintLogTask.getId());
+                        devopLogTask.getId());
             }
             catch(SQLException e)
             {
                 Bukkit.getLogger().info("ERROR: MintProject/validateTask/Yes: " + e.toString());
                 return;
             }
-            mintLogTask.setValidater(validator);
-            mintLogTask.setValidated(1);
-            taskLog.put(mintLogTask.getId(), mintLogTask);
+            devopLogTask.setValidater(validator);
+            devopLogTask.setValidated(1);
+            taskLog.put(devopLogTask.getId(), devopLogTask);
         }
 
         queuedValidateTask.remove(UUID.fromString(validator.getUniqueId()));
-        taskLogValidation.remove(mintLogTask.getId());
+        taskLogValidation.remove(devopLogTask.getId());
     }
 
     public long getId()
@@ -508,22 +508,22 @@ public class MintProject
         this.description = description;
     }
 
-    public MintTask getFocusedTask()
+    public DevopTask getFocusedTask()
     {
         return focusedTask;
     }
 
-    public void setFocusedTask(MintTask focusedTask)
+    public void setFocusedTask(DevopTask focusedTask)
     {
         this.focusedTask = focusedTask;
     }
 
-    public MintMaterial getFocusedMaterial()
+    public DevopMaterial getFocusedMaterial()
     {
         return focusedMaterial;
     }
 
-    public void setFocusedMaterial(MintMaterial focusedMaterial)
+    public void setFocusedMaterial(DevopMaterial focusedMaterial)
     {
         this.focusedMaterial = focusedMaterial;
     }
@@ -538,82 +538,82 @@ public class MintProject
         this.workers = workers;
     }
 
-    public HashMap<Long, MintLogTask> getTaskLog()
+    public HashMap<Long, DevopLogTask> getTaskLog()
     {
         return taskLog;
     }
 
-    public void setTaskLog(HashMap<Long, MintLogTask> taskLog)
+    public void setTaskLog(HashMap<Long, DevopLogTask> taskLog)
     {
         this.taskLog = taskLog;
     }
 
-    public HashMap<Long, MintLogTask> getTaskLogValidation()
+    public HashMap<Long, DevopLogTask> getTaskLogValidation()
     {
         return taskLogValidation;
     }
 
-    public void setTaskLogValidation(HashMap<Long, MintLogTask> taskLogValidation)
+    public void setTaskLogValidation(HashMap<Long, DevopLogTask> taskLogValidation)
     {
         this.taskLogValidation = taskLogValidation;
     }
 
-    public HashMap<Long, MintLogMaterial> getMaterialLog()
+    public HashMap<Long, DevopLogMaterial> getMaterialLog()
     {
         return materialLog;
     }
 
-    public void setMaterialLog(HashMap<Long, MintLogMaterial> materialLog)
+    public void setMaterialLog(HashMap<Long, DevopLogMaterial> materialLog)
     {
         this.materialLog = materialLog;
     }
 
-    public HashMap<Long, MintLogMaterial> getMaterialLogValidation()
+    public HashMap<Long, DevopLogMaterial> getMaterialLogValidation()
     {
         return materialLogValidation;
     }
 
-    public void setMaterialLogValidation(HashMap<Long, MintLogMaterial> materialLogValidation)
+    public void setMaterialLogValidation(HashMap<Long, DevopLogMaterial> materialLogValidation)
     {
         this.materialLogValidation = materialLogValidation;
     }
 
-    public HashMap<Long, MintTask> getTasks()
+    public HashMap<Long, DevopTask> getTasks()
     {
         return tasks;
     }
 
-    public void setTasks(HashMap<Long, MintTask> tasks)
+    public void setTasks(HashMap<Long, DevopTask> tasks)
     {
         this.tasks = tasks;
     }
 
-    public HashMap<Long, MintMaterial> getMaterials()
+    public HashMap<Long, DevopMaterial> getMaterials()
     {
         return materials;
     }
 
-    public void setMaterials(HashMap<Long, MintMaterial> materials)
+    public void setMaterials(HashMap<Long, DevopMaterial> materials)
     {
         this.materials = materials;
     }
 
-    public HashMap<UUID, MintLogMaterial> getQueuedValidateMaterial()
+    public HashMap<UUID, DevopLogMaterial> getQueuedValidateMaterial()
     {
         return queuedValidateMaterial;
     }
 
-    public void setQueuedValidateMaterial(HashMap<UUID, MintLogMaterial> queuedValidateMaterial)
+    public void setQueuedValidateMaterial(HashMap<UUID, DevopLogMaterial> queuedValidateMaterial)
     {
         this.queuedValidateMaterial = queuedValidateMaterial;
     }
 
-    public HashMap<UUID, MintLogTask> getQueuedValidateTask()
+    public HashMap<UUID, DevopLogTask> getQueuedValidateTask()
     {
         return queuedValidateTask;
     }
 
-    public void setQueuedValidateTask(HashMap<UUID, MintLogTask> queuedValidateTask)
+    public void setQueuedValidateTask(HashMap<UUID, DevopLogTask> queuedValidateTask)
     {
         this.queuedValidateTask = queuedValidateTask;
     }

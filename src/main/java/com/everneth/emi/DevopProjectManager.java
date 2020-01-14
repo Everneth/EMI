@@ -7,18 +7,18 @@ import org.bukkit.Bukkit;
 import java.sql.SQLException;
 import java.util.HashMap;
 
-public class MintProjectManager
+public class DevopProjectManager
 {
-    private static MintProjectManager mintProjectManager;
-    private MintProjectManager() {}
+    private static DevopProjectManager devopProjectManager;
+    private DevopProjectManager() {}
     private HashMap<Long, DevopProject> projects = new HashMap<>();
-    public static MintProjectManager getMintProjectManager()
+    public static DevopProjectManager getDevopProjectManager()
     {
-        if(mintProjectManager == null)
+        if(devopProjectManager == null)
         {
-            mintProjectManager = new MintProjectManager();
+            devopProjectManager = new DevopProjectManager();
         }
-        return mintProjectManager;
+        return devopProjectManager;
     }
 
     public DevopProject getProject(String projectName)

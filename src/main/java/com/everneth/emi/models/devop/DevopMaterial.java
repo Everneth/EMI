@@ -1,6 +1,6 @@
-package com.everneth.emi.models.mint;
+package com.everneth.emi.models.devop;
 
-public class MintMaterial
+public class DevopMaterial
 {
     private long id;
     private long projectID;
@@ -10,7 +10,7 @@ public class MintMaterial
     private int complete;
     private int focused;
 
-    public MintMaterial(long id, long projectID, String material, int total, int collected, int complete, int focused)
+    public DevopMaterial(long id, long projectID, String material, int total, int collected, int complete, int focused)
     {
         this.id = id;
         this.projectID = projectID;
@@ -21,7 +21,7 @@ public class MintMaterial
         this.focused = focused;
     }
 
-    public MintMaterial(long projectID, String material, int total, int collected, int complete, int focused)
+    public DevopMaterial(long projectID, String material, int total, int collected, int complete, int focused)
     {
         this.projectID = projectID;
         this.material = material;

@@ -1,8 +1,8 @@
-package com.everneth.emi.models.mint;
+package com.everneth.emi.models.devop;
 
 import com.everneth.emi.models.EMIPlayer;
 
-public class MintLogMaterial
+public class DevopLogMaterial
 {
     private long id;
     private long projectID;
@@ -15,7 +15,7 @@ public class MintLogMaterial
     private String logDate;
     private String description;
 
-    public MintLogMaterial(long id, long projectID, long materialID, EMIPlayer logger, EMIPlayer validater, int validated, int materialCollected, int timeWorked, String logDate, String description)
+    public DevopLogMaterial(long id, long projectID, long materialID, EMIPlayer logger, EMIPlayer validater, int validated, int materialCollected, int timeWorked, String logDate, String description)
     {
         this.id = id;
         this.projectID = projectID;
@@ -29,7 +29,7 @@ public class MintLogMaterial
         this.description = description;
     }
 
-    public MintLogMaterial(long projectID, long materialID, EMIPlayer logger, EMIPlayer validater, int validated, int materialCollected, int timeWorked, String logDate, String description)
+    public DevopLogMaterial(long projectID, long materialID, EMIPlayer logger, EMIPlayer validater, int validated, int materialCollected, int timeWorked, String logDate, String description)
     {
         this.projectID = projectID;
         this.materialID = materialID;
