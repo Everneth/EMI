@@ -10,6 +10,7 @@ import com.everneth.emi.commands.bot.DenySyncCommand;
 import com.everneth.emi.commands.bot.HelpClearCommand;
 import com.everneth.emi.commands.comm.CommCommand;
 import com.everneth.emi.commands.comp.CompCommand;
+import com.everneth.emi.commands.devop.DevopCommand;
 import com.everneth.emi.commands.par.CharterCommand;
 import com.everneth.emi.events.JoinEvent;
 import com.everneth.emi.events.LeaveEvent;
@@ -76,8 +77,8 @@ public class EMI extends JavaPlugin {
         registerCommands();
         registerListeners();
         initBot();
-        initApi();
-        initMintProjects();
+//        initApi();
+        initDevop();
     }
     @Override
     public void onDisable() {
@@ -111,6 +112,7 @@ public class EMI extends JavaPlugin {
         commandManager.registerCommand(new MinorHelpCommand());
         commandManager.registerCommand(new DiscordsyncCommand());
         commandManager.registerCommand(new CharterCommand());
+        commandManager.registerCommand(new DevopCommand());
     }
 
     private void initBot()
@@ -161,7 +163,7 @@ public class EMI extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new LeaveEvent(this), this);
     }
 
-    private void initMintProjects()
+    private void initDevop()
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
 
@@ -174,16 +176,16 @@ public class EMI extends JavaPlugin {
 
         try
         {
-            projects = new ArrayList<>(DB.getResults("SELECT * FROM mint_project"));
-            tasks = new ArrayList<>(DB.getResults("SELECT * FROM mint_task"));
-            materials = new ArrayList<>(DB.getResults("SELECT * FROM mint_material"));
-            taskLog = new ArrayList<>(DB.getResults("SELECT * FROM mint_log_task"));
-            materialLog = new ArrayList<>(DB.getResults("SELECT * FROM mint_log_material"));
-            workers = new ArrayList<>(DB.getResults("SELECT * FROM mint_log_join"));
+            projects = new ArrayList<>(DB.getResults("SELECT * FROM devop_project"));
+            tasks = new ArrayList<>(DB.getResults("SELECT * FROM devop_task"));
+            materials = new ArrayList<>(DB.getResults("SELECT * FROM devop_material"));
+            taskLog = new ArrayList<>(DB.getResults("SELECT * FROM devop_log_task"));
+            materialLog = new ArrayList<>(DB.getResults("SELECT * FROM devop_log_material"));
+            workers = new ArrayList<>(DB.getResults("SELECT * FROM devop_log_join"));
         }
         catch(SQLException e)
         {
-            this.getLogger().info("Failed to gather info for mint projects: " + e.toString());
+            this.getLogger().info("Failed to gather info for devop projects: " + e.toString());
             return;
         }
 

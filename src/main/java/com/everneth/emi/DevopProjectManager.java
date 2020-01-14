@@ -52,7 +52,7 @@ public class DevopProjectManager
     {
         try
         {
-            long projectID = DB.executeInsert("INSERT INTO mint_project (leader, name, start_date, end_date, complete, focused, description) VALUES (?, ?, ?, ?, 0, 0, ?)",
+            long projectID = DB.executeInsert("INSERT INTO devop_project (leader, name, start_date, end_date, complete, focused, description) VALUES (?, ?, ?, ?, 0, 0, ?)",
                     devopProject.getLeader().getId(),
                     devopProject.getName(),
                     devopProject.getStartDate(),
@@ -63,7 +63,7 @@ public class DevopProjectManager
         }
         catch (SQLException e)
         {
-            Bukkit.getLogger().info("MintProjectManager/addProject(MintProject) ERROR: " + e.toString());
+            Bukkit.getLogger().info("DevopProjectManager/addProject(DevopProject) ERROR: " + e.toString());
         }
     }
 
@@ -73,7 +73,7 @@ public class DevopProjectManager
         {
             if(newFocus == formerFocus)
             {
-                DB.executeUpdate("UPDATE mint_project SET focused = 0 WHERE project_id = ?",
+                DB.executeUpdate("UPDATE devop_project SET focused = 0 WHERE project_id = ?",
                         newFocus.getId());
                 newFocus.setFocused(0);
                 return;
@@ -81,17 +81,17 @@ public class DevopProjectManager
 
             if(formerFocus != null)
             {
-                DB.executeUpdate("UPDATE mint_project SET focused = 0 WHERE project_id = ?",
+                DB.executeUpdate("UPDATE devop_project SET focused = 0 WHERE project_id = ?",
                         formerFocus.getId());
                 formerFocus.setFocused(0);
             }
-            DB.executeUpdate("UPDATE mint_project SET focused = 1 WHERE project_id = ?",
+            DB.executeUpdate("UPDATE devop_project SET focused = 1 WHERE project_id = ?",
                     newFocus.getId());
             newFocus.setFocused(1);
         }
         catch (SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProjectManager/switchFocus: " + e.toString());
+            Bukkit.getLogger().info("ERROR: DevopProjectManager/switchFocus: " + e.toString());
         }
     }
 
@@ -99,13 +99,13 @@ public class DevopProjectManager
     {
         try
         {
-            DB.executeUpdate("UPDATE mint_project SET focused = 0 WHERE project_id = ?",
+            DB.executeUpdate("UPDATE devop_project SET focused = 0 WHERE project_id = ?",
                     project.getId());
             project.setFocused(0);
         }
         catch (SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProjectManager/unFocus: " + e.toString());
+            Bukkit.getLogger().info("ERROR: DevopProjectManager/unFocus: " + e.toString());
         }
     }
 }

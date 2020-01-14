@@ -59,13 +59,13 @@ public class DevopProject
     {
         try
         {
-            DB.executeInsert("INSERT INTO mint_log_join (player_id, project_id, join_date) VALUES (?, ?, ?)",
+            DB.executeInsert("INSERT INTO devop_log_join (player_id, project_id, join_date) VALUES (?, ?, ?)",
                     worker.getId(), id, Utils.getCurrentDate());
             workers.add(worker);
         }
         catch (SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/addWorker: " + e.toString());
+            Bukkit.getLogger().info("ERROR: DevopProject/addWorker: " + e.toString());
         }
     }
 
@@ -73,7 +73,7 @@ public class DevopProject
     {
         try
         {
-            DB.executeUpdate("UPDATE mint_project SET end_date = ?, complete = 1, focused = 0 WHERE project_id = ?",
+            DB.executeUpdate("UPDATE devop_project SET end_date = ?, complete = 1, focused = 0 WHERE project_id = ?",
                     Utils.getCurrentDate(),
                     id);
             complete = 1;
@@ -81,7 +81,7 @@ public class DevopProject
         }
         catch (SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/complete: " + e.toString());
+            Bukkit.getLogger().info("ERROR: DevopProject/complete: " + e.toString());
         }
     }
 
@@ -89,7 +89,7 @@ public class DevopProject
     {
         try
         {
-            long taskID = DB.executeInsert("INSERT INTO mint_task (project_id, task, complete, focused) VALUES (?, ?, 0, 0)",
+            long taskID = DB.executeInsert("INSERT INTO devop_task (project_id, task, complete, focused) VALUES (?, ?, 0, 0)",
                     id,
                     task.getTask());
             task.setId(taskID);
@@ -97,7 +97,7 @@ public class DevopProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/addTask: " + e.toString());
+            Bukkit.getLogger().info("ERROR: DevopProject/addTask: " + e.toString());
         }
     }
 
@@ -105,7 +105,7 @@ public class DevopProject
     {
         try
         {
-            DB.executeUpdate("UPDATE mint_task SET complete = 1, focused = 0 WHERE task_id = ?",
+            DB.executeUpdate("UPDATE devop_task SET complete = 1, focused = 0 WHERE task_id = ?",
                     taskID);
             tasks.get(taskID).setComplete(1);
             tasks.get(taskID).setFocused(0);
@@ -122,7 +122,7 @@ public class DevopProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/completeTask: " + e.toString());
+            Bukkit.getLogger().info("ERROR: DevopProject/completeTask: " + e.toString());
         }
     }
 
@@ -132,19 +132,19 @@ public class DevopProject
         {
             if(formerTask != null)
             {
-                DB.executeUpdate("UPDATE mint_task SET focused = 0 WHERE task_id = ?",
+                DB.executeUpdate("UPDATE devop_task SET focused = 0 WHERE task_id = ?",
                         formerTask.getId());
                 formerTask.setFocused(0);
             }
 
-            DB.executeUpdate("UPDATE mint_task SET focused = 1 WHERE task_id = ?",
+            DB.executeUpdate("UPDATE devop_task SET focused = 1 WHERE task_id = ?",
                     newTask.getId());
             newTask.setFocused(1);
             focusedTask = newTask;
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/switchTaskFocus: " + e.toString());
+            Bukkit.getLogger().info("ERROR: DevopProject/switchTaskFocus: " + e.toString());
         }
     }
 
@@ -152,14 +152,14 @@ public class DevopProject
     {
         try
         {
-            DB.executeUpdate("UPDATE mint_task SET focused = 0 WHERE task_id = ?",
+            DB.executeUpdate("UPDATE devop_task SET focused = 0 WHERE task_id = ?",
                     task.getId());
             task.setFocused(0);
             focusedTask = null;
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/unFocusTask: " + e.toString());
+            Bukkit.getLogger().info("ERROR: DevopProject/unFocusTask: " + e.toString());
         }
     }
 
@@ -167,13 +167,13 @@ public class DevopProject
     {
         try
         {
-            DB.executeUpdate("DELETE FROM mint_task WHERE task_id = ?",
+            DB.executeUpdate("DELETE FROM devop_task WHERE task_id = ?",
                     task.getId());
             tasks.remove(task.getId());
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/deleteTask: " + e.toString());
+            Bukkit.getLogger().info("ERROR: DevopProject/deleteTask: " + e.toString());
         }
     }
 
@@ -181,7 +181,7 @@ public class DevopProject
     {
         try
         {
-            long materialID = DB.executeInsert("INSERT INTO mint_material (project_id, material, total, collected, complete, focused) VALUES (?, ?, ?, 0, 0, 0)",
+            long materialID = DB.executeInsert("INSERT INTO devop_material (project_id, material, total, collected, complete, focused) VALUES (?, ?, ?, 0, 0, 0)",
                     id,
                     material.getMaterial(),
                     material.getTotal());
@@ -190,7 +190,7 @@ public class DevopProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/addMaterial: " + e.toString());
+            Bukkit.getLogger().info("ERROR: DevopProject/addMaterial: " + e.toString());
         }
     }
 
@@ -198,7 +198,7 @@ public class DevopProject
     {
         try
         {
-            DB.executeUpdate("UPDATE mint_material SET complete = 1, focused = 0 WHERE material_id = ?",
+            DB.executeUpdate("UPDATE devop_material SET complete = 1, focused = 0 WHERE material_id = ?",
                     materials.get(materialID).getId());
             materials.get(materialID).setComplete(1);
             materials.get(materialID).setFocused(0);
@@ -215,7 +215,7 @@ public class DevopProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/completeMaterial: " + e.toString());
+            Bukkit.getLogger().info("ERROR: DevopProject/completeMaterial: " + e.toString());
         }
     }
 
@@ -225,19 +225,19 @@ public class DevopProject
         {
             if(formerMaterial != null)
             {
-                DB.executeUpdate("UPDATE mint_material SET focused = 0 WHERE material_id = ?",
+                DB.executeUpdate("UPDATE devop_material SET focused = 0 WHERE material_id = ?",
                         formerMaterial.getId());
                 formerMaterial.setFocused(0);
             }
 
-            DB.executeUpdate("UPDATE mint_material SET focused = 1 WHERE material_id = ?",
+            DB.executeUpdate("UPDATE devop_material SET focused = 1 WHERE material_id = ?",
                     newMaterial.getId());
             newMaterial.setFocused(1);
             focusedMaterial = newMaterial;
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/switchMaterialFocus: " + e.toString());
+            Bukkit.getLogger().info("ERROR: DevopProject/switchMaterialFocus: " + e.toString());
         }
     }
 
@@ -245,13 +245,13 @@ public class DevopProject
     {
         try
         {
-            DB.executeUpdate("DELETE FROM mint_material WHERE material_id = ?",
+            DB.executeUpdate("DELETE FROM devop_material WHERE material_id = ?",
                     material.getId());
             materials.remove(material.getId());
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/deleteMaterial: " + e.toString());
+            Bukkit.getLogger().info("ERROR: DevopProject/deleteMaterial: " + e.toString());
         }
     }
 
@@ -259,7 +259,7 @@ public class DevopProject
     {
         try
         {
-            long logID = DB.executeInsert("INSERT INTO mint_log_task (project_id, logged_by, validated_by, validated, time_worked, log_date, description) VALUES (?, ?, ?, 0, ?, ?, ?)",
+            long logID = DB.executeInsert("INSERT INTO devop_log_task (project_id, logged_by, validated_by, validated, time_worked, log_date, description) VALUES (?, ?, ?, 0, ?, ?, ?)",
                     id,
                     log.getLogger().getId(),
                     null,
@@ -271,7 +271,7 @@ public class DevopProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/addTaskLog: " + e.toString());
+            Bukkit.getLogger().info("ERROR: DevopProject/addTaskLog: " + e.toString());
         }
     }
 
@@ -279,7 +279,7 @@ public class DevopProject
     {
         try
         {
-            long logID = DB.executeInsert("INSERT INTO mint_log_material (project_id, material_id, logged_by, validated_by, validated, material_collected, time_worked, log_date, description) VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?)",
+            long logID = DB.executeInsert("INSERT INTO devop_log_material (project_id, material_id, logged_by, validated_by, validated, material_collected, time_worked, log_date, description) VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?)",
                     id,
                     log.getMaterialID(),
                     log.getLogger().getId(),
@@ -294,7 +294,7 @@ public class DevopProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/addMaterialLog: " + e.toString());
+            Bukkit.getLogger().info("ERROR: DevopProject/addMaterialLog: " + e.toString());
         }
     }
 
@@ -314,14 +314,14 @@ public class DevopProject
     {
         try
         {
-            DB.executeUpdate("UPDATE mint_material set focused = 0 WHERE material_id = ?",
+            DB.executeUpdate("UPDATE devop_material set focused = 0 WHERE material_id = ?",
                     material.getId());
             material.setFocused(0);
             focusedMaterial = null;
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/unFocusMaterial: " + e.toString());
+            Bukkit.getLogger().info("ERROR: DevopProject/unFocusMaterial: " + e.toString());
         }
     }
 
@@ -332,14 +332,14 @@ public class DevopProject
 
         try
         {
-            DB.executeUpdate("UPDATE mint_material set collected = ? WHERE material_id = ?",
+            DB.executeUpdate("UPDATE devop_material set collected = ? WHERE material_id = ?",
                     totalCollected,
                     material.getId());
             material.setCollected(totalCollected);
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/updateMaterial: " + e.toString());
+            Bukkit.getLogger().info("ERROR: DevopProject/updateMaterial: " + e.toString());
         }
 
         if(totalCollected >= material.getTotal())
@@ -355,10 +355,10 @@ public class DevopProject
         {
             try
             {
-                DB.executeUpdate("DELETE FROM mint_log_material WHERE log_id = ?",
+                DB.executeUpdate("DELETE FROM devop_log_material WHERE log_id = ?",
                         devopLogMaterial.getId());
 
-                DB.executeUpdate("UPDATE mint_material set collected = ? WHERE material_id = ?",
+                DB.executeUpdate("UPDATE devop_material set collected = ? WHERE material_id = ?",
                         (devopMaterial.getCollected() - devopLogMaterial.getMaterialCollected()),
                         devopMaterial.getId());
                 devopMaterial.setCollected(devopMaterial.getCollected() - devopLogMaterial.getMaterialCollected());
@@ -416,7 +416,7 @@ public class DevopProject
             }
             catch(SQLException e)
             {
-                Bukkit.getLogger().info("ERROR: MintProject/validateTask/Yes: " + e.toString());
+                Bukkit.getLogger().info("ERROR: DevopProject/validateTask/Yes: " + e.toString());
                 return;
             }
             devopLogTask.setValidater(validator);
