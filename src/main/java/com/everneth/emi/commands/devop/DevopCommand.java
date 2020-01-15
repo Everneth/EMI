@@ -30,26 +30,26 @@ public class DevopCommand extends BaseCommand
 {
     @Dependency
     private Plugin plugin;
-    private String mintProjectTag = "&7[&dMint&5Pro&7] ";
+    private String devopProjectTag = "&7[&dDev&5op&7] ";
 
     //TODO add tab-complete
     @Subcommand("log material")
     @Syntax("<Project> <Material> <Amount> <TimeWorked> <Description>")
-    @CommandPermission("emi.mint.log")
-    public void onLogMaterial(Player player, String mintProject, String materialString, int amount, String time, String[] description)
+    @CommandPermission("emi.devop.log")
+    public void onLogMaterial(Player player, String devopProject, String materialString, int amount, String time, String[] description)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(mintProject);
+        DevopProject project = manager.getProject(devopProject);
 
         if(project == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cLog can't be sent because the project is complete!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cLog can't be sent because the project is complete!"));
             return;
         }
 
@@ -57,13 +57,13 @@ public class DevopCommand extends BaseCommand
 
         if(material == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial isn't associated with this project!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cMaterial isn't associated with this project!"));
             return;
         }
 
         if(material.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial has already been completed!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cMaterial has already been completed!"));
             return;
         }
 
@@ -71,7 +71,7 @@ public class DevopCommand extends BaseCommand
 
         if(timeWorked == -1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cInvalid time format, must be HOURS:MINUTES (00:00)!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cInvalid time format, must be HOURS:MINUTES (00:00)!"));
             return;
         }
 
@@ -79,27 +79,27 @@ public class DevopCommand extends BaseCommand
         DevopLogMaterial log = new DevopLogMaterial(project.getId(), material.getId(), logger, null, 0, amount, timeWorked, Utils.getCurrentDate(), Utils.buildMessage(description, 0, false));
 
         project.addMaterialLog(log);
-        player.sendMessage(Utils.color(mintProjectTag + "&aMaterial log submitted for validation!"));
+        player.sendMessage(Utils.color(devopProjectTag + "&aMaterial log submitted for validation!"));
     }
 
     //TODO add tab-complete
     @Subcommand("log task")
     @Syntax("<Project> <TimeWorked> <Description>")
-    @CommandPermission("emi.mint.log")
-    public void onLogTask(Player player, String mintProject, String time, String[] description)
+    @CommandPermission("emi.devop.log")
+    public void onLogTask(Player player, String devopProject, String time, String[] description)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(mintProject);
+        DevopProject project = manager.getProject(devopProject);
 
         if(project == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cLog can't be sent because the project is complete!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cLog can't be sent because the project is complete!"));
             return;
         }
 
@@ -107,7 +107,7 @@ public class DevopCommand extends BaseCommand
 
         if(timeWorked == -1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cInvalid time format, must be HOURS:MINUTES (00:00)!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cInvalid time format, must be HOURS:MINUTES (00:00)!"));
             return;
         }
 
@@ -115,27 +115,27 @@ public class DevopCommand extends BaseCommand
         DevopLogTask log = new DevopLogTask(project.getId(), logger, null, 0, timeWorked, Utils.getCurrentDate(), Utils.buildMessage(description, 0, false));
 
         project.addTaskLog(log);
-        player.sendMessage(Utils.color(mintProjectTag + "&aTask log submitted for validation!"));
+        player.sendMessage(Utils.color(devopProjectTag + "&aTask log submitted for validation!"));
     }
 
     //TODO add tab-complete
     @Subcommand("material complete")
     @Syntax("<Project> <Material>")
-    @CommandPermission("emi.mint.material.complete")
-    public void onMaterialComplete(Player player, String mintProject, String materialString)
+    @CommandPermission("emi.devop.material.complete")
+    public void onMaterialComplete(Player player, String devopProject, String materialString)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(mintProject);
+        DevopProject project = manager.getProject(devopProject);
 
         if(project == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial can't be completed because the project is complete!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cMaterial can't be completed because the project is complete!"));
             return;
         }
 
@@ -143,64 +143,64 @@ public class DevopCommand extends BaseCommand
 
         if(material == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial isn't associated with any in this project!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cMaterial isn't associated with any in this project!"));
             return;
         }
 
         if(material.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial has already been completed!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cMaterial has already been completed!"));
             return;
         }
         project.completeMaterial(material.getId());
-        player.sendMessage(Utils.color(mintProjectTag + "&aMaterial Completed!"));
+        player.sendMessage(Utils.color(devopProjectTag + "&aMaterial Completed!"));
     }
 
     //TODO add tab-complete
     @Subcommand("material add")
     @Syntax("<Project> <Material> <Amount>")
-    @CommandPermission("emi.mint.material.add")
-    public void onMaterialCreate(Player player, String mintProject, String materialString, int amount)
+    @CommandPermission("emi.devop.material.add")
+    public void onMaterialCreate(Player player, String devopProject, String materialString, int amount)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(mintProject);
+        DevopProject project = manager.getProject(devopProject);
 
         if(project == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial can't be added because the project is complete!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cMaterial can't be added because the project is complete!"));
             return;
         }
 
         DevopMaterial material = new DevopMaterial(project.getId(), materialString, amount, 0, 0, 0);
 
         project.addMaterial(material);
-        player.sendMessage(Utils.color(mintProjectTag + "&aMaterial added!"));
+        player.sendMessage(Utils.color(devopProjectTag + "&aMaterial added!"));
     }
 
     //TODO add tab-complete
     @Subcommand("material delete")
     @Syntax("<Project> <Material>")
-    @CommandPermission("emi.mint.material.delete")
-    public void onMaterialDelete(Player player, String mintProject, String materialString)
+    @CommandPermission("emi.devop.material.delete")
+    public void onMaterialDelete(Player player, String devopProject, String materialString)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(mintProject);
+        DevopProject project = manager.getProject(devopProject);
 
         if(project == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial can't be deleted because the project is complete!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cMaterial can't be deleted because the project is complete!"));
             return;
         }
 
@@ -208,32 +208,32 @@ public class DevopCommand extends BaseCommand
 
         if(material == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial isn't associated with any in this project!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cMaterial isn't associated with any in this project!"));
             return;
         }
 
         project.deleteMaterial(material);
-        player.sendMessage(Utils.color(mintProjectTag + "&aMaterial deleted!"));
+        player.sendMessage(Utils.color(devopProjectTag + "&aMaterial deleted!"));
     }
 
     //TODO add tab-complete
     @Subcommand("material focus")
     @Syntax("<Project> <Material>")
-    @CommandPermission("emi.mint.material.focus")
-    public void onMaterialFocus(Player player, String mintProject, String materialString)
+    @CommandPermission("emi.devop.material.focus")
+    public void onMaterialFocus(Player player, String devopProject, String materialString)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(mintProject);
+        DevopProject project = manager.getProject(devopProject);
 
         if(project == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial can't be focused because the project is complete!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cMaterial can't be focused because the project is complete!"));
             return;
         }
 
@@ -241,20 +241,20 @@ public class DevopCommand extends BaseCommand
 
         if(material == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial isn't associated with any in this project!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cMaterial isn't associated with any in this project!"));
             return;
         }
 
         if(material.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial can't be focused because the material is complete!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cMaterial can't be focused because the material is complete!"));
             return;
         }
 
         if(material.getFocused() == 1)
         {
             project.unFocusMaterial(material);
-            player.sendMessage(Utils.color(mintProjectTag + "&cMaterial unfocused!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cMaterial unfocused!"));
             return;
         }
 
@@ -270,27 +270,27 @@ public class DevopCommand extends BaseCommand
         }
 
         project.switchMaterialFocus(material, formerMaterial);
-        player.sendMessage(Utils.color(mintProjectTag + "&aMaterial focused!"));
+        player.sendMessage(Utils.color(devopProjectTag + "&aMaterial focused!"));
     }
 
     //TODO add tab-complete
     @Subcommand("material list")
     @Syntax("<Project>")
-    @CommandPermission("emi.mint.material.list")
-    public void onMaterialList(Player player, String mintProject)
+    @CommandPermission("emi.devop.material.list")
+    public void onMaterialList(Player player, String devopProject)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(mintProject);
+        DevopProject project = manager.getProject(devopProject);
 
         if(project == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getMaterials().isEmpty())
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cNo materials to list!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cNo materials to list!"));
             return;
         }
 
@@ -314,9 +314,9 @@ public class DevopCommand extends BaseCommand
             }
         }
 
-        player.sendMessage(Utils.color(mintProjectTag + "&aMaterials for &6" + project.getName()));
+        player.sendMessage(Utils.color(devopProjectTag + "&aMaterials for &6" + project.getName()));
 
-        player.sendMessage(Utils.color(mintProjectTag + "&aMaterials:"));
+        player.sendMessage(Utils.color(devopProjectTag + "&aMaterials:"));
 
         if(focusedMaterial != null)
         {
@@ -334,40 +334,40 @@ public class DevopCommand extends BaseCommand
         }
     }
 
-    //TODO Add tab-complete to mintProject, add complete check
+    //TODO Add tab-complete to devopProject, add complete check
     @Subcommand("project complete")
     @Syntax("<Project>")
-    @CommandPermission("emi.mint.project.complete")
-    public void onProjectComplete(Player player, String mintProject)
+    @CommandPermission("emi.devop.project.complete")
+    public void onProjectComplete(Player player, String devopProject)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(mintProject);
+        DevopProject project = manager.getProject(devopProject);
 
         if(project == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject has already been completed!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject has already been completed!"));
             return;
         }
 
         if(!project.getMaterialLogValidation().isEmpty() && !project.getTaskLogValidation().isEmpty())
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject can't be completed because not all of the logs have been validated!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject can't be completed because not all of the logs have been validated!"));
             return;
         }
         project.completeProject();
-        player.sendMessage(Utils.color(mintProjectTag + "&aProject completed!"));
+        player.sendMessage(Utils.color(devopProjectTag + "&aProject completed!"));
     }
 
     //TODO add tab-complete
     @Subcommand("project create")
     @Syntax("<Project> <Lead> <Description>")
-    @CommandPermission("emi.mint.project.create")
+    @CommandPermission("emi.devop.project.create")
     public void onProjectCreate(Player player, String projectName, String lead, String[] description)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
@@ -375,7 +375,7 @@ public class DevopCommand extends BaseCommand
 
         if(project != null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject already exists!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject already exists!"));
             return;
         }
 
@@ -383,7 +383,7 @@ public class DevopCommand extends BaseCommand
 
         if(dbPlayerLead == null || dbPlayerLead.isEmpty())
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cUnrecognized player, did you spell the name correctly?"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cUnrecognized player, did you spell the name correctly?"));
             return;
         }
 
@@ -392,14 +392,14 @@ public class DevopCommand extends BaseCommand
         project = new DevopProject(playerLead, projectName, Utils.getCurrentDate(), null, 0, 0, Utils.buildMessage(description, 0, false));
 
         manager.addProject(project);
-        player.sendMessage(Utils.color(mintProjectTag + "&aSuccessfully created the project!"));
-        player.performCommand("mint project join " + project.getName());
+        player.sendMessage(Utils.color(devopProjectTag + "&aSuccessfully created the project!"));
+        player.performCommand("devop project join " + project.getName());
     }
 
     //TODO add tab-complete
     @Subcommand("project focus")
     @Syntax("<Project>")
-    @CommandPermission("emi.mint.project.focus")
+    @CommandPermission("emi.devop.project.focus")
     public void onProjectFocus(Player player, String projectName)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
@@ -407,20 +407,20 @@ public class DevopCommand extends BaseCommand
 
         if(project == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject can't be focused because it's complete!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject can't be focused because it's complete!"));
             return;
         }
 
         if(project.getFocused() == 1)
         {
             manager.unFocus(project);
-            player.sendMessage(Utils.color(mintProjectTag + "&aProject unfocused!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&aProject unfocused!"));
             return;
         }
 
@@ -436,13 +436,13 @@ public class DevopCommand extends BaseCommand
         }
 
         manager.switchFocus(project, formerProject);
-        player.sendMessage(Utils.color(mintProjectTag + "&aProject focused!"));
+        player.sendMessage(Utils.color(devopProjectTag + "&aProject focused!"));
     }
 
     // TODO add tab-complete
     @Subcommand("project info")
     @Syntax("<Project>")
-    @CommandPermission("emi.mint.project.info")
+    @CommandPermission("emi.devop.project.info")
     public void onProjectInfo(Player player, String projectName)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
@@ -450,7 +450,7 @@ public class DevopCommand extends BaseCommand
 
         if(project == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
@@ -484,7 +484,7 @@ public class DevopCommand extends BaseCommand
             workers.add(emiPlayer.getName());
         }
 
-        player.sendMessage(Utils.color(mintProjectTag + "&aInformation for &6" + project.getName() + " &aby &6" + project.getLeader().getName() + "\n" +
+        player.sendMessage(Utils.color(devopProjectTag + "&aInformation for &6" + project.getName() + " &aby &6" + project.getLeader().getName() + "\n" +
                 "&aDates: &6" + decodeDate(project.getStartDate()) + " &ato &6" + endDate + "\n" +
                 "&aDescription: &6" + project.getDescription() + "\n" +
                 "&aFocused task: &6" + focusedTaskString + "\n" +
@@ -495,21 +495,21 @@ public class DevopCommand extends BaseCommand
     //TODO add tab-complete
     @Subcommand("project join")
     @Syntax("<Project>")
-    @CommandPermission("emi.mint.project.join")
-    public void onProjectJoin(Player player, String mintProject)
+    @CommandPermission("emi.devop.project.join")
+    public void onProjectJoin(Player player, String devopProject)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(mintProject);
+        DevopProject project = manager.getProject(devopProject);
 
         if(project == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cCan't join project because it's complete!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cCan't join project because it's complete!"));
             return;
         }
 
@@ -517,7 +517,7 @@ public class DevopCommand extends BaseCommand
         {
             if(emiPlayer.getUniqueId().equalsIgnoreCase(player.getUniqueId().toString()))
             {
-                player.sendMessage(Utils.color(mintProjectTag + "&cYou're already part of this project!"));
+                player.sendMessage(Utils.color(devopProjectTag + "&cYou're already part of this project!"));
                 return;
             }
         }
@@ -525,18 +525,18 @@ public class DevopCommand extends BaseCommand
         EMIPlayer emiPlayer = PlayerUtils.getEMIPlayer(player.getName());
 
         project.addWorker(emiPlayer);
-        player.sendMessage(Utils.color(mintProjectTag + "&aSuccessfully joined the project!"));
+        player.sendMessage(Utils.color(devopProjectTag + "&aSuccessfully joined the project!"));
     }
 
     @Subcommand("project list")
-    @CommandPermission("emi.mint.project.list")
+    @CommandPermission("emi.devop.project.list")
     public void onProjectList(Player player)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
 
         if(manager.getProjects().isEmpty())
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cNo projects to list!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cNo projects to list!"));
             return;
         }
 
@@ -560,7 +560,7 @@ public class DevopCommand extends BaseCommand
             }
         }
 
-        player.sendMessage(Utils.color(mintProjectTag + "&6Projects:"));
+        player.sendMessage(Utils.color(devopProjectTag + "&6Projects:"));
 
         if(focusedProject != null)
         {
@@ -580,25 +580,25 @@ public class DevopCommand extends BaseCommand
 
     @Subcommand("project work")
     @Syntax("<Project>")
-    @CommandPermission("emi.mint.project.work")
-    public void onWork(Player player, String mintProject)
+    @CommandPermission("emi.devop.project.work")
+    public void onWork(Player player, String devopProject)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(mintProject);
+        DevopProject project = manager.getProject(devopProject);
 
         if(project == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cNo work for this project because it's complete!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cNo work for this project because it's complete!"));
             return;
         }
 
-        player.sendMessage(Utils.color(mintProjectTag + "&aWork needed:"));
+        player.sendMessage(Utils.color(devopProjectTag + "&aWork needed:"));
 
         int totalLoops = 0;
         boolean isThereWork = false;
@@ -645,56 +645,56 @@ public class DevopCommand extends BaseCommand
 
     @Subcommand("task complete")
     @Syntax("<Project> <taskID>")
-    @CommandPermission("emi.mint.task.complete")
-    public void onTaskComplete(Player player, String mintProject, long taskID)
+    @CommandPermission("emi.devop.task.complete")
+    public void onTaskComplete(Player player, String devopProject, long taskID)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(mintProject);
+        DevopProject project = manager.getProject(devopProject);
 
         if(project == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cTask can't be completed because the project is complete!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cTask can't be completed because the project is complete!"));
             return;
         }
 
         if(project.getTasks().get(taskID) == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cTaskID isnt associated with any tasks!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cTaskID isnt associated with any tasks!"));
             return;
         }
 
         if(project.getTasks().get(taskID).getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cTask has already been completed!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cTask has already been completed!"));
             return;
         }
         project.completeTask(taskID);
-        player.sendMessage(Utils.color(mintProjectTag + "&aTask completed!"));
+        player.sendMessage(Utils.color(devopProjectTag + "&aTask completed!"));
     }
 
     @Subcommand("task add")
     @Syntax("<Project> <Task>")
-    @CommandPermission("emi.mint.task.add")
-    public void onTaskCreate(Player player, String mintProject, String[] taskParts)
+    @CommandPermission("emi.devop.task.add")
+    public void onTaskCreate(Player player, String devopProject, String[] taskParts)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(mintProject);
+        DevopProject project = manager.getProject(devopProject);
 
         if(project == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cTask cant be added because the project is complete!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cTask cant be added because the project is complete!"));
             return;
         }
 
@@ -702,26 +702,26 @@ public class DevopCommand extends BaseCommand
         DevopTask task = new DevopTask(project.getId(), taskString, 0, 0);
 
         project.addTask(task);
-        player.sendMessage(Utils.color(mintProjectTag + "&aTask added!"));
+        player.sendMessage(Utils.color(devopProjectTag + "&aTask added!"));
     }
 
     @Subcommand("task delete")
     @Syntax("<Project> <TaskID>")
-    @CommandPermission("emi.mint.task.delete")
-    public void onTaskDelete(Player player, String mintProject, long taskID)
+    @CommandPermission("emi.devop.task.delete")
+    public void onTaskDelete(Player player, String devopProject, long taskID)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(mintProject);
+        DevopProject project = manager.getProject(devopProject);
 
         if (project == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cTask can't be deleted because the project is complete!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cTask can't be deleted because the project is complete!"));
             return;
         }
 
@@ -729,31 +729,31 @@ public class DevopCommand extends BaseCommand
 
         if(task == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cTaskID isnt associated with any tasks!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cTaskID isnt associated with any tasks!"));
             return;
         }
 
         project.deleteTask(task);
-        player.sendMessage(Utils.color(mintProjectTag + "&aTask deleted!"));
+        player.sendMessage(Utils.color(devopProjectTag + "&aTask deleted!"));
     }
 
     @Subcommand("task focus")
     @Syntax("<Project> <taskID>")
-    @CommandPermission("emi.mint.task.focus")
-    public void onTaskFocus(Player player, String mintProject, long taskID)
+    @CommandPermission("emi.devop.task.focus")
+    public void onTaskFocus(Player player, String devopProject, long taskID)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(mintProject);
+        DevopProject project = manager.getProject(devopProject);
 
         if(project == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cTask can't be focused because the project is complete!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cTask can't be focused because the project is complete!"));
             return;
         }
 
@@ -761,20 +761,20 @@ public class DevopCommand extends BaseCommand
 
         if(task == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cTaskID isnt associated with any tasks."));
+            player.sendMessage(Utils.color(devopProjectTag + "&cTaskID isnt associated with any tasks."));
             return;
         }
 
         if(task.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cTask can't be focused because the task is complete!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cTask can't be focused because the task is complete!"));
             return;
         }
 
         if(task.getFocused() == 1)
         {
             project.unFocusTask(task);
-            player.sendMessage(Utils.color(mintProjectTag + "&cTask unfocused!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cTask unfocused!"));
             return;
         }
 
@@ -790,26 +790,26 @@ public class DevopCommand extends BaseCommand
         }
 
         project.switchTaskFocus(task, formerTask);
-        player.sendMessage(Utils.color(mintProjectTag + "&aTask focused!"));
+        player.sendMessage(Utils.color(devopProjectTag + "&aTask focused!"));
     }
 
     @Subcommand("task list")
     @Syntax("<Project>")
-    @CommandPermission("emi.mint.task.list")
-    public void onTaskList(Player player, String mintProject)
+    @CommandPermission("emi.devop.task.list")
+    public void onTaskList(Player player, String devopProject)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(mintProject);
+        DevopProject project = manager.getProject(devopProject);
 
         if(project == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getTasks().isEmpty())
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cNo tasks to list!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cNo tasks to list!"));
             return;
         }
 
@@ -833,11 +833,11 @@ public class DevopCommand extends BaseCommand
             }
         }
 
-        player.sendMessage(Utils.color(mintProjectTag + "&aTasks for &6" + project.getName()));
+        player.sendMessage(Utils.color(devopProjectTag + "&aTasks for &6" + project.getName()));
 
         if(focusedTask != null)
         {
-            if(player.hasPermission("emi.mint.view.taskid"))
+            if(player.hasPermission("emi.devop.view.taskid"))
             {
                 player.sendMessage(Utils.color("&aFocused: &7[&9" + focusedTask.getId() + "&7] &6" + focusedTask.getTask()));
             }
@@ -849,7 +849,7 @@ public class DevopCommand extends BaseCommand
 
         if(!currentTasks.isEmpty())
         {
-            if(player.hasPermission("emi.mint.view.taskid"))
+            if(player.hasPermission("emi.devop.view.taskid"))
             {
                 player.sendMessage(Utils.color("&aCurrent: " + buildTaskList(currentTasks, true)));
             }
@@ -861,7 +861,7 @@ public class DevopCommand extends BaseCommand
 
         if(!completeTasks.isEmpty())
         {
-            if(player.hasPermission("emi.mint.view.taskid"))
+            if(player.hasPermission("emi.devop.view.taskid"))
             {
                 player.sendMessage(Utils.color("&aComplete: " + buildTaskList(completeTasks, true)));
             }
@@ -874,21 +874,21 @@ public class DevopCommand extends BaseCommand
 
     @Subcommand("validate")
     @Syntax("<Project>")
-    @CommandPermission("emi.mint.validate")
-    public void onValidate(Player player, String mintProject)
+    @CommandPermission("emi.devop.validate")
+    public void onValidate(Player player, String devopProject)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(mintProject);
+        DevopProject project = manager.getProject(devopProject);
 
         if(project == null)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cNothing to validate because project is complete!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cNothing to validate because project is complete!"));
             return;
         }
 
@@ -897,8 +897,8 @@ public class DevopCommand extends BaseCommand
             if(project.getQueuedValidateMaterial().containsKey(player.getUniqueId()))
             {
                 DevopLogMaterial devopLogMaterial = project.getQueuedValidateMaterial().get(player.getUniqueId());
-                player.spigot().sendMessage(buildValidationMessage(mintProject));
-                player.sendMessage(Utils.color(mintProjectTag + "&6" + devopLogMaterial.getLogger().getName() +
+                player.spigot().sendMessage(buildValidationMessage(devopProject));
+                player.sendMessage(Utils.color(devopProjectTag + "&6" + devopLogMaterial.getLogger().getName() +
                         " &agathered &6" + devopLogMaterial.getMaterialCollected() + " " + project.getMaterials().get(devopLogMaterial.getMaterialID()).getMaterial() +
                         " &ain the time of &6" + decodeTime(devopLogMaterial.getTimeWorked()) +
                         " &aon the date of: &6" + decodeDate(devopLogMaterial.getLogDate()) + "."));
@@ -908,8 +908,8 @@ public class DevopCommand extends BaseCommand
             if(project.getQueuedValidateTask().containsKey(player.getUniqueId()))
             {
                 DevopLogTask devopLogTask = project.getQueuedValidateTask().get(player.getUniqueId());
-                player.spigot().sendMessage(buildValidationMessage(mintProject));
-                player.sendMessage(Utils.color(mintProjectTag + "&6" + devopLogTask.getLogger().getName() +
+                player.spigot().sendMessage(buildValidationMessage(devopProject));
+                player.sendMessage(Utils.color(devopProjectTag + "&6" + devopLogTask.getLogger().getName() +
                         " &aworked on: &6" + devopLogTask.getDescription() +
                         " &ain the time of &6" + decodeTime(devopLogTask.getTimeWorked()) +
                         " &aon the date of: &6" + decodeDate(devopLogTask.getLogDate()) + "."));
@@ -919,7 +919,7 @@ public class DevopCommand extends BaseCommand
 
         if(project.getMaterialLogValidation().isEmpty() && project.getTaskLogValidation().isEmpty())
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cNo logs to validate!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cNo logs to validate!"));
             return;
         }
 
@@ -928,8 +928,8 @@ public class DevopCommand extends BaseCommand
             DevopLogMaterial materialLog = project.getMaterialLogValidation().values().iterator().next();
             project.getQueuedValidateMaterial().put(player.getUniqueId(), materialLog);
             project.getMaterialLogValidation().remove(materialLog.getId());
-            player.spigot().sendMessage(buildValidationMessage(mintProject));
-            player.sendMessage(Utils.color(mintProjectTag + "&6" + materialLog.getLogger().getName() +
+            player.spigot().sendMessage(buildValidationMessage(devopProject));
+            player.sendMessage(Utils.color(devopProjectTag + "&6" + materialLog.getLogger().getName() +
                     " &agathered &6" + materialLog.getMaterialCollected() + " " + project.getMaterials().get(materialLog.getMaterialID()).getMaterial() +
                     " &ain the time of &6" + decodeTime(materialLog.getTimeWorked()) +
                     " &aon the date of: &6" + decodeDate(materialLog.getLogDate()) + "."));
@@ -941,8 +941,8 @@ public class DevopCommand extends BaseCommand
             DevopLogTask taskLog = project.getTaskLogValidation().values().iterator().next();
             project.getQueuedValidateTask().put(player.getUniqueId(), taskLog);
             project.getTaskLogValidation().remove(taskLog.getId());
-            player.spigot().sendMessage(buildValidationMessage(mintProject));
-            player.sendMessage(Utils.color(mintProjectTag + "&6" + taskLog.getLogger().getName() +
+            player.spigot().sendMessage(buildValidationMessage(devopProject));
+            player.sendMessage(Utils.color(devopProjectTag + "&6" + taskLog.getLogger().getName() +
                     " &aworked on: &6" + taskLog.getDescription() +
                     " &ain the time of &6" + decodeTime(taskLog.getTimeWorked()) +
                     " &aon the date of: &6" + decodeDate(taskLog.getLogDate()) + "."));
@@ -951,12 +951,12 @@ public class DevopCommand extends BaseCommand
 
     @Subcommand("validateyes")
     @Syntax("<Project>")
-    @CommandPermission("emi.mint.validate")
+    @CommandPermission("emi.devop.validate")
     @Private
-    public void onValidateYes(Player player, String mintProject)
+    public void onValidateYes(Player player, String devopProject)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(mintProject);
+        DevopProject project = manager.getProject(devopProject);
         EMIPlayer validator = PlayerUtils.getEMIPlayer(player.getName());
 
         if(project.getQueuedValidateMaterial().containsKey(player.getUniqueId()))
@@ -969,21 +969,21 @@ public class DevopCommand extends BaseCommand
         }
         else
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cNo logs have been queued for you!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cNo logs have been queued for you!"));
             return;
         }
 
-        player.sendMessage(Utils.color(mintProjectTag + "&aLog has been approved!"));
+        player.sendMessage(Utils.color(devopProjectTag + "&aLog has been approved!"));
     }
 
     @Subcommand("validateno")
     @Syntax("<Project>")
-    @CommandPermission("emi.mint.validate")
+    @CommandPermission("emi.devop.validate")
     @Private
-    public void onValidateNo(Player player, String mintProject)
+    public void onValidateNo(Player player, String devopProject)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(mintProject);
+        DevopProject project = manager.getProject(devopProject);
         EMIPlayer validator = PlayerUtils.getEMIPlayer(player.getName());
 
         if(project.getQueuedValidateMaterial().containsKey(player.getUniqueId()))
@@ -996,24 +996,24 @@ public class DevopCommand extends BaseCommand
         }
         else
         {
-            player.sendMessage(Utils.color(mintProjectTag + "&cNo logs have been queued for you!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cNo logs have been queued for you!"));
             return;
         }
 
-        player.sendMessage(Utils.color(mintProjectTag + "&aLog has been rejected!"));
+        player.sendMessage(Utils.color(devopProjectTag + "&aLog has been rejected!"));
     }
 
-    private TextComponent buildValidationMessage(String mintProject)
+    private TextComponent buildValidationMessage(String devopProject)
     {
         TextComponent messageYes = new TextComponent(Utils.color("&aYes"));
-        messageYes.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mint validateyes " + mintProject));
+        messageYes.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/devop validateyes " + devopProject));
         messageYes.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to validate this log").color(ChatColor.DARK_GREEN).create()));
 
         TextComponent messageNo = new TextComponent(Utils.color("&cNo"));
-        messageNo.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mint validateno " + mintProject));
+        messageNo.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/devop validateno " + devopProject));
         messageNo.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to deny the log").color(ChatColor.DARK_RED).create()));
 
-        TextComponent messagePart1 = new TextComponent(Utils.color(mintProjectTag + "&6Do you want to validate this log? &7["));
+        TextComponent messagePart1 = new TextComponent(Utils.color(devopProjectTag + "&6Do you want to validate this log? &7["));
         TextComponent messagePart2 = new TextComponent(Utils.color("&7] &6or &7["));
         TextComponent messagePart3 = new TextComponent(Utils.color("&7]"));
 
@@ -1044,7 +1044,7 @@ public class DevopCommand extends BaseCommand
         }
         catch(NumberFormatException e)
         {
-            Bukkit.getLogger().info("ERROR: MintCommand/processTimeString: " + e.toString());
+            Bukkit.getLogger().info("ERROR: devopCommand/processTimeString: " + e.toString());
             return -1;
         }
 

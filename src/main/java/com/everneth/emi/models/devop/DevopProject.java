@@ -365,7 +365,7 @@ public class DevopProject
             }
             catch(SQLException e)
             {
-                Bukkit.getLogger().info("ERROR: MintProject/validateMaterial/No: " + e.toString());
+                Bukkit.getLogger().info("ERROR: DevopProject/validateMaterial/No: " + e.toString());
                 return;
             }
         }
@@ -373,13 +373,13 @@ public class DevopProject
         {
             try
             {
-                DB.executeUpdate("UPDATE mint_log_material set validated_by = ?, validated = 1 WHERE log_id = ?",
+                DB.executeUpdate("UPDATE devop_log_material set validated_by = ?, validated = 1 WHERE log_id = ?",
                         validator.getId(),
                         devopLogMaterial.getId());
             }
             catch(SQLException e)
             {
-                Bukkit.getLogger().info("ERROR: MintProject/validateMaterial/Yes: " + e.toString());
+                Bukkit.getLogger().info("ERROR: DevopProject/validateMaterial/Yes: " + e.toString());
                 return;
             }
             devopLogMaterial.setValidater(validator);
@@ -397,12 +397,12 @@ public class DevopProject
         {
             try
             {
-                DB.executeUpdate("DELETE FROM mint_log_task WHERE log_id = ?",
+                DB.executeUpdate("DELETE FROM devop_log_task WHERE log_id = ?",
                         devopLogTask.getId());
             }
             catch(SQLException e)
             {
-                Bukkit.getLogger().info("ERROR: MintProject/validateTask/No: " + e.toString());
+                Bukkit.getLogger().info("ERROR: DevopProject/validateTask/No: " + e.toString());
                 return;
             }
         }
@@ -410,7 +410,7 @@ public class DevopProject
         {
             try
             {
-                DB.executeUpdate("UPDATE mint_log_task set validated_by = ?, validated = 1 WHERE log_id = ?",
+                DB.executeUpdate("UPDATE devop_log_task set validated_by = ?, validated = 1 WHERE log_id = ?",
                         validator.getId(),
                         devopLogTask.getId());
             }
@@ -621,6 +621,6 @@ public class DevopProject
     @Override
     public String toString()
     {
-        return "MintProject{" + "lead=" + leader + ", name='" + name + '\'' + ", startDate='" + startDate + '\'' + ", endDate='" + endDate + '\'' + ", complete=" + complete + ", focused=" + focused + ", description='" + description + '\'' + ", workLog=" + taskLog + ", materialLog=" + materialLog + ", taskRequirements=" + tasks + ", materialRequirements=" + materials + '}';
+        return "DevopProject{" + "lead=" + leader + ", name='" + name + '\'' + ", startDate='" + startDate + '\'' + ", endDate='" + endDate + '\'' + ", complete=" + complete + ", focused=" + focused + ", description='" + description + '\'' + ", workLog=" + taskLog + ", materialLog=" + materialLog + ", taskRequirements=" + tasks + ", materialRequirements=" + materials + '}';
     }
 }
