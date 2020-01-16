@@ -1,8 +1,12 @@
 package com.everneth.emi.events;
 
 import com.everneth.emi.EMI;
+import com.everneth.emi.DevopProjectManager;
 import com.everneth.emi.ReportManager;
 import com.everneth.emi.models.Report;
+import com.everneth.emi.models.devop.DevopLogMaterial;
+import com.everneth.emi.models.devop.DevopLogTask;
+import com.everneth.emi.models.devop.DevopProject;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,6 +31,24 @@ public class LeaveEvent implements Listener {
         {
             Report report = rm.findReportById(player.getUniqueId());
             EMI.getJda().getTextChannelById(report.getChannelId()).sendMessage("***" + player.getName() + "** has left the game.*").queue();
+        }
+
+        DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
+        for(DevopProject project : manager.getProjects().values())
+        {
+            if(project.getQueuedValidateMaterial().containsKey(player.getUniqueId()))
+            {
+                DevopLogMaterial devopLogMaterial = project.getQueuedValidateMaterial().get(player.getUniqueId());
+                project.getMaterialLogValidation().put(devopLogMaterial.getId(), devopLogMaterial);
+                project.getQueuedValidateMaterial().remove(player.getUniqueId());
+            }
+
+            if(project.getQueuedValidateTask().containsKey(player.getUniqueId()))
+            {
+                DevopLogTask devopLogTask = project.getQueuedValidateTask().get(player.getUniqueId());
+                project.getTaskLogValidation().put(devopLogTask.getId(), devopLogTask);
+                project.getQueuedValidateTask().remove(player.getUniqueId());
+            }
         }
     }
 }

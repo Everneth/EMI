@@ -4,13 +4,11 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import co.aikar.idb.DB;
 import com.everneth.emi.Utils;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.sql.SQLException;
-import java.util.UUID;
 
 /**
  *     Class: MintCommand
@@ -28,6 +26,7 @@ public class MintCommand extends BaseCommand {
     // TODO: Annotations & Calls
     private String message;
     private int playerId;
+    private String mintProjectTag = "&7[&dMint&5Pro&7] ";
 
     @Subcommand("motd")
     @CommandPermission("emi.mint.motd")
@@ -47,7 +46,6 @@ public class MintCommand extends BaseCommand {
             sender.sendMessage(Utils.color("&7[&dMINT&7] " + this.message));
         }
     }
-
 
     @Subcommand("motd set")
     @CommandPermission("emi.mint.motd.set")
@@ -81,6 +79,7 @@ public class MintCommand extends BaseCommand {
             sender.sendMessage(Utils.color(Utils.chatTag + " &aMint MOTD has been updated!"));
         }
     }
+
     @Subcommand("motd clear")
     @CommandPermission("emi.mint.motd.set")
     public void onClear(CommandSender sender)
