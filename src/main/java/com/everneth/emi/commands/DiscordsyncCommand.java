@@ -4,7 +4,7 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
-import com.everneth.emi.DiscordSyncManager;
+import com.everneth.emi.managers.DiscordSyncManager;
 import com.everneth.emi.EMI;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;

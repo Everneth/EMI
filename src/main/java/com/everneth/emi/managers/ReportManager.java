@@ -1,7 +1,8 @@
-package com.everneth.emi;
+package com.everneth.emi.managers;
 
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
+import com.everneth.emi.EMI;
 import com.everneth.emi.models.Report;
 
 import java.sql.SQLException;

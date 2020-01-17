@@ -15,6 +15,8 @@ import com.everneth.emi.commands.par.CharterCommand;
 import com.everneth.emi.events.JoinEvent;
 import com.everneth.emi.events.LeaveEvent;
 import com.everneth.emi.events.bot.MessageReceivedListener;
+import com.everneth.emi.managers.DevopProjectManager;
+import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.models.*;
 import com.everneth.emi.models.devop.*;
 import com.everneth.emi.utils.PlayerUtils;

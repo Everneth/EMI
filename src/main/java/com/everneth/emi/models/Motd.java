@@ -1,54 +1,64 @@
 package com.everneth.emi.models;
 
-public class Motd {
-    private int id;
-    private int playerId;
+public class Motd
+{
+    private Long id;
+    private EMIPlayer player;
+    private String tag;
     private String message;
-    private String name;
 
-
-    public Motd(int id, int playerId, String message)
+    public Motd(EMIPlayer player, String tag, String message)
     {
-        this.id = id;
-        this.playerId = playerId;
+        this.player = player;
+        this.tag = tag;
         this.message = message;
     }
 
-    public Motd(int id, int playerId, String message, String name)
+    public Motd(Long id, EMIPlayer player, String tag, String message)
     {
         this.id = id;
-        this.playerId = playerId;
+        this.player = player;
+        this.tag = tag;
         this.message = message;
-        this.name = name;
     }
 
-    public int getId() {
+    public Long getId()
+    {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id)
+    {
         this.id = id;
     }
 
-    public int getPlayerId() {
-        return playerId;
+    public EMIPlayer getPlayer()
+    {
+        return player;
     }
 
-    public void setPlayerId(int playerId) {
-        this.playerId = playerId;
+    public void setPlayerID(EMIPlayer player)
+    {
+        this.player = player;
     }
 
-    public String getMessage() {
+    public String getTag()
+    {
+        return tag;
+    }
+
+    public void setTag(String tag)
+    {
+        this.tag = tag;
+    }
+
+    public String getMessage()
+    {
         return message;
     }
 
-    public void setMessage(String message) {
+    public void setMessage(String message)
+    {
         this.message = message;
     }
-
-    public String getName()
-    {
-        return name;
-    }
-
 }

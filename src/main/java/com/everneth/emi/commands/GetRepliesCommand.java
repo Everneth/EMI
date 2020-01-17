@@ -3,7 +3,7 @@ package com.everneth.emi.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.idb.DbRow;
-import com.everneth.emi.ReportManager;
+import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.Utils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
