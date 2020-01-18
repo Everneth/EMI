@@ -65,7 +65,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>2.4.1</version>
+            <version>3.8.1_439</version>
         </dependency>
         <!--JDA-->
         <dependency>
@@ -83,7 +83,7 @@
         <dependency>
             <groupId>com.jagrosh</groupId>
             <artifactId>jda-utilities</artifactId>
-            <version>3.0.1</version>
+            <version>2.1.4</version>
             <scope>compile</scope>
             <type>pom</type>
         </dependency>
