@@ -91,7 +91,7 @@
             <groupId>org.jnbt</groupId>
             <artifactId>jnbt</artifactId>
             <version>1.4</version>
-            <scope>compiled</scope>
+            <scope>compile</scope>
         </dependency>
         <!--Spark-->
         <dependency>
