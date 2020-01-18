@@ -1,4 +1,4 @@
-package com.everneth.emi.commands.par;
+package com.everneth.emi.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;

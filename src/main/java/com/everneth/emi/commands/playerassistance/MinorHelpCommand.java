@@ -1,4 +1,4 @@
-package com.everneth.emi.commands;
+package com.everneth.emi.commands.playerassistance;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
