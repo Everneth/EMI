@@ -91,6 +91,8 @@
             <groupId>org.jnbt</groupId>
             <artifactId>jnbt</artifactId>
             <version>1.4</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}\jnbt-1.4.jar</systemPath>
         </dependency>
         <!--Spark-->
         <dependency>
