@@ -1,4 +1,5 @@
-target/
+target/*
+!target/jnbt-1.4.jar
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
