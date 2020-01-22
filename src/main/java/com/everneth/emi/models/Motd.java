@@ -2,44 +2,30 @@ package com.everneth.emi.models;
 
 public class Motd
 {
-    private Long id;
-    private EMIPlayer player;
+    private String sanitizedTag;
     private String tag;
     private String message;
 
-    public Motd(EMIPlayer player, String tag, String message)
+    public Motd(String sanitizedTag, String tag, String message)
     {
-        this.player = player;
+        this.sanitizedTag = sanitizedTag;
         this.tag = tag;
         this.message = message;
     }
 
-    public Motd(Long id, EMIPlayer player, String tag, String message)
+    public String displayMotd()
     {
-        this.id = id;
-        this.player = player;
-        this.tag = tag;
-        this.message = message;
+        return ("&7[" + tag + "&7] &f" + message);
     }
 
-    public Long getId()
+    public String getSanitizedTag()
     {
-        return id;
+        return sanitizedTag;
     }
 
-    public void setId(Long id)
+    public void setSanitizedTag(String sanitizedTag)
     {
-        this.id = id;
-    }
-
-    public EMIPlayer getPlayer()
-    {
-        return player;
-    }
-
-    public void setPlayerID(EMIPlayer player)
-    {
-        this.player = player;
+        this.sanitizedTag = sanitizedTag;
     }
 
     public String getTag()

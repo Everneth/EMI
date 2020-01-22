@@ -3,6 +3,7 @@ package com.everneth.emi.events;
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 
+import com.everneth.emi.managers.MotdManager;
 import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.Utils;
 import com.everneth.emi.EMI;
@@ -90,38 +91,13 @@ public class JoinEvent implements Listener {
           );
         }
 
-        // Prepare for futures to be turned into a list of DbRows
-        rows = new ArrayList<DbRow>();
-        motdList = new ArrayList<Motd>();
-        futureList = DB.getResultsAsync("SELECT motd_id, player_id, message, ministry_name FROM motds\n" +
-                "INNER JOIN ministries ON motds.ministry_id = ministries.ministry_id");
-        // get the results from the future
-        try {
-            rows = futureList.get();
-        }
-        catch (Exception e)
+        // Display MOTDs to player upon login.
+        MotdManager motdManager = MotdManager.getMotdManager();
+        for(Motd motd : motdManager.getMotds().values())
         {
-            System.out.print(e.getMessage());
+            player.sendMessage(Utils.color(motd.displayMotd()));
         }
-        // process it into an iterable list.
-        buildMotdList(rows);
 
-        // Send a message tot he player with all active MOTDs
-        for(Motd motd : motdList)
-        {
-            if(motd.getName().equals("interior") && !(motd.getMessage() == null))
-            {
-                player.sendMessage(Utils.color(INT_INTRO + motd.getMessage()));
-            }
-            else if(motd.getName().equals("competition") && !(motd.getMessage() == null))
-            {
-                player.sendMessage(Utils.color(COMP_INTRO + motd.getMessage()));
-            }
-            else if(motd.getName().equals("communications") && !(motd.getMessage() == null))
-            {
-                player.sendMessage(Utils.color(COMM_INTRO + motd.getMessage()));
-            }
-        }
         ReportManager rm = ReportManager.getReportManager();
         if(rm.hasActiveReport(player.getUniqueId()))
         {
@@ -130,19 +106,6 @@ public class JoinEvent implements Listener {
             {
                 player.sendMessage(Utils.color("&c[!]&f You have &6" + numMissed + " &fmissed messages on your report. Please use &c/getreplies&f to view them."));
             }
-        }
-    }
-
-    private void buildMotdList(List<DbRow> rows)
-    {
-        // get what we need and create an ArrayList of Motd objects
-        for(DbRow row : rows)
-        {
-            this.motdList.add(new Motd(
-                    row.getInt("motd_id"),
-                    row.getInt("player_id"),
-                    row.getString("message"),
-                    row.getString("ministry_name")));
         }
     }
 }

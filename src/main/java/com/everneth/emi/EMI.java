@@ -16,6 +16,7 @@ import com.everneth.emi.events.JoinEvent;
 import com.everneth.emi.events.LeaveEvent;
 import com.everneth.emi.events.bot.MessageReceivedListener;
 import com.everneth.emi.managers.DevopProjectManager;
+import com.everneth.emi.managers.MotdManager;
 import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.models.*;
 import com.everneth.emi.models.devop.*;
@@ -81,6 +82,7 @@ public class EMI extends JavaPlugin {
         initBot();
 //        initApi();
         initDevop();
+        initMotds();
     }
     @Override
     public void onDisable() {
@@ -115,6 +117,7 @@ public class EMI extends JavaPlugin {
         commandManager.registerCommand(new DiscordsyncCommand());
         commandManager.registerCommand(new CharterCommand());
         commandManager.registerCommand(new DevopCommand());
+        commandManager.registerCommand(new MotdCommand());
     }
 
     private void initBot()
@@ -354,6 +357,29 @@ public class EMI extends JavaPlugin {
                 }
             }
             manager.addProject(projectRow.getInt("project_id"), project);
+        }
+    }
+
+    public void initMotds()
+    {
+        MotdManager motdManager = MotdManager.getMotdManager();
+
+        ArrayList<DbRow> motds;
+
+        try
+        {
+            motds = new ArrayList<>(DB.getResults("SELECT * FROM motds"));
+        }
+        catch(SQLException e)
+        {
+            this.getLogger().info("ERROR: EMI/initMotds: " + e.toString());
+            return;
+        }
+
+        for(DbRow dbRow : motds)
+        {
+            Motd motd = new Motd(dbRow.getString("sanitized_tag"), dbRow.getString("tag"), dbRow.getString("message"));
+            motdManager.getMotds().put(motd.getSanitizedTag(), motd);
         }
     }
 

@@ -11,7 +11,7 @@ public class MotdManager
 {
     private static MotdManager motdManager;
     private MotdManager() {}
-    private HashMap<Long, Motd> motds = new HashMap<>();
+    private HashMap<String, Motd> motds = new HashMap<>();
     public static MotdManager getMotdManager()
     {
         if(motdManager == null)
@@ -25,12 +25,11 @@ public class MotdManager
     {
         try
         {
-            Long motdID = DB.executeInsert("INSERT INTO motds (player_id, tag, message) VALUES (?, ?, ?)",
-                    motd.getPlayer().getId(),
+            DB.executeInsert("INSERT INTO motds (sanitized_tag, tag, message) VALUES (?, ?, ?)",
+                    motd.getSanitizedTag(),
                     motd.getTag(),
                     motd.getMessage());
-            motd.setId(motdID);
-            motds.put(motdID, motd);
+            motds.put(motd.getSanitizedTag(), motd);
         }
         catch(SQLException e)
         {
@@ -38,7 +37,38 @@ public class MotdManager
         }
     }
 
-    public HashMap<Long, Motd> getMotds()
+    public void updateMotd(Motd motd)
+    {
+        try
+        {
+            DB.executeUpdate("UPDATE motds SET tag = ?, message = ? WHERE sanitized_tag = ?",
+                    motd.getTag(),
+                    motd.getMessage(),
+                    motd.getSanitizedTag());
+            motds.get(motd.getSanitizedTag()).setTag(motd.getTag());
+            motds.get(motd.getSanitizedTag()).setMessage(motd.getMessage());
+        }
+        catch(SQLException e)
+        {
+            Bukkit.getLogger().info("ERROR: MotdManager/updateMotd: " + e.toString());
+        }
+    }
+
+    public void deleteMotd(Motd motd)
+    {
+        try
+        {
+            DB.executeUpdate("DELETE FROM motds WHERE sanitized_tag = ?",
+                    motd.getSanitizedTag());
+            motds.remove(motd.getSanitizedTag());
+        }
+        catch(SQLException e)
+        {
+            Bukkit.getLogger().info("ERROR: MotdManager/deleteMotd: " + e.toString());
+        }
+    }
+
+    public HashMap<String, Motd> getMotds()
     {
         return motds;
     }
