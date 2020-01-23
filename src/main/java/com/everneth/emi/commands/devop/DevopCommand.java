@@ -3,7 +3,7 @@ package com.everneth.emi.commands.devop;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import co.aikar.idb.DbRow;
-import com.everneth.emi.DevopProjectManager;
+import com.everneth.emi.managers.DevopProjectManager;
 import com.everneth.emi.Utils;
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.devop.*;

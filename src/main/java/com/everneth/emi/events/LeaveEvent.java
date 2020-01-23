@@ -1,8 +1,8 @@
 package com.everneth.emi.events;
 
 import com.everneth.emi.EMI;
-import com.everneth.emi.DevopProjectManager;
-import com.everneth.emi.ReportManager;
+import com.everneth.emi.managers.DevopProjectManager;
+import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.models.Report;
 import com.everneth.emi.models.devop.DevopLogMaterial;
 import com.everneth.emi.models.devop.DevopLogTask;

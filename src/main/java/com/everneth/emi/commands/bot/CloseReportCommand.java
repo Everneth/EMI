@@ -1,7 +1,7 @@
 package com.everneth.emi.commands.bot;
 
 import com.everneth.emi.EMI;
-import com.everneth.emi.ReportManager;
+import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.models.PostResponse;
 import com.everneth.emi.utils.FileUtils;
 
@@ -23,7 +23,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class CloseReportCommand extends Command {

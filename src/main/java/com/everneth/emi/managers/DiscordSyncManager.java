@@ -1,4 +1,4 @@
-package com.everneth.emi;
+package com.everneth.emi.managers;
 
 import net.dv8tion.jda.core.entities.User;
 import org.bukkit.entity.Player;

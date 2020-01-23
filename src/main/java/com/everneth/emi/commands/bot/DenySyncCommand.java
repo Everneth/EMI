@@ -1,6 +1,6 @@
 package com.everneth.emi.commands.bot;
 
-import com.everneth.emi.DiscordSyncManager;
+import com.everneth.emi.managers.DiscordSyncManager;
 import com.everneth.emi.EMI;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;

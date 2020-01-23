@@ -1,54 +1,50 @@
 package com.everneth.emi.models;
 
-public class Motd {
-    private int id;
-    private int playerId;
+public class Motd
+{
+    private String sanitizedTag;
+    private String tag;
     private String message;
-    private String name;
 
-
-    public Motd(int id, int playerId, String message)
+    public Motd(String sanitizedTag, String tag, String message)
     {
-        this.id = id;
-        this.playerId = playerId;
+        this.sanitizedTag = sanitizedTag;
+        this.tag = tag;
         this.message = message;
     }
 
-    public Motd(int id, int playerId, String message, String name)
+    public String displayMotd()
     {
-        this.id = id;
-        this.playerId = playerId;
-        this.message = message;
-        this.name = name;
+        return ("&7[" + tag + "&7] &f" + message);
     }
 
-    public int getId() {
-        return id;
+    public String getSanitizedTag()
+    {
+        return sanitizedTag;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setSanitizedTag(String sanitizedTag)
+    {
+        this.sanitizedTag = sanitizedTag;
     }
 
-    public int getPlayerId() {
-        return playerId;
+    public String getTag()
+    {
+        return tag;
     }
 
-    public void setPlayerId(int playerId) {
-        this.playerId = playerId;
+    public void setTag(String tag)
+    {
+        this.tag = tag;
     }
 
-    public String getMessage() {
+    public String getMessage()
+    {
         return message;
     }
 
-    public void setMessage(String message) {
+    public void setMessage(String message)
+    {
         this.message = message;
     }
-
-    public String getName()
-    {
-        return name;
-    }
-
 }
