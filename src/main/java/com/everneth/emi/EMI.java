@@ -80,7 +80,7 @@ public class EMI extends JavaPlugin {
         registerCommands();
         registerListeners();
         initBot();
-//        initApi();
+        initApi();
         initDevop();
         initMotds();
     }
