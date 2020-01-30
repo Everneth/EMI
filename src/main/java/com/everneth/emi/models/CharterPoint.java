@@ -77,7 +77,7 @@ public class CharterPoint {
 
         Calendar cal = Calendar.getInstance();
 
-        cal.add(Calendar.DAY_OF_MONTH, 30);
+        cal.add(Calendar.DAY_OF_MONTH, 60);
 
         try {
             return DB.executeInsert("INSERT INTO charter_points " +
@@ -118,6 +118,7 @@ public class CharterPoint {
         {
             case(1):
                 //TODO: notification to discord/private message from "system" user
+                sender.sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 1 point."));
                 break;
             case(2):
                 if(Bukkit.getBanList(BanList.Type.NAME).isBanned(player.getName()))

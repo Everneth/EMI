@@ -1,4 +1,4 @@
-package com.everneth.emi;
+package com.everneth.emi.managers;
 
 import co.aikar.idb.DB;
 import com.everneth.emi.models.devop.DevopProject;

@@ -3,7 +3,7 @@ package com.everneth.emi.events.bot;
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
-import com.everneth.emi.ReportManager;
+import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.Utils;
 
 import com.everneth.emi.models.PostResponse;

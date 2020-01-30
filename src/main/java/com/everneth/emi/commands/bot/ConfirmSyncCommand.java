@@ -2,7 +2,7 @@ package com.everneth.emi.commands.bot;
 
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
-import com.everneth.emi.DiscordSyncManager;
+import com.everneth.emi.managers.DiscordSyncManager;
 import com.everneth.emi.EMI;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
