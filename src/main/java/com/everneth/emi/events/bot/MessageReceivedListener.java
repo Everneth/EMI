@@ -94,6 +94,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                 WhitelistApp appInProgress = WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong());
                 if(appInProgress != null) {
 
+                    if(appInProgress.getStep() == 2)
                         if (appInProgress.getStep() == 11 && event.getMessage().getContentRaw().toLowerCase().equals("yes")) {
                             appInProgress.setHoldForNextStep(false);
                         } else if (appInProgress.getStep() == 11 && event.getMessage().getContentRaw().toLowerCase().equals("no")) {
@@ -111,7 +112,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                         switch (appInProgress.getStep()) {
                             case 1:
                                 appInProgress.setHoldForNextStep(true);
-                                event.getPrivateChannel().sendMessage("What is your Minecraft IGN?").queue();
+                                event.getPrivateChannel().sendMessage("What is your Minecraft IGN? **NOTE:** If you enter an invalid IGN, you will be asked again.").queue();
                                 break;
                             case 2:
                                 appInProgress.setHoldForNextStep(true);
@@ -197,8 +198,8 @@ public class MessageReceivedListener extends ListenerAdapter {
                                     String msg = appInProgress.getInGameName() + "'s whitelist application successfully transmitted to the site.\n\n" +
                                             url;
                                     WhitelistAppService.getService().messageStaff(msg);
-                                    WhitelistAppService.getService().changeRoleToPending(event.getMember());
-                                    event.getPrivateChannel().sendMessage("Your application has been submitted! Your role is now Pending").queue();
+                                    WhitelistAppService.getService().changeRoleToApplicant(event.getMember());
+                                    event.getPrivateChannel().sendMessage("Your application has been submitted! Your role is now Applicant").queue();
                                 } else {
 
                                     String msg = appInProgress.getInGameName() + "'s whitelist application could not be transmitted to the site. An embed of the application has been posted.";

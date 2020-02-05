@@ -10,8 +10,16 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.managers.GuildManager;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.UUID;
 
 public class WhitelistAppService {
     private static WhitelistAppService service;
@@ -47,13 +55,11 @@ public class WhitelistAppService {
         appMap.remove(id);
     }
 
-    public void changeRoleToPending(Member member)
+    public void changeRoleToApplicant(Member member)
     {
         GuildManager manager = EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getManager();
         Role applicant = manager.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("applicant-role-id"));
-        Role pending = manager.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("pending-role-id"));
-        manager.getGuild().removeRoleFromMember(member, applicant).queue();
-        manager.getGuild().addRoleToMember(member, pending).queue();
+        manager.getGuild().addRoleToMember(member, applicant).queue();
     }
 
     public void messageStaffWithEmbed(EmbedBuilder eb2)
@@ -78,7 +84,23 @@ public class WhitelistAppService {
         switch(step)
         {
             case 1:
-                appMap.get(id).setInGameName(data);
+                CloseableHttpClient httpclient = HttpClients.createDefault();
+                HttpGet httpGet = new HttpGet("https://api.mojang.com/users/profiles/minecraft/" + data);
+                try {
+                    CloseableHttpResponse response = httpclient.execute(httpGet);
+                    if(response.getStatusLine().getStatusCode() != 204)
+                    {
+                        JSONObject obj = new JSONObject(EntityUtils.toString(response.getEntity()));
+                        appMap.get(id).setMinecraftUuid(UUID.fromString(obj.getString("id")));
+                        appMap.get(id).setInGameName(data);
+                    }
+                    else
+                        return;
+                }
+                catch(IOException e)
+                {
+                    EMI.getPlugin().getLogger().warning(e.getMessage());
+                }
                 break;
             case 2:
                 appMap.get(id).setLocation(data);
