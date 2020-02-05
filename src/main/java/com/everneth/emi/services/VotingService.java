@@ -4,15 +4,18 @@ import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.models.WhitelistApp;
+
 import com.everneth.emi.models.WhitelistVote;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class VotingService {
+
     private HashMap<Long, WhitelistVote> voteMap = new HashMap<>();
     public static VotingService service;
 
@@ -26,7 +29,6 @@ public class VotingService {
         }
         return service;
     }
-
     public void addVote(long id, WhitelistVote vote)
     {
         voteMap.put(id, vote);
