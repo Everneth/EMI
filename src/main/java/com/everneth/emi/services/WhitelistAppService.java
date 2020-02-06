@@ -106,7 +106,11 @@ public class WhitelistAppService {
         }
     }
 
-
+    public void approveWhitelistAppRecord(long id)
+    {
+        DB.executeUpdateAsync("UPDATE applications SET is_approved = 1 WHERE applicant_discord_id = ?",
+                id);
+    }
 
     public void addData(long id, int step, String data)
     {

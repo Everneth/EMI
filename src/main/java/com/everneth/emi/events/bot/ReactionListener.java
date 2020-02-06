@@ -2,6 +2,7 @@ package com.everneth.emi.events.bot;
 
 import com.everneth.emi.EMI;
 import com.everneth.emi.services.VotingService;
+import com.everneth.emi.services.WhitelistAppService;
 import com.everneth.emi.utils.PlayerUtils;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -42,8 +43,10 @@ public class ReactionListener extends ListenerAdapter {
                                                     PlayerUtils.getPlayerRow(VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId()).getString("player_ign"));
                                             event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("whitelist-channel-id")).sendMessage(
                                                     event.getGuild().getMemberById(VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId()).getAsMention() + " has been whitelisted! Congrats!").queue();
+                                            WhitelistAppService.getService().approveWhitelistAppRecord(VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId());
                                             VotingService.getService().removeVote(event.getMessageIdLong());
                                             event.getGuild().getTextChannelById(event.getChannel().getIdLong()).editMessageById(event.getMessageIdLong(), "The vote is now over. Applicant accepted.").queue();
+
                                         }
                                         else
                                         {
