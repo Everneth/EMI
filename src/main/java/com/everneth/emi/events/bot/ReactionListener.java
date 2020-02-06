@@ -34,7 +34,7 @@ public class ReactionListener extends ListenerAdapter {
                             (msg) -> {
                                 for (MessageReaction reaction : msg.getReactions()) {
                                     // check majority of any reaction, then identify it
-                                    if ((reaction.getCount() / staffMembers.size()) * 100 >= 51)
+                                    if (((reaction.getCount()-1) / staffMembers.size()) * 100 >= 51)
                                     {
                                         // we've reached majority, what action do we take
                                         if(reaction.getReactionEmote().getEmoji().equals(":white_check_mark:"))
@@ -43,7 +43,9 @@ public class ReactionListener extends ListenerAdapter {
                                                     PlayerUtils.getPlayerRow(VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId()).getString("player_ign"));
                                             event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("whitelist-channel-id")).sendMessage(
                                                     event.getGuild().getMemberById(VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId()).getAsMention() + " has been whitelisted! Congrats!").queue();
-                                            WhitelistAppService.getService().approveWhitelistAppRecord(VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId());
+                                            WhitelistAppService.getService().approveWhitelistAppRecord(
+                                                    VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId(),
+                                                    event.getMessageIdLong());
                                             VotingService.getService().removeVote(event.getMessageIdLong());
                                             event.getGuild().getTextChannelById(event.getChannel().getIdLong()).editMessageById(event.getMessageIdLong(), "The vote is now over. Applicant accepted.").queue();
 
@@ -51,6 +53,7 @@ public class ReactionListener extends ListenerAdapter {
                                         else
                                         {
                                             event.getGuild().getTextChannelById(event.getChannel().getIdLong()).editMessageById(event.getMessageIdLong(), "The vote is now over. Applicant denied.").queue();
+                                            WhitelistAppService.getService().changeRoleToApplicant(event.getGuild().getMemberById(VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId()));
                                         }
                                     }
                                 }

@@ -109,10 +109,22 @@ public class WhitelistAppService {
         }
     }
 
-    public void approveWhitelistAppRecord(long id)
+    public void approveWhitelistAppRecord(long id, long msgid)
     {
         DB.executeUpdateAsync("UPDATE applications SET is_approved = 1 WHERE applicant_discord_id = ?",
                 id);
+        try {
+            DB.executeInsert("INSERT INTO players (player_name, player_uuid, member_id, discord_id) " +
+                            "VALES (?, ?, ?, ?)",
+                    this.appMap.get(msgid).getInGameName(),
+                    this.appMap.get(msgid).getMinecraftUuid().toString(),
+                    null,
+                    id);
+        }
+        catch (SQLException e)
+        {
+            EMI.getPlugin().getLogger().warning("Error inserting new player record. Output: " + e.getMessage());
+        }
     }
 
     public List<WhitelistApp> getAllCurrentApplicants()
