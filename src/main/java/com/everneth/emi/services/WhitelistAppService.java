@@ -1,6 +1,7 @@
 package com.everneth.emi.services;
 
 import co.aikar.idb.DB;
+import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 
 import com.everneth.emi.models.WhitelistApp;
@@ -21,7 +22,9 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -110,6 +113,34 @@ public class WhitelistAppService {
     {
         DB.executeUpdateAsync("UPDATE applications SET is_approved = 1 WHERE applicant_discord_id = ?",
                 id);
+    }
+
+    public List<WhitelistApp> getAllCurrentApplicants()
+    {
+        List<WhitelistApp> applicants = new ArrayList<>();
+        List<DbRow> results = new ArrayList<>();
+        try {
+            results = DB.getResultsAsync("SELECT * FROM applicants WHERE is_approved = ?", 0).get();
+        }
+        catch(Exception e)
+        {
+            EMI.getPlugin().getLogger().warning("Error retrieving current applications. Error msg: " + e.getMessage());
+        }
+        for(DbRow result : results)
+            applicants.add(new WhitelistApp(
+                    result.getString("mc_ign"),
+                    result.getString("location"),
+                    result.getInt("age"),
+                    result.getString("friend"),
+                    result.getString("looking_for"),
+                    result.getString("has_been_banned"),
+                    result.getString("love_hate"),
+                    result.getString("intro"),
+                    result.getString("secret_word"),
+                    result.getLong("applicant_discord_id"),
+                    UUID.fromString(result.getString("mc_uuid"))
+            ));
+        return applicants;
     }
 
     public void addData(long id, int step, String data)
