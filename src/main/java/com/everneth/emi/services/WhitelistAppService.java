@@ -1,5 +1,6 @@
 package com.everneth.emi.services;
 
+import co.aikar.idb.DB;
 import com.everneth.emi.EMI;
 
 import com.everneth.emi.models.WhitelistApp;
@@ -19,6 +20,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -79,6 +81,32 @@ public class WhitelistAppService {
     {
         return appMap.get(id);
     }
+
+    public void addApplicationRecord(WhitelistApp application)
+    {
+        try {
+            DB.executeInsert("INSERT INTO applications (" +
+                            "mc_ign, location, age, friend, looking_for, has_been_banned, is_approved, love_hate, intro, secret_word, mc_uuid, applicant_discord_id) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    application.getInGameName(),
+                    application.getLocation(),
+                    application.getAge(),
+                    application.getFriend(),
+                    application.getLookingFor(),
+                    application.getBannedElsewhere(),
+                    0,
+                    application.getLoveHate(),
+                    application.getIntro(),
+                    application.getSecretWord(),
+                    application.getMinecraftUuid().toString(),
+                    application.getDiscordId());
+        } catch(SQLException e)
+        {
+            EMI.getPlugin().getLogger().severe(e.getMessage());
+        }
+    }
+
+
 
     public void addData(long id, int step, String data)
     {

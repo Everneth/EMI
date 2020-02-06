@@ -182,7 +182,10 @@ public class MessageReceivedListener extends ListenerAdapter {
                                 eb2.addField("What do you love and/or hate about Minecraft?", appInProgress.getLoveHate(), false);
                                 eb2.addField("Tell us something about you.", appInProgress.getIntro(), false);
                                 eb2.addField("What is the secret word?", appInProgress.getSecretWord(), false);
+                                eb2.setFooter("UUID: " + appInProgress.getMinecraftUuid().toString());
                                 WhitelistAppService.getService().messageStaffWithEmbed(eb2);
+
+                                WhitelistAppService.getService().addApplicationRecord(appInProgress);
 
                                 PostResponse postResponse;
                                 int statusCode = 0;
