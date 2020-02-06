@@ -20,8 +20,8 @@ public class RoleChangeListener extends ListenerAdapter {
                                 event.getUser().getIdLong(),
                                 msg.getIdLong()
                         ));
-                        msg.addReaction("").queue();
-                        msg.addReaction("").queue();
+                        msg.addReaction(":white_check_mark:").queue();
+                        msg.addReaction("no_entry").queue();
                     }
             );
             // notify user

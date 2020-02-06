@@ -52,6 +52,20 @@ public class VotingService {
         }
         return app;
     }
+    public boolean isVotingMessage(long messageId)
+    {
+        return this.voteMap.containsKey(messageId);
+    }
+
+    public WhitelistVote getVoteByMessageId(long messageId)
+    {
+        return this.voteMap.get(messageId);
+    }
+
+    public long getMessageId(long userid)
+    {
+        return this.voteMap.get(userid).getMessageId();
+    }
 
     public static HashMap<Long, WhitelistApp> load()
     {

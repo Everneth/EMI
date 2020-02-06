@@ -27,4 +27,52 @@ public class WhitelistVote {
     public int InsertVote() {return 0;}
 
     public int UpdateVote() {return 0;}
+
+    public int getVotesInFavor() {
+        return votesInFavor;
+    }
+
+    public void setVotesInFavor(int votesInFavor) {
+        this.votesInFavor = votesInFavor;
+    }
+
+    public int getVotesAgainst() {
+        return votesAgainst;
+    }
+
+    public void setVotesAgainst(int votesAgainst) {
+        this.votesAgainst = votesAgainst;
+    }
+
+    public long getApplicantDiscordId() {
+        return applicantDiscordId;
+    }
+
+    public void setApplicantDiscordId(long applicantDiscordId) {
+        this.applicantDiscordId = applicantDiscordId;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
+    public Timer getTimer() {
+        return timer;
+    }
+
+    public void setTimer(Timer timer) {
+        this.timer = timer;
+    }
+
+    public long getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(long messageId) {
+        this.messageId = messageId;
+    }
 }
