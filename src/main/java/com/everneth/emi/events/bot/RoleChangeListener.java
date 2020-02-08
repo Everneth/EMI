@@ -3,6 +3,7 @@ package com.everneth.emi.events.bot;
 import com.everneth.emi.EMI;
 import com.everneth.emi.models.WhitelistVote;
 import com.everneth.emi.services.VotingService;
+import com.everneth.emi.utils.PlayerUtils;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
@@ -20,10 +21,15 @@ public class RoleChangeListener extends ListenerAdapter {
                                 event.getUser().getIdLong(),
                                 msg.getIdLong()
                         ));
+
                         msg.addReaction(":white_check_mark:").queue();
                         msg.addReaction("no_entry").queue();
                     }
             );
-            // notify user
+        else if(PlayerUtils.isMemberAlready(event.getUser().getIdLong()))
+        {
+            event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("whitelist-channel-id"))
+                    .sendMessage("Welcome back " + event.getUser().getAsMention() + "!").queue();
+        }
     }
 }

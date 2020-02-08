@@ -117,6 +117,21 @@ public class PlayerUtils {
         return player;
     }
 
+    public static boolean isMemberAlready(long discordId)
+    {
+        CompletableFuture<DbRow> futurePlayer;
+        DbRow player = new DbRow();
+        futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE discord_id = ?", discordId);
+        try {
+            player = futurePlayer.get();
+        }
+        catch (Exception e)
+        {
+            EMI.getPlugin().getLogger().info(e.getMessage());
+        }
+        return player.isEmpty();
+    }
+
     public static EMIPlayer getEMIPlayer(String name)
     {
         DbRow playerRow = PlayerUtils.getPlayerRow(name);
