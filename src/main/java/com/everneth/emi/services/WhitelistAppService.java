@@ -7,10 +7,7 @@ import com.everneth.emi.EMI;
 import com.everneth.emi.models.WhitelistApp;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.ChannelType;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.managers.GuildManager;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -125,6 +122,43 @@ public class WhitelistAppService {
         {
             EMI.getPlugin().getLogger().warning("Error inserting new player record. Output: " + e.getMessage());
         }
+    }
+
+    public WhitelistApp getSingleApplicant(String discordDetails)
+    {
+        int poundIndex = discordDetails.indexOf('#');
+        String name = discordDetails.substring(0, poundIndex);
+        String discriminator = discordDetails.substring(poundIndex + 1);
+
+        DbRow result = new DbRow();
+
+        try {
+            result = DB.getFirstRowAsync("SELECT * FROM applicants WHERE applicant_discord_id = ?",
+                    EMI.getJda().getUserByTag(name, discriminator).getIdLong()).get();
+        }
+        catch(Exception e)
+        {
+            EMI.getPlugin().getLogger().warning("Error retrieving single application: Error msg: " + e.getMessage());
+        }
+
+        return dbRowToApp(result);
+    }
+
+    private WhitelistApp dbRowToApp(DbRow appRecord)
+    {
+        return new WhitelistApp(
+                appRecord.getString("mc_ign"),
+                appRecord.getString("location"),
+                appRecord.getInt("age"),
+                appRecord.getString("friend"),
+                appRecord.getString("looking_for"),
+                appRecord.getString("has_been_banned"),
+                appRecord.getString("love_hate"),
+                appRecord.getString("intro"),
+                appRecord.getString("secret_word"),
+                appRecord.getLong("applicant_discord_id"),
+                UUID.fromString(appRecord.getString("mc_uuid"))
+        );
     }
 
     public List<WhitelistApp> getAllCurrentApplicants()
