@@ -203,6 +203,14 @@ public class CharterCommand extends BaseCommand {
             }
         }
     }
+    @CommandPermission("emi.par.charter.recent")
+    @Subcommand("recent")
+    @CommandAlias("crecent")
+    public void onRecentCommand(CommandSender sender)
+    {
+
+    }
+
     @CommandPermission("emi.par.charter.edit")
     @Subcommand("edit")
     @CommandAlias("cedit")
