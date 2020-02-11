@@ -25,7 +25,7 @@ public class WhitelistAppCommand extends Command {
     private String convertToMessage(List<WhitelistApp> apps, CommandEvent event)
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("```asciidoc\n = Current Application Results =\n");
+        sb.append("```asciidoc\n= Current Application Results =\n");
 
         for(WhitelistApp app : apps)
         {
@@ -39,9 +39,10 @@ public class WhitelistAppCommand extends Command {
 
     private MessageEmbed convertToEmbed(WhitelistApp app, CommandEvent event)
     {
+        User user = event.getGuild().getMemberById(app.getDiscordId()).getUser();
         EmbedBuilder eb2 = new EmbedBuilder();
         eb2.setTitle("Discord Whitelist Application for " + app.getInGameName());
-        eb2.setDescription("Discord Name: " + event.getAuthor().getAsTag() + " - Discord ID: " + app.getDiscordId());
+        eb2.setDescription("Discord Name: " + user.getAsTag() + " - Discord ID: " + app.getDiscordId());
         eb2.setThumbnail("https://everneth.com/uploads/monthly_2017_05/par-icon.png.7be3a897907506e63716375bda342551.png");
         eb2.addField("Minecraft IGN", app.getInGameName(), false);
         eb2.addField("Where do  you live?", app.getLocation(), false);

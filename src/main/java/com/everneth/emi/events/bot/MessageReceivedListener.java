@@ -93,8 +93,6 @@ public class MessageReceivedListener extends ListenerAdapter {
             if (!event.getAuthor().isBot() && !event.getMessage().getContentRaw().isEmpty()) {
                 WhitelistApp appInProgress = WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong());
                 if(appInProgress != null) {
-
-                    if(appInProgress.getStep() == 2)
                         if (appInProgress.getStep() == 11 && event.getMessage().getContentRaw().toLowerCase().equals("yes")) {
                             appInProgress.setHoldForNextStep(false);
                         } else if (appInProgress.getStep() == 11 && event.getMessage().getContentRaw().toLowerCase().equals("no")) {
@@ -201,7 +199,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                                     String msg = appInProgress.getInGameName() + "'s whitelist application successfully transmitted to the site.\n\n" +
                                             url;
                                     WhitelistAppService.getService().messageStaff(msg);
-                                    WhitelistAppService.getService().changeRoleToApplicant(event.getMember());
+                                    WhitelistAppService.getService().changeRoleToApplicant(appInProgress.getDiscordId());
                                     event.getPrivateChannel().sendMessage("Your application has been submitted! Your role is now Applicant").queue();
                                 } else {
 

@@ -19,7 +19,7 @@ public class ApplyCommand extends Command {
         long applicationRoleId = EMI.getPlugin().getConfig().getLong("applicant-role-id");
         Role applicantRole = event.getGuild().getRoleById(applicationRoleId);
 
-        if(event.getMember().getRoles().contains(applicantRole) && WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong()) == null) {
+        if(WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong()) == null) {
             WhitelistAppService.getService().addApp(event.getAuthor().getIdLong(), new WhitelistApp());
         }
     }

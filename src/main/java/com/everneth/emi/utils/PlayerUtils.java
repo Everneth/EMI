@@ -117,6 +117,21 @@ public class PlayerUtils {
         return player;
     }
 
+    public static DbRow getAppRecord(long discordId)
+    {
+        CompletableFuture<DbRow> futurePlayer;
+        DbRow player = new DbRow();
+        futurePlayer = DB.getFirstRowAsync("SELECT * FROM applications WHERE applicant_discord_id = ?", discordId);
+        try {
+            player = futurePlayer.get();
+        }
+        catch (Exception e)
+        {
+            EMI.getPlugin().getLogger().info(e.getMessage());
+        }
+        return player;
+    }
+
     public static boolean isMemberAlready(long discordId)
     {
         CompletableFuture<DbRow> futurePlayer;
@@ -129,7 +144,10 @@ public class PlayerUtils {
         {
             EMI.getPlugin().getLogger().info(e.getMessage());
         }
-        return player.isEmpty();
+        if(player == null)
+            return false;
+        else
+            return true;
     }
 
     public static EMIPlayer getEMIPlayer(String name)

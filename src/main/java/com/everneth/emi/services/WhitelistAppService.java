@@ -5,6 +5,7 @@ import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 
 import com.everneth.emi.models.WhitelistApp;
+import com.everneth.emi.utils.PlayerUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -15,6 +16,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.bukkit.entity.Player;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -59,11 +61,11 @@ public class WhitelistAppService {
         appMap.remove(id);
     }
 
-    public void changeRoleToApplicant(Member member)
+    public void changeRoleToApplicant(long discordId)
     {
         GuildManager manager = EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getManager();
         Role applicant = manager.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("applicant-role-id"));
-        manager.getGuild().addRoleToMember(member, applicant).queue();
+        manager.getGuild().addRoleToMember(manager.getGuild().getMemberById(discordId), applicant).queue();
     }
 
     public void messageStaffWithEmbed(EmbedBuilder eb2)
@@ -108,13 +110,14 @@ public class WhitelistAppService {
 
     public void approveWhitelistAppRecord(long id, long msgid)
     {
+        DbRow playerToAdd = PlayerUtils.getAppRecord(id);
         DB.executeUpdateAsync("UPDATE applications SET is_approved = 1 WHERE applicant_discord_id = ?",
                 id);
         try {
             DB.executeInsert("INSERT INTO players (player_name, player_uuid, member_id, discord_id) " +
-                            "VALES (?, ?, ?, ?)",
-                    this.appMap.get(msgid).getInGameName(),
-                    this.appMap.get(msgid).getMinecraftUuid().toString(),
+                            "VALUES (?, ?, ?, ?)",
+                    playerToAdd.getString("mc_ign"),
+                    playerToAdd.getString("mc_uuid"),
                     null,
                     id);
         }
@@ -133,7 +136,7 @@ public class WhitelistAppService {
         DbRow result = new DbRow();
 
         try {
-            result = DB.getFirstRowAsync("SELECT * FROM applicants WHERE applicant_discord_id = ?",
+            result = DB.getFirstRowAsync("SELECT * FROM applications WHERE applicant_discord_id = ?",
                     EMI.getJda().getUserByTag(name, discriminator).getIdLong()).get();
         }
         catch(Exception e)
@@ -151,8 +154,8 @@ public class WhitelistAppService {
                 appRecord.getString("location"),
                 appRecord.getInt("age"),
                 appRecord.getString("friend"),
-                appRecord.getString("looking_for"),
                 appRecord.getString("has_been_banned"),
+                appRecord.getString("looking_for"),
                 appRecord.getString("love_hate"),
                 appRecord.getString("intro"),
                 appRecord.getString("secret_word"),
@@ -166,7 +169,7 @@ public class WhitelistAppService {
         List<WhitelistApp> applicants = new ArrayList<>();
         List<DbRow> results = new ArrayList<>();
         try {
-            results = DB.getResultsAsync("SELECT * FROM applicants WHERE is_approved = ?", 0).get();
+            results = DB.getResultsAsync("SELECT * FROM applications WHERE is_approved = ?", 0).get();
         }
         catch(Exception e)
         {
@@ -202,7 +205,19 @@ public class WhitelistAppService {
                     if(response.getStatusLine().getStatusCode() != 204)
                     {
                         JSONObject obj = new JSONObject(EntityUtils.toString(response.getEntity()));
-                        appMap.get(id).setMinecraftUuid(UUID.fromString(obj.getString("id")));
+
+                        StringBuffer sb = new StringBuffer(obj.getString("id"));
+                        sb.insert(8, "-");
+
+                        sb = new StringBuffer(sb.toString());
+                        sb.insert(13, "-");
+
+                        sb = new StringBuffer(sb.toString());
+                        sb.insert(18, "-");
+
+                        sb = new StringBuffer(sb.toString());
+                        sb.insert(23, "-");
+                        appMap.get(id).setMinecraftUuid(UUID.fromString(sb.toString()));
                         appMap.get(id).setInGameName(data);
                     }
                     else

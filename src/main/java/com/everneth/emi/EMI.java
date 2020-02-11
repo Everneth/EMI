@@ -5,6 +5,7 @@ import co.aikar.idb.*;
 import com.everneth.emi.api.*;
 import com.everneth.emi.commands.*;
 import com.everneth.emi.commands.bot.*;
+import com.everneth.emi.commands.bot.par.WhitelistAppCommand;
 import com.everneth.emi.commands.comm.CommCommand;
 import com.everneth.emi.commands.comp.CompCommand;
 import com.everneth.emi.commands.devop.DevopCommand;
@@ -12,6 +13,8 @@ import com.everneth.emi.commands.par.CharterCommand;
 import com.everneth.emi.events.JoinEvent;
 import com.everneth.emi.events.LeaveEvent;
 import com.everneth.emi.events.bot.MessageReceivedListener;
+import com.everneth.emi.events.bot.ReactionListener;
+import com.everneth.emi.events.bot.RoleChangeListener;
 import com.everneth.emi.managers.DevopProjectManager;
 import com.everneth.emi.managers.MotdManager;
 import com.everneth.emi.managers.ReportManager;
@@ -122,12 +125,13 @@ public class EMI extends JavaPlugin {
     {
         CommandClientBuilder builder = new CommandClientBuilder();
         builder.setPrefix(this.getConfig().getString("bot-prefix"));
-        builder.setActivity(Activity.playing(this.getConfig().getString("bot-game")));
+        builder.setActivity(Activity.listening(this.getConfig().getString("bot-game")));
         builder.addCommand(new HelpClearCommand());
         builder.addCommand(new ConfirmSyncCommand());
         builder.addCommand(new DenySyncCommand());
         builder.addCommand(new CloseReportCommand());
         builder.addCommand(new ApplyCommand());
+        builder.addCommand(new WhitelistAppCommand());
         builder.setOwnerId(this.getConfig().getString("bot-owner-id"));
 
         CommandClient client = builder.build();
@@ -136,6 +140,8 @@ public class EMI extends JavaPlugin {
             jda = new JDABuilder(config.getString("bot-token"))
                     .addEventListeners(client)
                     .addEventListeners(new MessageReceivedListener())
+                    .addEventListeners(new ReactionListener())
+                    .addEventListeners(new RoleChangeListener())
                     .build();
             jda.awaitReady();
         }

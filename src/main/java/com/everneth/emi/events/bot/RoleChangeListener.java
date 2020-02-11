@@ -9,9 +9,12 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
 
 public class RoleChangeListener extends ListenerAdapter {
+    private final String APPROVE_REACTION = "\u2705";
+    private final String REJECT_REACTION = "\u26D4";
     @Override
     public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event)
     {
+
         Role pendingRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("pending-role-id"));
         if(event.getRoles().contains(pendingRole))
             event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id"))
@@ -22,8 +25,8 @@ public class RoleChangeListener extends ListenerAdapter {
                                 msg.getIdLong()
                         ));
 
-                        msg.addReaction(":white_check_mark:").queue();
-                        msg.addReaction("no_entry").queue();
+                        msg.addReaction(APPROVE_REACTION).queue();
+                        msg.addReaction(REJECT_REACTION).queue();
                     }
             );
         else if(PlayerUtils.isMemberAlready(event.getUser().getIdLong()))

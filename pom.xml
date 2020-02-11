@@ -6,7 +6,7 @@
 
     <groupId>com.everneth</groupId>
     <artifactId>EMI</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.2</version>
 
     <repositories>
         <repository>
@@ -71,7 +71,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>4.0.0_44</version>
+            <version>4.1.1_108</version>
             <exclusions>
                 <exclusion>
                     <groupId>club.minnced</groupId>
@@ -91,7 +91,8 @@
             <groupId>org.jnbt</groupId>
             <artifactId>jnbt</artifactId>
             <version>1.4</version>
-            <scope>compile</scope>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/jnbt-1.4.jar</systemPath>
         </dependency>
         <!--Spark-->
         <dependency>
