@@ -7,7 +7,6 @@ import com.everneth.emi.EMI;
 import com.everneth.emi.models.WhitelistApp;
 import com.everneth.emi.utils.PlayerUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.managers.GuildManager;
 
@@ -48,10 +47,8 @@ public class WhitelistAppService {
         app.setHoldForNextStep(false);
         appMap.put(id, app);
 
-        MessageBuilder mb = new MessageBuilder();
-
         EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getMemberById(id).getUser().openPrivateChannel().queue(privateChannel ->
-                privateChannel.sendMessage("What be ye minecraft IGN?").queue()
+                privateChannel.sendMessage("What is your Minecraft IGN? **NOTE:** If you enter an invalid IGN, you will be asked again.").queue()
         );
     }
 
