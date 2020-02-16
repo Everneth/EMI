@@ -2,10 +2,6 @@ package com.everneth.emi.commands.mint;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
-import co.aikar.idb.DB;
-import com.everneth.emi.Utils;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.sql.SQLException;

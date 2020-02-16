@@ -1,47 +1,52 @@
 package com.everneth.emi.models;
 
-import java.util.Date;
-import java.util.Timer;
+import co.aikar.idb.DB;
+import com.everneth.emi.EMI;
+
+import java.sql.SQLException;
 
 public class WhitelistVote {
-    private int votesInFavor;
-    private int votesAgainst;
     private long applicantDiscordId;
     private boolean completed;
-    private Timer timer;
     private long messageId;
+    private int id;
 
 
     public WhitelistVote(long applicantDiscordId, long messageId)
     {
         this.applicantDiscordId = applicantDiscordId;
         this.messageId = messageId;
-        this.timer = new Timer();
         this.completed = false;
-        this.votesAgainst = 0;
-        this.votesInFavor = 0;
-        // Set timer to expire in 24 hours
-        // Insert vote after constructed
+        this.insertVote();
     }
 
-    public int InsertVote() {return 0;}
-
-    public int UpdateVote() {return 0;}
-
-    public int getVotesInFavor() {
-        return votesInFavor;
+    // Used only in Load()
+    public WhitelistVote(long applicantDiscordId, long messageId, boolean completed)
+    {
+        this.applicantDiscordId = applicantDiscordId;
+        this.messageId = messageId;
+        this.completed = completed;
     }
 
-    public void setVotesInFavor(int votesInFavor) {
-        this.votesInFavor = votesInFavor;
+    public void insertVote() {
+        try {
+            DB.executeInsert("INSERT INTO votes (applicant_id, message_id, is_active) VALUES (?, ?, ?)",
+                    this.applicantDiscordId,
+                    this.messageId,
+                    1);
+        }
+        catch (SQLException e)
+        {
+            EMI.getPlugin().getLogger().warning(e.getMessage());
+        }
     }
 
-    public int getVotesAgainst() {
-        return votesAgainst;
-    }
-
-    public void setVotesAgainst(int votesAgainst) {
-        this.votesAgainst = votesAgainst;
+    public void updateVote() {
+        try {
+            DB.executeUpdateAsync("UPDATE votes SET is_active = 0 WHERE message_id = ?", this.messageId);
+        } catch (Exception e) {
+            EMI.getPlugin().getLogger().warning(e.getMessage());
+        }
     }
 
     public long getApplicantDiscordId() {
@@ -58,14 +63,6 @@ public class WhitelistVote {
 
     public void setCompleted(boolean completed) {
         this.completed = completed;
-    }
-
-    public Timer getTimer() {
-        return timer;
-    }
-
-    public void setTimer(Timer timer) {
-        this.timer = timer;
     }
 
     public long getMessageId() {

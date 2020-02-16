@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.requests.RestAction;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -50,6 +49,7 @@ public class ReactionListener extends ListenerAdapter {
                                 WhitelistAppService.getService().approveWhitelistAppRecord(
                                         VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId(),
                                         event.getMessageIdLong());
+                                VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).updateVote();
                                 VotingService.getService().removeVote(event.getMessageIdLong());
                                 event.getGuild().getTextChannelById(event.getChannel().getIdLong()).editMessageById(event.getMessageIdLong(),
                                         "The vote is now over. Applicant " +

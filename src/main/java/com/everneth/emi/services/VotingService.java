@@ -2,16 +2,13 @@ package com.everneth.emi.services;
 
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
-import com.everneth.emi.EMI;
-import com.everneth.emi.models.WhitelistApp;
 
+import com.everneth.emi.EMI;
 import com.everneth.emi.models.WhitelistVote;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class VotingService {
@@ -26,6 +23,7 @@ public class VotingService {
         if(service == null)
         {
             service = new VotingService();
+            service.load();
         }
         return service;
     }
@@ -67,34 +65,29 @@ public class VotingService {
         return this.voteMap.get(userid).getMessageId();
     }
 
-    public static HashMap<Long, WhitelistApp> load()
+    public HashMap<Long, WhitelistVote> load()
     {
-        HashMap<Long, WhitelistApp> data = new HashMap<>();
+        HashMap<Long, WhitelistVote> data = new HashMap<>();
         List<DbRow> results = new ArrayList<>();
         try
         {
-            results = DB.getResultsAsync("SELECT * FROM applications WHERE is_approved = 0").get();
+            results = DB.getResultsAsync("SELECT * FROM votes WHERE is_active = 1").get();
         }
         catch (Exception e)
         {
             EMI.getPlugin().getLogger().warning(e.getMessage());
         }
-
-        if(!results.isEmpty()) {
-            for (DbRow row : results) {
-                data.put(row.getLong("applicant_discord_id"), new WhitelistApp(
-                        row.getString("mc_ign"),
-                        row.getString("location"),
-                        row.getInt("age"),
-                        row.getString("friend"),
-                        row.getString("has_been_banned"),
-                        row.getString("looking_for"),
-                        row.getString("love_hate"),
-                        row.getString("intro"),
-                        row.getString("secret_word"),
-                        row.getLong("applicant_discord_id"),
-                        UUID.fromString(row.getString("mc_uuid"))
-                ));
+        if(!results.isEmpty())
+        {
+            for(DbRow result : results)
+            {
+                this.voteMap.put(
+                        result.getLong("message_id"),
+                        new WhitelistVote(
+                                result.getLong("applicant_id"),
+                                result.getLong("message_id"),
+                                false)
+                        );
             }
         }
         return data;

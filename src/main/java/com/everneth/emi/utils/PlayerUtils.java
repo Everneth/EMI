@@ -5,13 +5,9 @@ import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.models.CharterPoint;
 import com.everneth.emi.models.EMIPlayer;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class PlayerUtils {
