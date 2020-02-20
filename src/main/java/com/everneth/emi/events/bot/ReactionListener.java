@@ -50,7 +50,6 @@ public class ReactionListener extends ListenerAdapter {
                                         VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId(),
                                         event.getMessageIdLong());
                                 VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).updateVote();
-                                VotingService.getService().removeVote(event.getMessageIdLong());
                                 event.getGuild().getTextChannelById(event.getChannel().getIdLong()).editMessageById(event.getMessageIdLong(),
                                         "The vote is now over. Applicant " +
                                                 event.getGuild().getMemberById(VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId()).getAsMention() +
@@ -61,6 +60,7 @@ public class ReactionListener extends ListenerAdapter {
                                 Member memberToEdit = event.getGuild().getMemberById(VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId());
                                 event.getGuild().removeRoleFromMember(memberToEdit, pendingRole).queue();
                                 event.getGuild().addRoleToMember(memberToEdit, citizenRole).queue();
+                                VotingService.getService().removeVote(event.getMessageIdLong());
 
                             } else {
                                 Role pendingRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("pending-role-id"));
@@ -72,6 +72,7 @@ public class ReactionListener extends ListenerAdapter {
                                                 event.getGuild().getMemberById(VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId()).getAsMention() +
                                                 " denied.").queue();
                                 WhitelistAppService.getService().changeRoleToApplicant(VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId());
+                                VotingService.getService().removeVote(event.getMessageIdLong());
                             }
                         }
                     }
