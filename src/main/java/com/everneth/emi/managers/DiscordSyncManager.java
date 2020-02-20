@@ -1,6 +1,6 @@
 package com.everneth.emi.managers;
 
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.api.entities.User;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;

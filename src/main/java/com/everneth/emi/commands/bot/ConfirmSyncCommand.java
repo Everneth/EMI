@@ -6,9 +6,11 @@ import com.everneth.emi.managers.DiscordSyncManager;
 import com.everneth.emi.EMI;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.User;
+
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -20,7 +22,6 @@ import java.util.concurrent.CompletableFuture;
 
 public class ConfirmSyncCommand extends Command {
     private CompletableFuture<DbRow> playerObjectFuture;
-    private DbRow playerRow;
     private CompletableFuture<Integer> futurePlayerId;
     public ConfirmSyncCommand()
     {
@@ -37,48 +38,39 @@ public class ConfirmSyncCommand extends Command {
         long pendingRoleId = EMI.getPlugin().getConfig().getLong("pending-role-id");
         long memberRoleId = EMI.getPlugin().getConfig().getLong("member-role-id");
 
-        if(toFind == null)
+        if(event.isFromType(ChannelType.PRIVATE))
         {
-            event.replyInDm("No sync request exists for your account.");
-        }
-        else
-        {
-            if(syncExists(toFind))
+            if(toFind == null)
             {
-                event.replyInDm("You have already synced this account. If this is in error, please contact staff.");
+                event.replyInDm("No sync request exists for your account or it hs already been synced.");
             }
-            else
-            {
-                int playerId = syncAccount(toFind);
-                if(playerId == 0)
-                {
-                    event.replyInDm("ERROR: Could not sync account. No player record found.");
-                }
-                else
-                {
-                    dsm.removeSyncRequest(this.getPlayerRow(playerId).getString("player_uuid"));
-                    EMI.getJda().getGuildById(guildId).getController().addSingleRoleToMember(
-                            EMI.getJda().getGuildById(guildId).getMemberById(event.getAuthor().getIdLong()), EMI.getJda().getGuildById(guildId).getRoleById(syncRoleId)
-                    ).queue();
-                    Role memberRole = EMI.getJda().getGuildById(guildId).getRoleById(memberRoleId);
-                    if(EMI.getPlugin().getConfig().getBoolean("use-pending-role"))
-                    {
-                        Role pendingRole = EMI.getJda().getGuildById(guildId).getRoleById(pendingRoleId);
-                        Member member = EMI.getJda().getGuildById(guildId).getMember(event.getSelfUser());
-                        if(member.getRoles().contains(pendingRole))
-                        {
-                            member.getRoles().remove(pendingRole);
-                            member.getRoles().add(memberRole);
-                            event.replyInDm("Your account has been synced and your roles updated!");
-                        }
-                        else
-                        {
+            else {
+                if (syncExists(toFind)) {
+                    event.replyInDm("You have already synced this account. If this is in error, please contact staff.");
+                } else {
+                    int playerId = syncAccount(toFind);
+                    if (playerId == 0) {
+                        event.replyInDm("ERROR: Could not sync account. No player record found.");
+                    } else {
+                        dsm.removeSyncRequest(this.getPlayerRow(playerId).getString("player_uuid"));
+                        EMI.getJda().getGuildById(guildId).addRoleToMember(
+                                EMI.getJda().getGuildById(guildId).getMemberById(event.getAuthor().getIdLong()),
+                                EMI.getJda().getGuildById(guildId).getRoleById(syncRoleId)
+                        ).queue();
+                        Role memberRole = EMI.getJda().getGuildById(guildId).getRoleById(memberRoleId);
+                        if (EMI.getPlugin().getConfig().getBoolean("use-pending-role")) {
+                            Role pendingRole = EMI.getJda().getGuildById(guildId).getRoleById(pendingRoleId);
+                            Member member = EMI.getJda().getGuildById(guildId).getMember(event.getSelfUser());
+                            if (member.getRoles().contains(pendingRole)) {
+                                member.getRoles().remove(pendingRole);
+                                member.getRoles().add(memberRole);
+                                event.replyInDm("Your account has been synced and your roles updated!");
+                            } else {
+                                event.replyInDm("Your account has been synced!");
+                            }
+                        } else {
                             event.replyInDm("Your account has been synced!");
                         }
-                    }
-                    else
-                    {
-                        event.replyInDm("Your account has been synced!");
                     }
                 }
             }

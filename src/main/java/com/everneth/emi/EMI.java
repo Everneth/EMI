@@ -4,10 +4,8 @@ import co.aikar.commands.BukkitCommandManager;
 import co.aikar.idb.*;
 import com.everneth.emi.api.*;
 import com.everneth.emi.commands.*;
-import com.everneth.emi.commands.bot.CloseReportCommand;
-import com.everneth.emi.commands.bot.ConfirmSyncCommand;
-import com.everneth.emi.commands.bot.DenySyncCommand;
-import com.everneth.emi.commands.bot.HelpClearCommand;
+import com.everneth.emi.commands.bot.*;
+import com.everneth.emi.commands.bot.par.WhitelistAppCommand;
 import com.everneth.emi.commands.comm.CommCommand;
 import com.everneth.emi.commands.comp.CompCommand;
 import com.everneth.emi.commands.devop.DevopCommand;
@@ -15,6 +13,8 @@ import com.everneth.emi.commands.par.CharterCommand;
 import com.everneth.emi.events.JoinEvent;
 import com.everneth.emi.events.LeaveEvent;
 import com.everneth.emi.events.bot.MessageReceivedListener;
+import com.everneth.emi.events.bot.ReactionListener;
+import com.everneth.emi.events.bot.RoleChangeListener;
 import com.everneth.emi.managers.DevopProjectManager;
 import com.everneth.emi.managers.MotdManager;
 import com.everneth.emi.managers.ReportManager;
@@ -24,9 +24,10 @@ import com.everneth.emi.utils.PlayerUtils;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.entities.Game;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+
+import net.dv8tion.jda.api.entities.Activity;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -124,19 +125,23 @@ public class EMI extends JavaPlugin {
     {
         CommandClientBuilder builder = new CommandClientBuilder();
         builder.setPrefix(this.getConfig().getString("bot-prefix"));
-        builder.setGame(Game.playing(this.getConfig().getString("bot-game")));
+        builder.setActivity(Activity.listening(this.getConfig().getString("bot-game")));
         builder.addCommand(new HelpClearCommand());
         builder.addCommand(new ConfirmSyncCommand());
         builder.addCommand(new DenySyncCommand());
         builder.addCommand(new CloseReportCommand());
+        builder.addCommand(new ApplyCommand());
+        builder.addCommand(new WhitelistAppCommand());
         builder.setOwnerId(this.getConfig().getString("bot-owner-id"));
 
         CommandClient client = builder.build();
 
         try {
             jda = new JDABuilder(config.getString("bot-token"))
-                    .addEventListener(client)
-                    .addEventListener(new MessageReceivedListener())
+                    .addEventListeners(client)
+                    .addEventListeners(new MessageReceivedListener())
+                    .addEventListeners(new ReactionListener())
+                    .addEventListeners(new RoleChangeListener())
                     .build();
             jda.awaitReady();
         }

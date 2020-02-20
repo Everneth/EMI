@@ -6,7 +6,7 @@ import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Dependency;
 import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
-import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

@@ -5,13 +5,9 @@ import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.models.CharterPoint;
 import com.everneth.emi.models.EMIPlayer;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class PlayerUtils {
@@ -100,6 +96,54 @@ public class PlayerUtils {
             EMI.getPlugin().getLogger().info(e.getMessage());
         }
         return player;
+    }
+
+    public static DbRow getPlayerRow(long discordId)
+    {
+        CompletableFuture<DbRow> futurePlayer;
+        DbRow player = new DbRow();
+        futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE discord_id = ?", discordId);
+        try {
+            player = futurePlayer.get();
+        }
+        catch (Exception e)
+        {
+            EMI.getPlugin().getLogger().info(e.getMessage());
+        }
+        return player;
+    }
+
+    public static DbRow getAppRecord(long discordId)
+    {
+        CompletableFuture<DbRow> futurePlayer;
+        DbRow player = new DbRow();
+        futurePlayer = DB.getFirstRowAsync("SELECT * FROM applications WHERE applicant_discord_id = ?", discordId);
+        try {
+            player = futurePlayer.get();
+        }
+        catch (Exception e)
+        {
+            EMI.getPlugin().getLogger().info(e.getMessage());
+        }
+        return player;
+    }
+
+    public static boolean isMemberAlready(long discordId)
+    {
+        CompletableFuture<DbRow> futurePlayer;
+        DbRow player = new DbRow();
+        futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE discord_id = ?", discordId);
+        try {
+            player = futurePlayer.get();
+        }
+        catch (Exception e)
+        {
+            EMI.getPlugin().getLogger().info(e.getMessage());
+        }
+        if(player == null)
+            return false;
+        else
+            return true;
     }
 
     public static EMIPlayer getEMIPlayer(String name)
