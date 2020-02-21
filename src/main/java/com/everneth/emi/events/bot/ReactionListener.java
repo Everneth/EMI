@@ -34,7 +34,7 @@ public class ReactionListener extends ListenerAdapter {
                     Message msg = event.getGuild().getTextChannelById(event.getChannel().getIdLong()).retrieveMessageById(event.getMessageIdLong()).complete();
                     for (MessageReaction reaction : msg.getReactions()) {
                         // check majority of any reaction, then identify it
-                        if (((reaction.getCount()) / staffMembers.size()) * 100 >= 51) {
+                        if (((reaction.getCount()-1) / staffMembers.size()) * 100 >= 51) {
                             // we've reached majority, what action do we take
                             if (reaction.getReactionEmote().getEmoji().equals(APPROVE_REACTION)) {
                                 String ign = PlayerUtils.getAppRecord(VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId()).getString("mc_ign");
@@ -56,12 +56,11 @@ public class ReactionListener extends ListenerAdapter {
                                                 " accepted.").queue();
 
                                 Role pendingRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("pending-role-id"));
-                                Role citizenRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("citizen-role-id"));
+                                Role citizenRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("member-role-id"));
                                 Member memberToEdit = event.getGuild().getMemberById(VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId());
                                 event.getGuild().removeRoleFromMember(memberToEdit, pendingRole).queue();
                                 event.getGuild().addRoleToMember(memberToEdit, citizenRole).queue();
                                 VotingService.getService().removeVote(event.getMessageIdLong());
-
                             } else {
                                 Role pendingRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("pending-role-id"));
                                 Role applicantRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("applicant-role-id"));

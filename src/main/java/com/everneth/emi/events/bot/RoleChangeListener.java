@@ -16,6 +16,7 @@ public class RoleChangeListener extends ListenerAdapter {
     {
 
         Role pendingRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("pending-role-id"));
+        Role citizenRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("member-role-id"));
         if(event.getRoles().contains(pendingRole))
             event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id"))
                     .sendMessage(event.getMember().getAsMention() + " has just met requirements.").queue(
@@ -31,8 +32,10 @@ public class RoleChangeListener extends ListenerAdapter {
             );
         else if(PlayerUtils.isMemberAlready(event.getUser().getIdLong()))
         {
-            event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("whitelist-channel-id"))
-                    .sendMessage("Welcome back " + event.getUser().getAsMention() + "!").queue();
+            if(event.getGuild().getMemberById(event.getUser().getIdLong()).getRoles().isEmpty()) {
+                event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("whitelist-channel-id"))
+                        .sendMessage("Welcome back " + event.getUser().getAsMention() + "!").queue();
+            }
         }
     }
 }

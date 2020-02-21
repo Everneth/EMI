@@ -202,9 +202,9 @@ public class MessageReceivedListener extends ListenerAdapter {
                                     WhitelistAppService.getService().changeRoleToApplicant(appInProgress.getDiscordId());
                                     event.getPrivateChannel().sendMessage("Your application has been submitted! Your role is now Applicant").queue();
                                 } else {
-
                                     String msg = appInProgress.getInGameName() + "'s whitelist application could not be transmitted to the site. An embed of the application has been posted.";
                                     WhitelistAppService.getService().messageStaff(msg);
+                                    WhitelistAppService.getService().changeRoleToApplicant(appInProgress.getDiscordId());
                                 }
                                 WhitelistAppService.getService().removeApp(appInProgress.getDiscordId());
                                 break;
