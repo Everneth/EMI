@@ -104,10 +104,41 @@ public class WhitelistAppService {
         }
     }
 
+    public void updateApplicationRecord(WhitelistApp application)
+    {
+            DB.executeUpdateAsync("UPDATE applications " +
+                    "SET mc_ign = ?," +
+                    " location = ?," +
+                    " age = ?," +
+                    " friend = ?," +
+                    " looking_for = ?," +
+                    " has_been_banned = ?," +
+                    " is_approved = ?," +
+                    " love_hate = ?," +
+                    " intro = ?," +
+                    " secret_word = ?," +
+                    " mc_uuid = ?," +
+                    " applicant_discord_id = ?" +
+                    " WHERE applicant_discord_id = ?",
+                    application.getInGameName(),
+                    application.getLocation(),
+                    application.getAge(),
+                    application.getFriend(),
+                    application.getLookingFor(),
+                    application.getBannedElsewhere(),
+                    0,
+                    application.getLoveHate(),
+                    application.getIntro(),
+                    application.getSecretWord(),
+                    application.getMinecraftUuid(),
+                    application.getDiscordId(),
+                    application.getDiscordId());
+    }
+
     public void approveWhitelistAppRecord(long id, long msgid)
     {
         DbRow playerToAdd = PlayerUtils.getAppRecord(id);
-        DB.executeUpdateAsync("UPDATE applications SET is_approved = 1 WHERE applicant_discord_id = ?",
+        DB.executeUpdateAsync("UPDATE applications SET is_approved = 1, app_active = 0 WHERE applicant_discord_id = ?",
                 id);
         try {
             DB.executeInsert("INSERT INTO players (player_name, player_uuid, member_id, discord_id) " +
@@ -143,6 +174,23 @@ public class WhitelistAppService {
         return dbRowToApp(result);
     }
 
+    public WhitelistApp getSingleApplicant(UUID minecraftUuid)
+    {
+
+        DbRow result = new DbRow();
+
+        try {
+            result = DB.getFirstRowAsync("SELECT * FROM applications WHERE mc_uuid = ?",
+                    minecraftUuid.toString()).get();
+        }
+        catch(Exception e)
+        {
+            EMI.getPlugin().getLogger().warning("Error retrieving single application: Error msg: " + e.getMessage());
+        }
+
+        return dbRowToApp(result);
+    }
+
     private WhitelistApp dbRowToApp(DbRow appRecord)
     {
         return new WhitelistApp(
@@ -165,7 +213,7 @@ public class WhitelistAppService {
         List<WhitelistApp> applicants = new ArrayList<>();
         List<DbRow> results = new ArrayList<>();
         try {
-            results = DB.getResultsAsync("SELECT * FROM applications WHERE is_approved = ?", 0).get();
+            results = DB.getResultsAsync("SELECT * FROM applications WHERE app_active = ?", 1).get();
         }
         catch(Exception e)
         {
@@ -186,6 +234,11 @@ public class WhitelistAppService {
                     UUID.fromString(result.getString("mc_uuid"))
             ));
         return applicants;
+    }
+
+    public boolean appExists(UUID minecraftUuid) {
+        WhitelistApp app = getSingleApplicant(minecraftUuid);
+        return app == null;
     }
 
     public void addData(long id, int step, String data)
