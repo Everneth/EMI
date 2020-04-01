@@ -5,7 +5,6 @@ import com.everneth.emi.services.VotingService;
 import com.everneth.emi.services.WhitelistAppService;
 import com.everneth.emi.utils.PlayerUtils;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
@@ -14,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ReactionListener extends ListenerAdapter {
     private final String APPROVE_REACTION = "\u2705";
@@ -30,9 +30,20 @@ public class ReactionListener extends ListenerAdapter {
                     Role staffRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("staff-role-id"));
                     List<Member> staffMembers = event.getGuild().getMembersWithRoles(staffRole);
 
-                    // First check the amount of reactions subtracting 2 for the bots reactions
-                    Message msg = event.getGuild().getTextChannelById(event.getChannel().getIdLong()).retrieveMessageById(event.getMessageIdLong()).complete();
-                    for (MessageReaction reaction : msg.getReactions()) {
+                    // time for some black magic java 8 features
+                    AtomicReference<List<MessageReaction>> reactionsRef = null;
+
+                    // Using said black magic, retrieve the message for the latest snapshot of the data, then store it in the atomic reference
+                   event.getGuild().getTextChannelById(event.getChannel().getIdLong()).retrieveMessageById(event.getMessageIdLong()).queue(
+                            (message) -> {
+                                reactionsRef.set(message.getReactions());}
+                    );
+
+                   // please dont explode
+                   List<MessageReaction> reactions = reactionsRef.get();
+
+                   // process like before?
+                    for (MessageReaction reaction : reactions) {
                         // check majority of any reaction, then identify it
                         if (((reaction.getCount()-1) / staffMembers.size()) * 100 >= 51) {
                             // we've reached majority, what action do we take
@@ -61,7 +72,7 @@ public class ReactionListener extends ListenerAdapter {
                                 event.getGuild().removeRoleFromMember(memberToEdit, pendingRole).queue();
                                 event.getGuild().addRoleToMember(memberToEdit, citizenRole).queue();
                                 VotingService.getService().removeVote(event.getMessageIdLong());
-                            } else {
+                            } else if (reaction.getReactionEmote().getEmoji().equals(REJECT_REACTION)) {
                                 Role pendingRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("pending-role-id"));
                                 Role applicantRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("applicant-role-id"));
                                 Member memberToEdit = event.getGuild().getMemberById(VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId());
