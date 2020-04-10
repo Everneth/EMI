@@ -10,10 +10,12 @@ import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.RestAction;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ReactionListener extends ListenerAdapter {
     private final String APPROVE_REACTION = "\u2705";
@@ -30,11 +32,12 @@ public class ReactionListener extends ListenerAdapter {
                     Role staffRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("staff-role-id"));
                     List<Member> staffMembers = event.getGuild().getMembersWithRoles(staffRole);
 
-                    // First check the amount of reactions subtracting 2 for the bots reactions
-                    Message msg = event.getGuild().getTextChannelById(event.getChannel().getIdLong()).retrieveMessageById(event.getMessageIdLong()).complete();
-                    for (MessageReaction reaction : msg.getReactions()) {
+                    Message message = event.getChannel().retrieveMessageById(event.getMessageIdLong()).complete();
+
+                    for (MessageReaction reaction : message.getReactions()) {
                         // check majority of any reaction, then identify it
-                        if (((reaction.getCount()-1) / staffMembers.size()) * 100 >= 51) {
+                        double numReactions = reaction.getCount();
+                        if (((numReactions-1) / (double) staffMembers.size()) * 100 >= 51) {
                             // we've reached majority, what action do we take
                             if (reaction.getReactionEmote().getEmoji().equals(APPROVE_REACTION)) {
                                 String ign = PlayerUtils.getAppRecord(VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId()).getString("mc_ign");
@@ -61,7 +64,7 @@ public class ReactionListener extends ListenerAdapter {
                                 event.getGuild().removeRoleFromMember(memberToEdit, pendingRole).queue();
                                 event.getGuild().addRoleToMember(memberToEdit, citizenRole).queue();
                                 VotingService.getService().removeVote(event.getMessageIdLong());
-                            } else {
+                            } else if (reaction.getReactionEmote().getEmoji().equals(REJECT_REACTION)) {
                                 Role pendingRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("pending-role-id"));
                                 Role applicantRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("applicant-role-id"));
                                 Member memberToEdit = event.getGuild().getMemberById(VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId());

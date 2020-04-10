@@ -183,7 +183,10 @@ public class MessageReceivedListener extends ListenerAdapter {
                                 eb2.setFooter("UUID: " + appInProgress.getMinecraftUuid().toString());
                                 WhitelistAppService.getService().messageStaffWithEmbed(eb2);
 
-                                WhitelistAppService.getService().addApplicationRecord(appInProgress);
+                                if(WhitelistAppService.getService().appExists(appInProgress.getMinecraftUuid()))
+                                    WhitelistAppService.getService().updateApplicationRecord(appInProgress);
+                                else
+                                    WhitelistAppService.getService().addApplicationRecord(appInProgress);
 
                                 PostResponse postResponse;
                                 int statusCode = 0;
