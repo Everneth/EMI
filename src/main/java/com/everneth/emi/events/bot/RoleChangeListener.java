@@ -19,7 +19,7 @@ public class RoleChangeListener extends ListenerAdapter {
         Role citizenRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("member-role-id"));
         if(event.getRoles().contains(pendingRole))
             event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id"))
-                    .sendMessage(event.getMember().getAsMention() + " has just met requirements.").queue(
+                    .sendMessage("Heads up @everyone! " + event.getMember().getAsMention() + " has just met requirements.").queue(
                     (msg) -> {
                         VotingService.getService().addVote(msg.getIdLong(), new WhitelistVote(
                                 event.getUser().getIdLong(),

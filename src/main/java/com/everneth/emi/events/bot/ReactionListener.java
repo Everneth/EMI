@@ -5,10 +5,12 @@ import com.everneth.emi.services.VotingService;
 import com.everneth.emi.services.WhitelistAppService;
 import com.everneth.emi.utils.PlayerUtils;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.RestAction;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -30,22 +32,12 @@ public class ReactionListener extends ListenerAdapter {
                     Role staffRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("staff-role-id"));
                     List<Member> staffMembers = event.getGuild().getMembersWithRoles(staffRole);
 
-                    // time for some black magic java 8 features
-                    AtomicReference<List<MessageReaction>> reactionsRef = null;
+                    Message message = event.getChannel().retrieveMessageById(event.getMessageIdLong()).complete();
 
-                    // Using said black magic, retrieve the message for the latest snapshot of the data, then store it in the atomic reference
-                   event.getGuild().getTextChannelById(event.getChannel().getIdLong()).retrieveMessageById(event.getMessageIdLong()).queue(
-                            (message) -> {
-                                reactionsRef.set(message.getReactions());}
-                    );
-
-                   // please dont explode
-                   List<MessageReaction> reactions = reactionsRef.get();
-
-                   // process like before?
-                    for (MessageReaction reaction : reactions) {
+                    for (MessageReaction reaction : message.getReactions()) {
                         // check majority of any reaction, then identify it
-                        if (((reaction.getCount()-1) / staffMembers.size()) * 100 >= 51) {
+                        double numReactions = reaction.getCount();
+                        if (((numReactions-1) / (double) staffMembers.size()) * 100 >= 51) {
                             // we've reached majority, what action do we take
                             if (reaction.getReactionEmote().getEmoji().equals(APPROVE_REACTION)) {
                                 String ign = PlayerUtils.getAppRecord(VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId()).getString("mc_ign");

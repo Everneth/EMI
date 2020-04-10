@@ -188,7 +188,10 @@ public class WhitelistAppService {
             EMI.getPlugin().getLogger().warning("Error retrieving single application: Error msg: " + e.getMessage());
         }
 
-        return dbRowToApp(result);
+        if(result == null)
+            return null;
+        else
+            return dbRowToApp(result);
     }
 
     private WhitelistApp dbRowToApp(DbRow appRecord)
@@ -238,7 +241,10 @@ public class WhitelistAppService {
 
     public boolean appExists(UUID minecraftUuid) {
         WhitelistApp app = getSingleApplicant(minecraftUuid);
-        return app == null;
+        if(app == null)
+            return false;
+        else
+            return true;
     }
 
     public void addData(long id, int step, String data)
