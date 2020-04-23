@@ -12,6 +12,7 @@ import com.everneth.emi.commands.devop.DevopCommand;
 import com.everneth.emi.commands.par.CharterCommand;
 import com.everneth.emi.events.JoinEvent;
 import com.everneth.emi.events.LeaveEvent;
+import com.everneth.emi.events.bot.GuildLeaveListener;
 import com.everneth.emi.events.bot.MessageReceivedListener;
 import com.everneth.emi.events.bot.ReactionListener;
 import com.everneth.emi.events.bot.RoleChangeListener;
@@ -142,6 +143,7 @@ public class EMI extends JavaPlugin {
                     .addEventListeners(new MessageReceivedListener())
                     .addEventListeners(new ReactionListener())
                     .addEventListeners(new RoleChangeListener())
+                    .addEventListeners(new GuildLeaveListener())
                     .build();
             jda.awaitReady();
         }

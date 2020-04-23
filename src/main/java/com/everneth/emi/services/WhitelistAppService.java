@@ -174,6 +174,21 @@ public class WhitelistAppService {
         return dbRowToApp(result);
     }
 
+    public WhitelistApp getSingleApplicant(long discordId)
+    {
+        DbRow result = new DbRow();
+        try {
+            result = DB.getFirstRowAsync("SELECT * FROM applications WHERE applicant_discord_id = ?",
+                    discordId).get();
+        }
+        catch(Exception e)
+        {
+            EMI.getPlugin().getLogger().warning("Error retrieving single application: Error msg: " + e.getMessage());
+        }
+
+        return dbRowToApp(result);
+    }
+
     public WhitelistApp getSingleApplicant(UUID minecraftUuid)
     {
 

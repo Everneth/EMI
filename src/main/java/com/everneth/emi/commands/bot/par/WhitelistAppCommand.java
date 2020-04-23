@@ -90,7 +90,13 @@ public class WhitelistAppCommand extends Command {
         @Override
         protected void execute(CommandEvent event)
         {
-            WhitelistApp app = WhitelistAppService.getService().getSingleApplicant(event.getArgs());
+            long id = Long.parseLong(event.getArgs());
+            WhitelistApp app;
+            if(id == 0L)
+                app = WhitelistAppService.getService().getSingleApplicant(event.getArgs());
+            else
+                app = WhitelistAppService.getService().getSingleApplicant(id);
+
             if(app == null)
             {
                 event.reply("```asciidoc\n [NO RESULTS]```");
