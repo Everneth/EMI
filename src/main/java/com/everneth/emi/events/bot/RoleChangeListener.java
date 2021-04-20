@@ -7,6 +7,7 @@ import com.everneth.emi.utils.PlayerUtils;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
+import org.bukkit.Statistic;
 
 public class RoleChangeListener extends ListenerAdapter {
     private final String APPROVE_REACTION = "\u2705";
@@ -14,11 +15,10 @@ public class RoleChangeListener extends ListenerAdapter {
     @Override
     public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event)
     {
-
         Role pendingRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("pending-role-id"));
         Role citizenRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("member-role-id"));
         if(event.getRoles().contains(pendingRole))
-            event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("staff-channel-id"))
+            event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("voting-channel-id"))
                     .sendMessage("Heads up @everyone! " + event.getMember().getAsMention() + " has just met requirements.").queue(
                     (msg) -> {
                         VotingService.getService().addVote(msg.getIdLong(), new WhitelistVote(
