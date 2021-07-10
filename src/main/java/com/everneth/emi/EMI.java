@@ -138,7 +138,7 @@ public class EMI extends JavaPlugin {
         CommandClient client = builder.build();
 
         try {
-            jda = new JDABuilder(config.getString("bot-token"))
+            jda = JDABuilder.createDefault(config.getString("bot-token"))
                     .addEventListeners(client)
                     .addEventListeners(new MessageReceivedListener())
                     .addEventListeners(new ReactionListener())
@@ -147,11 +147,7 @@ public class EMI extends JavaPlugin {
                     .build();
             jda.awaitReady();
         }
-        catch(LoginException e)
-        {
-            e.printStackTrace();
-        }
-        catch(InterruptedException e)
+        catch(Exception e)
         {
             e.printStackTrace();
         }
@@ -161,7 +157,6 @@ public class EMI extends JavaPlugin {
     {
         port(this.getConfig().getInt("api-port"));
         get(Path.Web.ONE_STATS, StatisticController.getPlayerStats);
-        get(Path.Web.ONE_DATA, PlayerdataController.getPlayerData);
         get(Path.Web.ONE_ADV, AdvancementController.getPlayerAdvs);
         post(Path.Web.EXECUTE_COMMAND, CommandController.sendCommandPayload);
         get("*", (request, response) -> "404 not found!!");
