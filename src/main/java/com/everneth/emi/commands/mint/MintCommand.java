@@ -2,6 +2,7 @@ package com.everneth.emi.commands.mint;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 
 import java.sql.SQLException;
@@ -18,4 +19,13 @@ public class MintCommand extends BaseCommand
 {
     @Dependency
     private Plugin plugin;
+
+    @CommandPermission("emi.mint")
+    @Subcommand("help")
+    public void onHelpCommand(CommandSender sender)
+    {
+
+    }
+
+
 }

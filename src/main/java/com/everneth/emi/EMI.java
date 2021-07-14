@@ -2,7 +2,6 @@ package com.everneth.emi;
 
 import co.aikar.commands.BukkitCommandManager;
 import co.aikar.idb.*;
-import com.everneth.emi.api.*;
 import com.everneth.emi.commands.*;
 import com.everneth.emi.commands.bot.*;
 import com.everneth.emi.commands.bot.par.WhitelistAppCommand;
@@ -82,7 +81,6 @@ public class EMI extends JavaPlugin {
         registerCommands();
         registerListeners();
         initBot();
-        initApi();
         initDevop();
         initMotds();
     }
@@ -151,17 +149,6 @@ public class EMI extends JavaPlugin {
         {
             e.printStackTrace();
         }
-    }
-
-    private void initApi()
-    {
-        port(this.getConfig().getInt("api-port"));
-        get(Path.Web.ONE_STATS, StatisticController.getPlayerStats);
-        get(Path.Web.ONE_ADV, AdvancementController.getPlayerAdvs);
-        post(Path.Web.EXECUTE_COMMAND, CommandController.sendCommandPayload);
-        get("*", (request, response) -> "404 not found!!");
-
-        Spark.exception(Exception.class, (exception, request, response) -> {exception.printStackTrace();});
     }
 
     private void registerListeners()
