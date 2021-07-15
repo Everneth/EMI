@@ -10,6 +10,7 @@ import com.everneth.emi.EMI;
 import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.Utils;
 import com.everneth.emi.models.Report;
+import com.everneth.emi.utils.PlayerUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -73,7 +74,7 @@ public class ReportCommand extends BaseCommand {
         Role botRole = guildManager.getGuild().getRolesByName(EMI.getJda().getSelfUser().getName(), true).get(0);
         ReportManager rm = ReportManager.getReportManager();
 
-        DbRow playerRow = getPlayerRow(player.getUniqueId());
+        DbRow playerRow = PlayerUtils.getPlayerRow(player.getUniqueId());
 
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle(player.getName());
@@ -118,20 +119,6 @@ public class ReportCommand extends BaseCommand {
                         channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessage(eb.build()).queue();
                     });
         }
-    }
-    private DbRow getPlayerRow(UUID uuid)
-    {
-        CompletableFuture<DbRow> futurePlayer;
-        DbRow player = new DbRow();
-        futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE player_uuid = ?", uuid.toString());
-        try {
-            player = futurePlayer.get();
-        }
-        catch (Exception e)
-        {
-            EMI.getPlugin().getLogger().info(e.getMessage());
-        }
-        return player;
     }
     private boolean hasSynced(DbRow row)
     {
