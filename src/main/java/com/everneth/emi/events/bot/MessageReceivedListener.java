@@ -96,7 +96,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                         if (appInProgress.getStep() == 11 && event.getMessage().getContentRaw().toLowerCase().equals("yes")) {
                             appInProgress.setHoldForNextStep(false);
                         } else if (appInProgress.getStep() == 11 && event.getMessage().getContentRaw().toLowerCase().equals("no")) {
-                            WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong()).setStep(1);
+                            appInProgress.setStep(1);
                             appInProgress.setHoldForNextStep(false);
                         } else if (appInProgress.getStep() == 11 && (!event.getMessage().getContentRaw().toLowerCase().equals("no") || !event.getMessage().getContentRaw().toLowerCase().equals("yes"))) {
                             event.getPrivateChannel().sendMessage("**INVALID INPUT** Please review once more and answer with yes or no!").queue();
