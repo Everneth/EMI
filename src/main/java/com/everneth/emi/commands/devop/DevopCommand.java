@@ -25,12 +25,12 @@ import java.util.ArrayList;
  *      Purpose: Command structure to aid in managing public projects
  */
 
-@CommandAlias("devop")
+@CommandAlias("devop|mint")
 public class DevopCommand extends BaseCommand
 {
     @Dependency
     private Plugin plugin;
-    private String devopProjectTag = "&7[&dDev&5op&7] ";
+    private final String devopProjectTag = "&7[&dMint&5Projects] ";
 
     //TODO add tab-complete
     @Subcommand("log material")
@@ -665,7 +665,7 @@ public class DevopCommand extends BaseCommand
 
         if(project.getTasks().get(taskID) == null)
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cTaskID isnt associated with any tasks!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cTaskID isn't associated with any tasks!"));
             return;
         }
 
@@ -729,7 +729,7 @@ public class DevopCommand extends BaseCommand
 
         if(task == null)
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cTaskID isnt associated with any tasks!"));
+            player.sendMessage(Utils.color(devopProjectTag + "&cTaskID isn't associated with any tasks!"));
             return;
         }
 
@@ -761,7 +761,7 @@ public class DevopCommand extends BaseCommand
 
         if(task == null)
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cTaskID isnt associated with any tasks."));
+            player.sendMessage(Utils.color(devopProjectTag + "&cTaskID isn't associated with any tasks."));
             return;
         }
 
