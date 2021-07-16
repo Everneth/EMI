@@ -10,6 +10,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.TextChannel;
 import org.apache.http.Consts;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -32,43 +33,81 @@ public class CloseReportCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
+
+        long mintChannelId = EMI.getPlugin().getConfig().getLong("mint-channel-id");
+        long staffChannelId = EMI.getPlugin().getConfig().getLong("staff-channel-id");
+
         // We need to make sure the command sender has the correct authorized roles.
         // Assume no one has roles
         boolean hasRequiredRoles = false;
-
         // Get the roles from the member
         List<Role> roleList = event.getMember().getRoles();
         String playerName = event.getTextChannel().getName().substring(0, event.getTextChannel().getName().indexOf('_'));
         ReportManager rm = ReportManager.getReportManager();
 
-        UUID uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
-        // Lets check them
-        for (Role role : roleList) {
-            if (role.getName().equals("Staff")) {
-                // Found a required role, no need to continue, break from the loop
-                hasRequiredRoles = true;
-                break;
+        if(event.getChannel().getName().contains("_staff"))
+        {
+            UUID uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
+            // Lets check them
+            for (Role role : roleList) {
+                if (role.getIdLong() == staffChannelId) {
+                    // Found a required role, no need to continue, break from the loop
+                    hasRequiredRoles = true;
+                    break;
+                }
+            }
+            // We've looped through. Do we have the role?
+            if (hasRequiredRoles) {
+                // Got the role! Lets build a list of messages to clear.
+                List<Message> messageList = event.getTextChannel().getIterableHistory().complete();
+                // Take our messages and build a string, we'll dump that string into a message file
+                // and embed the file into a message
+                File embedFile = transcribeToFile(messageList);
+                String msg = "Log from " + playerName + "'s report has been attached.";
+                Message message = new MessageBuilder().append(msg).build();
+                event.getGuild().getTextChannelById(
+                        EMI.getPlugin().getConfig().getLong("staff-channel-id")
+                ).sendMessage(message).addFile(embedFile).queue();
+
+                event.getTextChannel().delete().queue();
+            } else {
+                // You can;t even use this at all, we're not checking any further
+                // TODO: Mute member if attempts are made to use command to spam replies
+                event.reply("Sorry dear, you must be a member of staff to use this command. :heart: ");
             }
         }
-        // We've looped through. Do we have the role?
-        if (hasRequiredRoles) {
-            // Got the role! Lets build a list of messages to clear.
-            List<Message> messageList = event.getTextChannel().getIterableHistory().complete();
-            // Take our messages and build a string, we'll dump that string into a message file
-            // and embed the file into a message
-            File embedFile = transcribeToFile(messageList);
-            String msg = "Log from " + playerName + "'s report has been attached.";
-            Message message = new MessageBuilder().append(msg).build();
-            event.getGuild().getTextChannelById(
-                    EMI.getPlugin().getConfig().getLong("staff-channel-id")
-            ).sendMessage(message).addFile(embedFile).queue();
+        else if(event.getChannel().getName().contains("_mint"))
+        {
+            UUID uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
+            // Lets check them
+            for (Role role : roleList) {
+                if (role.getIdLong() == mintChannelId) {
+                    // Found a required role, no need to continue, break from the loop
+                    hasRequiredRoles = true;
+                    break;
+                }
+            }
+            // We've looped through. Do we have the role?
+            if (hasRequiredRoles) {
+                // Got the role! Lets build a list of messages to clear.
+                List<Message> messageList = event.getTextChannel().getIterableHistory().complete();
+                // Take our messages and build a string, we'll dump that string into a message file
+                // and embed the file into a message
+                File embedFile = transcribeToFile(messageList);
+                String msg = "Log from " + playerName + "'s request has been attached.";
+                Message message = new MessageBuilder().append(msg).build();
+                event.getGuild().getTextChannelById(
+                        EMI.getPlugin().getConfig().getLong("mint-channel-id")
+                ).sendMessage(message).addFile(embedFile).queue();
 
-            event.getTextChannel().delete().queue();
-        } else {
-            // You can;t even use this at all, we're not checking any further
-            // TODO: Mute member if attempts are made to use command to spam replies
-            event.reply("Sorry dear, you must be a member of staff to use this command. :heart: ");
+                event.getTextChannel().delete().queue();
+            } else {
+                // You can;t even use this at all, we're not checking any further
+                // TODO: Mute member if attempts are made to use command to spam replies
+                event.reply("Sorry dear, you must be a member of MINT or Staff to use this command. :heart: ");
+            }
         }
+
     }
 
     private File transcribeToFile(List<Message> messageList) {
