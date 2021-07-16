@@ -57,78 +57,10 @@ public class ReportCommand extends BaseCommand {
                     "your active report for new or existing issues in progress. <3"));
         }
         else {
-            buildPrivateChannel(player, message);
+            Report.buildPrivateChannel(player, message, "_staff");
             // Make the bot post the embed to the channel and notify the player
             player.sendMessage(Utils.color("<&6The Wench&f> I have created a direct channel with staff. Please use &6/rr <message>&f to message staff directly! A staff member " +
                     "will get back to you shortly. If you miss any replies, you will be notified the next time you join the server. &c&lIf your Discord is linked, please use that to reply and get missed messages. &d<3"));
-        }
-    }
-
-    private void buildPrivateChannel(Player player, String message)
-    {
-        Date now = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        Member discordMember;
-        GuildManager guildManager = EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getManager();
-        Role staffRole = guildManager.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("staff-role-id"));
-        Role botRole = guildManager.getGuild().getRolesByName(EMI.getJda().getSelfUser().getName(), true).get(0);
-        ReportManager rm = ReportManager.getReportManager();
-
-        DbRow playerRow = PlayerUtils.getPlayerRow(player.getUniqueId());
-
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(player.getName());
-        eb.setDescription(player.getUniqueId().toString());
-        eb.setColor(0xffff00);
-        eb.setThumbnail("https://minotar.net/helm/" + player.getUniqueId() + "/100.png");
-        eb.addField("X", Double.toString(player.getLocation().getX()), true);
-        eb.addField("Y", Double.toString(player.getLocation().getY()), true);
-        eb.addField("Z", Double.toString(player.getLocation().getZ()), true);
-        eb.addField("Dimension", player.getWorld().getEnvironment().toString(), true);
-        eb.addField("Time Reported (EST)", format.format(now), true);
-        eb.addField("Description", message, false);
-        eb.setFooter("Help requested!", null);
-
-        if(hasSynced(playerRow)) {
-            discordMember = guildManager.getGuild().getMemberById(playerRow.getLong("discord_id"));
-            ChannelAction<TextChannel> channelAction = guildManager.getGuild().createTextChannel(player.getName().toLowerCase() + "_staff");
-            channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
-                    .addPermissionOverride(staffRole, Permission.ALL_CHANNEL_PERMISSIONS, 0)
-                    .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0)
-                    .addPermissionOverride(discordMember, Permission.MESSAGE_READ.getRawValue(), 0)
-                    .addPermissionOverride(discordMember, Permission.MESSAGE_HISTORY.getRawValue(), 0)
-                    .addPermissionOverride(discordMember, Permission.MESSAGE_WRITE.getRawValue(), 0).queue(
-                    channel -> {
-                        Report reportToAdd = new Report(channel.getIdLong());
-                        reportToAdd.setDiscordUserId(discordMember.getUser().getIdLong());
-                        rm.addReport(player.getUniqueId(), reportToAdd);
-                        rm.addReportRecord(reportToAdd, playerRow.getInt("player_id"));
-                        channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessage(eb.build()).queue();
-                    });
-        }
-        else
-        {
-            ChannelAction<TextChannel> channelAction = guildManager.getGuild().createTextChannel(player.getName().toLowerCase() + "_staff");
-            channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
-                    .addPermissionOverride(staffRole, Permission.ALL_TEXT_PERMISSIONS, 0)
-                    .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0).queue(
-                    channel -> {
-                        Report reportToAdd = new Report(channel.getIdLong());
-                        rm.addReport(player.getUniqueId(), reportToAdd);
-                        rm.addReportRecord(reportToAdd, playerRow.getInt("player_id"));
-                        channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessage(eb.build()).queue();
-                    });
-        }
-    }
-    private boolean hasSynced(DbRow row)
-    {
-        if(row.getLong("discord_id") == null || row.getLong("discord_id") == 0)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
         }
     }
 }
