@@ -4,6 +4,7 @@ import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.models.Report;
+import com.everneth.emi.utils.PlayerUtils;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -60,7 +61,7 @@ public final class ReportManager {
     public int messagesMissed(UUID uuid)
     {
         Report report = rm.findReportById(uuid);
-        DbRow playerRecord = getPlayerRow(uuid);
+        DbRow playerRecord = PlayerUtils.getPlayerRow(uuid);
         DbRow reportRecord = getReportRecord(uuid);
         EMI.getJda().getTextChannelById(report.getChannelId()).sendMessage("***" + playerRecord.getString("player_name") + "** has joined the game.*").queue();
         try {
@@ -77,7 +78,7 @@ public final class ReportManager {
     public List<DbRow> getMissedMessages(UUID uuid)
     {
         Report report = rm.findReportById(uuid);
-        DbRow playerRecord = getPlayerRow(uuid);
+        DbRow playerRecord = PlayerUtils.getPlayerRow(uuid);
         DbRow reportRecord = getReportRecord(uuid);
         try
         {
@@ -101,7 +102,7 @@ public final class ReportManager {
 
     public DbRow getReportRecord(UUID uuid)
     {
-        DbRow playerRow = getPlayerRow(uuid);
+        DbRow playerRow = PlayerUtils.getPlayerRow(uuid);
         try {
             CompletableFuture<DbRow> result =  DB.getFirstRowAsync("SELECT * FROM reports WHERE initiator_id = ?", playerRow.getInt("player_id"));
             return result.get();
@@ -148,7 +149,7 @@ public final class ReportManager {
     {
         Date now = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        DbRow playerRow = getPlayerRow(uuid);
+        DbRow playerRow = PlayerUtils.getPlayerRow(uuid);
         DbRow reportRecord = getReportRecord(uuid);
         DB.executeUpdateAsync(
                 "UPDATE reports SET active = 0, date_closed = ? WHERE initiator_id = ?",
@@ -195,19 +196,5 @@ public final class ReportManager {
                 }
             }
         }
-    }
-    private DbRow getPlayerRow(UUID uuid)
-    {
-        CompletableFuture<DbRow> futurePlayer;
-        DbRow player = new DbRow();
-        futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE player_uuid = ?", uuid.toString());
-        try {
-            player = futurePlayer.get();
-        }
-        catch (Exception e)
-        {
-            EMI.getPlugin().getLogger().info(e.getMessage());
-        }
-        return player;
     }
 }

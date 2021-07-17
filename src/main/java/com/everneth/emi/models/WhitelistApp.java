@@ -152,28 +152,4 @@ public class WhitelistApp {
     public void setHoldForNextStep(boolean holdForNextStep) {
         this.holdForNextStep = holdForNextStep;
     }
-    public String prepareAppForPost()
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<strong>Minecraft IGN</strong><br/><em>");
-        sb.append(this.inGameName);
-        sb.append("</em><br/><br/><strong>Where do you live? (Country or State if USA)</strong><br/><em>");
-        sb.append(this.location );
-        sb.append("</em><br/><br/><strong>What is your age?</strong><br/><em>");
-        sb.append(this.age);
-        sb.append("</em><br/><br/><strong>Do you know someone in our community?</strong><br/><em>");
-        sb.append(this.friend);
-        sb.append("</em><br/><br/><strong>Have you been banned elsewhere before?</strong><br/><em>");
-        sb.append(this.bannedElsewhere);
-        sb.append("</em><br/><br/><strong>What are you looking for in a Minecraft community?</strong><br/><em>");
-        sb.append(this.lookingFor);
-        sb.append("</em><br/><br/><strong>What do you love and/or hate about Minecraft?</strong><br/><em>");
-        sb.append(this.loveHate);
-        sb.append("</em><br/><br/><strong>Tell us something about you!</strong><br/><em>");
-        sb.append(this.intro);
-        sb.append("</em><br/><br/><strong>What is the secret word?</strong><br/><em>");
-        sb.append(this.secretWord);
-        sb.append("</em><br/><br/>");
-        return sb.toString();
-    }
 }

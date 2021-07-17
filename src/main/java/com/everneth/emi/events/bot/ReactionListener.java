@@ -60,9 +60,11 @@ public class ReactionListener extends ListenerAdapter {
 
                                 Role pendingRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("pending-role-id"));
                                 Role citizenRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("member-role-id"));
+                                Role syncedRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("synced-role-id"));
                                 Member memberToEdit = event.getGuild().getMemberById(VotingService.getService().getVoteByMessageId(event.getMessageIdLong()).getApplicantDiscordId());
                                 event.getGuild().removeRoleFromMember(memberToEdit, pendingRole).queue();
                                 event.getGuild().addRoleToMember(memberToEdit, citizenRole).queue();
+                                event.getGuild().addRoleToMember(memberToEdit, syncedRole).queue();
                                 VotingService.getService().removeVote(event.getMessageIdLong());
                             } else if (reaction.getReactionEmote().getEmoji().equals(REJECT_REACTION)) {
                                 Role pendingRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("pending-role-id"));

@@ -8,6 +8,7 @@ import com.everneth.emi.models.EMIPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class PlayerUtils {
@@ -144,6 +145,21 @@ public class PlayerUtils {
             return false;
         else
             return true;
+    }
+
+    public static DbRow getPlayerRow(UUID uuid)
+    {
+        CompletableFuture<DbRow> futurePlayer;
+        DbRow player = new DbRow();
+        futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE player_uuid = ?", uuid.toString());
+        try {
+            player = futurePlayer.get();
+        }
+        catch (Exception e)
+        {
+            EMI.getPlugin().getLogger().info(e.getMessage());
+        }
+        return player;
     }
 
     public static EMIPlayer getEMIPlayer(String name)

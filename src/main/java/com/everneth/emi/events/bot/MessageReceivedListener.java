@@ -96,7 +96,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                         if (appInProgress.getStep() == 11 && event.getMessage().getContentRaw().toLowerCase().equals("yes")) {
                             appInProgress.setHoldForNextStep(false);
                         } else if (appInProgress.getStep() == 11 && event.getMessage().getContentRaw().toLowerCase().equals("no")) {
-                            WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong()).setStep(1);
+                            appInProgress.setStep(1);
                             appInProgress.setHoldForNextStep(false);
                         } else if (appInProgress.getStep() == 11 && (!event.getMessage().getContentRaw().toLowerCase().equals("no") || !event.getMessage().getContentRaw().toLowerCase().equals("yes"))) {
                             event.getPrivateChannel().sendMessage("**INVALID INPUT** Please review once more and answer with yes or no!").queue();
@@ -188,27 +188,11 @@ public class MessageReceivedListener extends ListenerAdapter {
                                 else
                                     WhitelistAppService.getService().addApplicationRecord(appInProgress);
 
-                                PostResponse postResponse;
-                                int statusCode = 0;
-                                String url = "";
-                                try {
-                                    postResponse = transcribeToPost(appInProgress);
-                                    statusCode = postResponse.getStatusCode();
-                                    url = postResponse.getUrl();
-                                } catch (IOException e) {
-                                    System.out.println(e.getMessage());
-                                }
-                                if (statusCode == 200 || statusCode == 201) {
-                                    String msg = appInProgress.getInGameName() + "'s whitelist application successfully transmitted to the site.\n\n" +
-                                            url;
-                                    WhitelistAppService.getService().messageStaff(msg);
-                                    WhitelistAppService.getService().changeRoleToApplicant(appInProgress.getDiscordId());
-                                    event.getPrivateChannel().sendMessage("Your application has been submitted! Your role is now Applicant").queue();
-                                } else {
-                                    String msg = appInProgress.getInGameName() + "'s whitelist application could not be transmitted to the site. An embed of the application has been posted.";
-                                    WhitelistAppService.getService().messageStaff(msg);
-                                    WhitelistAppService.getService().changeRoleToApplicant(appInProgress.getDiscordId());
-                                }
+
+                                String msg = appInProgress.getInGameName() + "'s whitelist application could not be transmitted to the site. An embed of the application has been posted.";
+                                WhitelistAppService.getService().messageStaff(msg);
+                                WhitelistAppService.getService().changeRoleToApplicant(appInProgress.getDiscordId());
+                                event.getPrivateChannel().sendMessage("Your application has been submitted! Your role is now Applicant").queue();
                                 WhitelistAppService.getService().removeApp(appInProgress.getDiscordId());
                                 break;
                         }
@@ -217,49 +201,4 @@ public class MessageReceivedListener extends ListenerAdapter {
                 }
             }
         }
-
-    private PostResponse transcribeToPost(WhitelistApp app) throws IOException {
-        final String URL =
-                EMI.getPlugin().getConfig().getString("api-topic-post-url") + "api" +
-                        EMI.getPlugin().getConfig().getString("api-topic-post-endpoint");
-        final String KEY = EMI.getPlugin().getConfig().getString("api-key");
-        final int POSTER = EMI.getPlugin().getConfig().getInt("system-user-id");
-        final int FORUM_ID = EMI.getPlugin().getConfig().getInt("whitelist-app-forum-id");
-
-        StringBuilder sb = new StringBuilder();
-
-        String postHeader = "<span style=\"font-size:24px;\"><b>Whitelist application submitted by " + app.getInGameName() + "</b></span><br />";
-        sb.append(postHeader);
-        sb.append(app.prepareAppForPost());
-
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(URL);
-        List<NameValuePair> params = new ArrayList<NameValuePair>();
-
-        String title = app.getInGameName() + "'s whitelist application";
-
-        params.add(new BasicNameValuePair("key", KEY));
-        params.add(new BasicNameValuePair("forum", String.valueOf(FORUM_ID)));
-        params.add(new BasicNameValuePair("title", title));
-        params.add(new BasicNameValuePair("post", sb.toString()));
-        params.add(new BasicNameValuePair("author", String.valueOf(POSTER)));
-
-        httpPost.setEntity(new UrlEncodedFormEntity(params, Consts.UTF_8));
-
-        try {
-            CloseableHttpResponse response2 = httpclient.execute(httpPost);
-            JSONObject obj = new JSONObject(EntityUtils.toString(response2.getEntity()));
-
-            return new PostResponse(response2.getStatusLine().getStatusCode(), obj.getString("url"));
-        }
-        catch (Exception e)
-        {
-            EMI.getPlugin().getLogger().info("Something broke: " + e.getMessage());
-            return new PostResponse(0, "");
-        }
-        finally
-        {
-            httpclient.close();
-        }
-    }
 }
