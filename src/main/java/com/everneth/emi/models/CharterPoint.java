@@ -71,7 +71,7 @@ public class CharterPoint {
 
     public long issuePoint()
     {
-        DbRow issuer = getPlayerRow(UUID.fromString(this.getIssuer().getUniqueId()));
+        DbRow issuer = PlayerUtils.getPlayerRow(UUID.fromString(this.getIssuer().getUniqueId()));
         Date now = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -278,50 +278,5 @@ public class CharterPoint {
             return true;
         else
             return false;
-    }
-
-    private DbRow getPlayerRow(UUID uuid)
-    {
-        CompletableFuture<DbRow> futurePlayer;
-        DbRow player = new DbRow();
-        futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE player_uuid = ?", uuid.toString());
-        try {
-            player = futurePlayer.get();
-        }
-        catch (Exception e)
-        {
-            EMI.getPlugin().getLogger().info(e.getMessage());
-        }
-        return player;
-    }
-
-    private DbRow getPlayerRow(int id)
-    {
-        CompletableFuture<DbRow> futurePlayer;
-        DbRow player = new DbRow();
-        futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE player_id = ?", id);
-        try {
-            player = futurePlayer.get();
-        }
-        catch (Exception e)
-        {
-            EMI.getPlugin().getLogger().info(e.getMessage());
-        }
-        return player;
-    }
-
-    private DbRow getPlayerRow(String playerName)
-    {
-        CompletableFuture<DbRow> futurePlayer;
-        DbRow player = new DbRow();
-        futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE player_name = ?", playerName);
-        try {
-            player = futurePlayer.get();
-        }
-        catch (Exception e)
-        {
-            EMI.getPlugin().getLogger().info(e.getMessage());
-        }
-        return player;
     }
 }

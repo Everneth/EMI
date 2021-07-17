@@ -54,8 +54,7 @@ public class SupportCommand extends BaseCommand {
         eb.setFooter("Help requested!", null);
 
         // Make the bot post the embed to the channel and notify the player
-        EMI.getJda().getTextChannelById(EMI.getPlugin().getConfig().getString("report-channel")).sendMessage(eb.build()).queue();
-        EMI.getJda().getTextChannelById(303912184944263169L).sendMessage(eb.build()).queue();
+        EMI.getJda().getTextChannelById(EMI.getPlugin().getConfig().getLong("help-channel-id")).sendMessage(eb.build()).queue();
         player.sendMessage(Utils.color("<&6The Wench&f> Your report submitted to &6#help&f! A staff member " +
                 "will get back to you shortly. <3"));
     }
