@@ -2,7 +2,6 @@ package com.everneth.emi;
 
 import co.aikar.commands.BukkitCommandManager;
 import co.aikar.idb.*;
-import com.everneth.emi.api.*;
 import com.everneth.emi.commands.*;
 import com.everneth.emi.commands.bot.*;
 import com.everneth.emi.commands.bot.par.WhitelistAppCommand;
@@ -33,18 +32,11 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.everneth.emi.commands.mint.MintCommand;
-import spark.Spark;
-
-import static spark.Spark.*;
-import javax.security.auth.login.LoginException;
 
 import java.io.File;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-
-import static spark.Spark.get;
-import static spark.Spark.port;
 
 /**
  *     Class: EMI
@@ -82,7 +74,6 @@ public class EMI extends JavaPlugin {
         registerCommands();
         registerListeners();
         initBot();
-        initApi();
         initDevop();
         initMotds();
     }
@@ -151,17 +142,6 @@ public class EMI extends JavaPlugin {
         {
             e.printStackTrace();
         }
-    }
-
-    private void initApi()
-    {
-        port(this.getConfig().getInt("api-port"));
-        get(Path.Web.ONE_STATS, StatisticController.getPlayerStats);
-        get(Path.Web.ONE_ADV, AdvancementController.getPlayerAdvs);
-        post(Path.Web.EXECUTE_COMMAND, CommandController.sendCommandPayload);
-        get("*", (request, response) -> "404 not found!!");
-
-        Spark.exception(Exception.class, (exception, request, response) -> {exception.printStackTrace();});
     }
 
     private void registerListeners()
