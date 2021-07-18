@@ -2,8 +2,10 @@ package com.everneth.emi.commands.bot;
 
 import com.everneth.emi.EMI;
 import com.everneth.emi.managers.ReportManager;
+import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.utils.FileUtils;
 
+import com.everneth.emi.utils.PlayerUtils;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.MessageBuilder;
@@ -30,12 +32,12 @@ public class CloseReportCommand extends Command {
         boolean hasRequiredRoles = false;
         // Get the roles from the member
         List<Role> roleList = event.getMember().getRoles();
-        String playerName = event.getTextChannel().getName().substring(0, event.getTextChannel().getName().indexOf('_'));
         ReportManager rm = ReportManager.getReportManager();
 
         if(event.getChannel().getName().contains("_staff"))
         {
             UUID uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
+            EMIPlayer player = PlayerUtils.getEMIPlayer(uuid);
             // Lets check them
             for (Role role : roleList) {
                 if (role.getIdLong() == staffRoleId) {
@@ -50,8 +52,8 @@ public class CloseReportCommand extends Command {
                 List<Message> messageList = event.getTextChannel().getIterableHistory().complete();
                 // Take our messages and build a string, we'll dump that string into a message file
                 // and embed the file into a message
-                File embedFile = transcribeToFile(messageList, playerName);
-                String msg = "Log from " + playerName + "'s report has been attached.";
+                File embedFile = transcribeToFile(messageList);
+                String msg = "Log from " + player.getName() + "'s report has been attached.";
                 Message message = new MessageBuilder().append(msg).build();
                 event.getGuild().getTextChannelById(
                         EMI.getPlugin().getConfig().getLong("staff-channel-id")
@@ -68,6 +70,7 @@ public class CloseReportCommand extends Command {
         else if(event.getChannel().getName().contains("_mint"))
         {
             UUID uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
+            EMIPlayer player = PlayerUtils.getEMIPlayer(uuid);
             // Lets check them
             for (Role role : roleList) {
                 if (role.getIdLong() == staffRoleId || role.getIdLong() == mintRoleId) {
@@ -82,8 +85,8 @@ public class CloseReportCommand extends Command {
                 List<Message> messageList = event.getTextChannel().getIterableHistory().complete();
                 // Take our messages and build a string, we'll dump that string into a message file
                 // and embed the file into a message
-                File embedFile = transcribeToFile(messageList, playerName);
-                String msg = "Log from " + playerName + "'s request has been attached.";
+                File embedFile = transcribeToFile(messageList);
+                String msg = "Log from " + player.getName() + "'s request has been attached.";
                 Message message = new MessageBuilder().append(msg).build();
                 event.getGuild().getTextChannelById(
                         EMI.getPlugin().getConfig().getLong("mint-channel-id")
@@ -100,13 +103,13 @@ public class CloseReportCommand extends Command {
 
     }
 
-    private File transcribeToFile(List<Message> messageList, String playerName) {
+    private File transcribeToFile(List<Message> messageList) {
         StringBuilder sb = new StringBuilder();
 
         List<Message> reverse = reverseList(messageList);
 
         for (Message msg : reverse) {
-            String logMsg = playerName + ": " + msg.getContentRaw() + "\n";
+            String logMsg = msg.getMember().getEffectiveName() + ": " + msg.getContentRaw() + "\n";
             sb.append(logMsg);
         }
         try {
