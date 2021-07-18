@@ -22,6 +22,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @CommandAlias("charter")
@@ -144,14 +145,14 @@ public class CharterCommand extends BaseCommand {
         }
         else {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-            Date now = new Date();
+            LocalDateTime now = LocalDateTime.now();
 
             SortedMap<Integer, String> map = new TreeMap<Integer, String>(Collections.reverseOrder());
             int i = 1;
             int numActive = 0;
             int numExpired = 0;
             for (DbRow charterPoint : points) {
-                boolean isExpired = now.after(charterPoint.get("date_expired"));
+                boolean isExpired = now.isAfter(charterPoint.get("date_expired"));
                 boolean isExpunged = charterPoint.get("expunged");
                 if (includeExpired) {
                     if (isExpunged || isExpired) {
@@ -247,7 +248,7 @@ public class CharterCommand extends BaseCommand {
             }
             else
             {
-                sender.sendMessage(Utils.color("&cERROR: &e Please report the following to Comms..." ));
+                sender.sendMessage(Utils.color("&cERROR: &e Please report the following to HC..." ));
                 sender.sendMessage("RECORD [" + pointId + "] UPDATE TABLE FAIL. CC-onEdit()");
             }
         }
@@ -270,7 +271,7 @@ public class CharterCommand extends BaseCommand {
             }
             else
             {
-                sender.sendMessage("&9[Charter] &3Could not remove point(s) issued to " + charterPoint.getRecipient().getName() + ". DB error on update. Please notify Comms.");
+                sender.sendMessage("&9[Charter] &3Could not remove point(s) issued to " + charterPoint.getRecipient().getName() + ". DB error on update. Please notify HC.");
             }
         }
     }

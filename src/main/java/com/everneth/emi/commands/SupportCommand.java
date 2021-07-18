@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -37,7 +38,7 @@ public class SupportCommand extends BaseCommand {
         // information to the embed builder
         Player player = (Player)sender;
 
-        Date now = new Date();
+        LocalDateTime now = LocalDateTime.now();
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
         EmbedBuilder eb = new EmbedBuilder();

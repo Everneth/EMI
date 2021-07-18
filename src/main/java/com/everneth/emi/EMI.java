@@ -28,6 +28,8 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -135,6 +137,9 @@ public class EMI extends JavaPlugin {
                     .addEventListeners(new ReactionListener())
                     .addEventListeners(new RoleChangeListener())
                     .addEventListeners(new GuildLeaveListener())
+                    .setMemberCachePolicy(MemberCachePolicy.ALL)
+                    .enableIntents(GatewayIntent.GUILD_MEMBERS)
+                    .enableIntents(GatewayIntent.DIRECT_MESSAGES)
                     .build();
             jda.awaitReady();
         }

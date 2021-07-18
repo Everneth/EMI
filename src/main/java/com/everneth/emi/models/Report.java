@@ -14,7 +14,8 @@ import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+
 public class Report {
     private long discordUserId;
     private long channelId;
@@ -65,7 +66,7 @@ public class Report {
 
     public static void buildPrivateChannel(Player player, String message, String reportType)
     {
-        Date now = new Date();
+        LocalDateTime now = LocalDateTime.now();
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         Member discordMember;
         GuildManager guildManager = EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getManager();

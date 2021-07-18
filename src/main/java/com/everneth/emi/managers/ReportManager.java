@@ -8,6 +8,7 @@ import com.everneth.emi.utils.PlayerUtils;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -116,7 +117,7 @@ public final class ReportManager {
 
     public void addReportRecord(Report report, int playerId)
     {
-        Date now = new Date();
+        LocalDateTime now = LocalDateTime.now();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         try {
@@ -147,7 +148,7 @@ public final class ReportManager {
 
     public void closeReport(UUID uuid)
     {
-        Date now = new Date();
+        LocalDateTime now = LocalDateTime.now();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         DbRow playerRow = PlayerUtils.getPlayerRow(uuid);
         DbRow reportRecord = getReportRecord(uuid);

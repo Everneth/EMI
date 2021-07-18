@@ -2,7 +2,6 @@ package com.everneth.emi.commands.bot;
 
 import com.everneth.emi.EMI;
 import com.everneth.emi.managers.ReportManager;
-import com.everneth.emi.models.PostResponse;
 import com.everneth.emi.utils.FileUtils;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -10,17 +9,6 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
-import org.apache.http.Consts;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,8 +22,8 @@ public class CloseReportCommand extends Command {
     @Override
     protected void execute(CommandEvent event) {
 
-        long mintChannelId = EMI.getPlugin().getConfig().getLong("mint-channel-id");
-        long staffChannelId = EMI.getPlugin().getConfig().getLong("staff-channel-id");
+        long mintRoleId = EMI.getPlugin().getConfig().getLong("mint-role-id");
+        long staffRoleId = EMI.getPlugin().getConfig().getLong("staff-role-id");
 
         // We need to make sure the command sender has the correct authorized roles.
         // Assume no one has roles
@@ -50,7 +38,7 @@ public class CloseReportCommand extends Command {
             UUID uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
             // Lets check them
             for (Role role : roleList) {
-                if (role.getIdLong() == staffChannelId) {
+                if (role.getIdLong() == staffRoleId) {
                     // Found a required role, no need to continue, break from the loop
                     hasRequiredRoles = true;
                     break;
@@ -62,7 +50,7 @@ public class CloseReportCommand extends Command {
                 List<Message> messageList = event.getTextChannel().getIterableHistory().complete();
                 // Take our messages and build a string, we'll dump that string into a message file
                 // and embed the file into a message
-                File embedFile = transcribeToFile(messageList);
+                File embedFile = transcribeToFile(messageList, playerName);
                 String msg = "Log from " + playerName + "'s report has been attached.";
                 Message message = new MessageBuilder().append(msg).build();
                 event.getGuild().getTextChannelById(
@@ -70,6 +58,7 @@ public class CloseReportCommand extends Command {
                 ).sendMessage(message).addFile(embedFile).queue();
 
                 event.getTextChannel().delete().queue();
+                rm.closeReport(uuid);
             } else {
                 // You can;t even use this at all, we're not checking any further
                 // TODO: Mute member if attempts are made to use command to spam replies
@@ -81,7 +70,7 @@ public class CloseReportCommand extends Command {
             UUID uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
             // Lets check them
             for (Role role : roleList) {
-                if (role.getIdLong() == mintChannelId) {
+                if (role.getIdLong() == staffRoleId || role.getIdLong() == mintRoleId) {
                     // Found a required role, no need to continue, break from the loop
                     hasRequiredRoles = true;
                     break;
@@ -93,7 +82,7 @@ public class CloseReportCommand extends Command {
                 List<Message> messageList = event.getTextChannel().getIterableHistory().complete();
                 // Take our messages and build a string, we'll dump that string into a message file
                 // and embed the file into a message
-                File embedFile = transcribeToFile(messageList);
+                File embedFile = transcribeToFile(messageList, playerName);
                 String msg = "Log from " + playerName + "'s request has been attached.";
                 Message message = new MessageBuilder().append(msg).build();
                 event.getGuild().getTextChannelById(
@@ -101,6 +90,7 @@ public class CloseReportCommand extends Command {
                 ).sendMessage(message).addFile(embedFile).queue();
 
                 event.getTextChannel().delete().queue();
+                rm.closeReport(uuid);
             } else {
                 // You can;t even use this at all, we're not checking any further
                 // TODO: Mute member if attempts are made to use command to spam replies
@@ -110,13 +100,13 @@ public class CloseReportCommand extends Command {
 
     }
 
-    private File transcribeToFile(List<Message> messageList) {
+    private File transcribeToFile(List<Message> messageList, String playerName) {
         StringBuilder sb = new StringBuilder();
 
         List<Message> reverse = reverseList(messageList);
 
         for (Message msg : reverse) {
-            String logMsg = msg.getMember().getEffectiveName() + ": " + msg.getContentRaw() + "\n";
+            String logMsg = playerName + ": " + msg.getContentRaw() + "\n";
             sb.append(logMsg);
         }
         try {

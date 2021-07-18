@@ -7,11 +7,12 @@ import com.everneth.emi.services.VotingService;
 import com.everneth.emi.services.WhitelistAppService;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class GuildLeaveListener extends ListenerAdapter {
     @Override
-    public void onGuildMemberLeave(GuildMemberLeaveEvent event)
+    public void onGuildMemberRemove(GuildMemberRemoveEvent event)
     {
         Role pendingRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("pending-role-id"));
         Role applicantRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("applicant-role-id"));

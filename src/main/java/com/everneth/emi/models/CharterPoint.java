@@ -2,7 +2,6 @@ package com.everneth.emi.models;
 
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
-import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
 import com.everneth.emi.utils.PlayerUtils;
 import org.bukkit.*;
@@ -11,8 +10,8 @@ import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 public class CharterPoint {
     private EMIPlayer issuer;
@@ -72,7 +71,7 @@ public class CharterPoint {
     public long issuePoint()
     {
         DbRow issuer = PlayerUtils.getPlayerRow(UUID.fromString(this.getIssuer().getUniqueId()));
-        Date now = new Date();
+        LocalDateTime now = LocalDateTime.now();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         Calendar cal = Calendar.getInstance();
@@ -101,11 +100,11 @@ public class CharterPoint {
     {
         List<DbRow> pointsList = PlayerUtils.getAllPoints(this.recipient.getName());
         int points = 0;
-        Date now = new Date();
+        LocalDateTime now = LocalDateTime.now();
 
         for(DbRow point : pointsList)
         {
-            boolean isExpired = now.after(point.get("date_expired"));
+            boolean isExpired = now.isAfter(point.get("date_expired"));
             boolean isExpunged = point.get("expunged");
             if(!isExpired && !isExpunged) {
                 points += point.getInt("amount");
@@ -197,7 +196,7 @@ public class CharterPoint {
     {
         int retVal = 0;
         DbRow playerRecord = PlayerUtils.getPlayerRow(name);
-        Date now = new Date();
+        LocalDateTime now = LocalDateTime.now();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         if(playerRecord.isEmpty())
