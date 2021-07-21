@@ -71,7 +71,7 @@ public class CharterPoint {
     public long issuePoint()
     {
         DbRow issuer = PlayerUtils.getPlayerRow(UUID.fromString(this.getIssuer().getUniqueId()));
-        LocalDateTime now = LocalDateTime.now();
+        Date now = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         Calendar cal = Calendar.getInstance();

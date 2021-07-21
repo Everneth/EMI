@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Report {
     private long discordUserId;
@@ -67,7 +68,7 @@ public class Report {
     public static void buildPrivateChannel(Player player, String message, String reportType)
     {
         LocalDateTime now = LocalDateTime.now();
-        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         Member discordMember;
         GuildManager guildManager = EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getManager();
         Role staffRole = guildManager.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("staff-role-id"));
@@ -88,7 +89,7 @@ public class Report {
                 ebs.addField("Y", Double.toString(player.getLocation().getY()), true);
                 ebs.addField("Z", Double.toString(player.getLocation().getZ()), true);
                 ebs.addField("Dimension", player.getWorld().getEnvironment().toString(), true);
-                ebs.addField("Time Requested (EST)", format.format(now), true);
+                ebs.addField("Time Requested (EST)", formatter.format(now), true);
                 ebs.addField("Description", message, false);
                 ebs.setFooter("Staff help requested!", null);
 
@@ -133,7 +134,7 @@ public class Report {
                 ebm.addField("Y", Double.toString(player.getLocation().getY()), true);
                 ebm.addField("Z", Double.toString(player.getLocation().getZ()), true);
                 ebm.addField("Dimension", player.getWorld().getEnvironment().toString(), true);
-                ebm.addField("Time Requested (EST)", format.format(now), true);
+                ebm.addField("Time Requested (EST)", formatter.format(now), true);
                 ebm.addField("Description", message, false);
                 ebm.setFooter("MINT help requested!", null);
 

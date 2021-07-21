@@ -5,6 +5,7 @@ import co.aikar.commands.annotation.*;
 import com.everneth.emi.Utils;
 import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.models.Report;
+import com.everneth.emi.utils.PlayerUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -41,9 +42,13 @@ public class MintCommand extends BaseCommand
         else {
             Report.buildPrivateChannel(player, message, "_mint");
             // Make the bot post the embed to the channel and notify the player
-            player.sendMessage(Utils.color("<&6The Wench&f> I have created a direct channel with MINT. Please use &6/rr <message>&f to message MINT directly! A member " +
-                    "of the Interior will get back to you shortly. If you miss any replies, you will be notified the next time you join the server. &c&lIf your Discord is linked, please use that to reply and get missed messages. &d<3"));
+            if(Report.hasSynced(PlayerUtils.getPlayerRow(player.getUniqueId())))
+                player.sendMessage(Utils.color("<&6The Wench&f> I have created a direct channel with the &dMinistry of the Interior&f. &a&lProceed to Discord to continue the chat. &d<3"));
+            else
+                player.sendMessage(Utils.color("<&6The Wench&f> I have created a direct channel with the &dMinistry of the Interior&f. Please use &6/rr <message>&f to message MINT directly! A member " +
+                        "will get back to you shortly. If you miss any replies, you will be notified the next time you join the server. &c&lYour Discord is NOT linked, please use that command to reply and get missed messages. &d<3"));
         }
+
     }
 
 

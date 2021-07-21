@@ -23,6 +23,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @CommandAlias("charter")
@@ -144,7 +145,7 @@ public class CharterCommand extends BaseCommand {
             sender.sendMessage(Utils.color("&9[Charter] &3No charter point history found. Excellent citizenship!"));
         }
         else {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             LocalDateTime now = LocalDateTime.now();
 
             SortedMap<Integer, String> map = new TreeMap<Integer, String>(Collections.reverseOrder());
@@ -157,20 +158,20 @@ public class CharterCommand extends BaseCommand {
                 if (includeExpired) {
                     if (isExpunged || isExpired) {
                         String msg = " &3#" + charterPoint.getInt("charter_point_id") + "&7 - (&b" +
-                                format.format(charterPoint.get("date_issued")) + "&7&m) &c&m" + charterPoint.getInt("amount") +
+                                formatter.format(charterPoint.get("date_issued")) + "&7&m) &c&m" + charterPoint.getInt("amount") +
                                 " point(s)&7&m issued to &c&m" + charterPoint.getString("issued_to") + " by &l&d&m" + charterPoint.getString("issued_by") + ".&3&m \nReason: &7&m" +
                                 charterPoint.getString("reason") + "-- &o[Expires: &b&o&m" +
-                                format.format(charterPoint.get("date_expired")) + "]";
+                                formatter.format(charterPoint.get("date_expired")) + "]";
                         map.put(i, msg);
                         if (isExpired) {
                             ++numExpired;
                         }
                     } else {
                         String msg = "&3#" + charterPoint.getInt("charter_point_id") + "&7 - (&b" +
-                                format.format(charterPoint.get("date_issued")) + "&7) &c" + charterPoint.getInt("amount") +
+                                formatter.format(charterPoint.get("date_issued")) + "&7) &c" + charterPoint.getInt("amount") +
                                 "&o point(s)&7 issued to &c" + charterPoint.getString("issued_to") + " &7&oby &l&d" + charterPoint.getString("issued_by") + "&r.&3&o \nReason: &7&o" +
                                 charterPoint.getString("reason") + " -- &o(Expires: &b&o" +
-                                format.format(charterPoint.get("date_expired")) + "&b&o)";
+                                formatter.format(charterPoint.get("date_expired")) + "&b&o)";
                         map.put(i, msg);
                         numActive++;
                     }
@@ -178,10 +179,10 @@ public class CharterCommand extends BaseCommand {
                 } else {
                     if (!isExpunged && !isExpired) {
                         String msg = "&3#" + charterPoint.getInt("charter_point_id") + "&7 - (&b" +
-                                format.format(charterPoint.get("date_issued")) + "&7) &c" + charterPoint.getInt("amount") +
+                                formatter.format(charterPoint.get("date_issued")) + "&7) &c" + charterPoint.getInt("amount") +
                                 "&o point(s)&7 issued to &c" + charterPoint.getString("issued_to") + " &7&oby &l&d" + charterPoint.getString("issued_by") + "&r.&3&o \nReason: &7&o" +
                                 charterPoint.getString("reason") + " -- &o(Expires: &b&o" +
-                                format.format(charterPoint.get("date_expired")) + "&b&o)";
+                                formatter.format(charterPoint.get("date_expired")) + "&b&o)";
                         map.put(i, msg);
                         numActive++;
                     }
@@ -267,11 +268,11 @@ public class CharterCommand extends BaseCommand {
         {
             if(charterPoint.removeCharterPoint(pointId))
             {
-                sender.sendMessage("&9[Charter] &3The point(s) issued to " + charterPoint.getRecipient().getName() + " have been removed (expunged) from the players history.");
+                sender.sendMessage(Utils.color("&9[Charter] &3The point(s) issued to " + charterPoint.getRecipient().getName() + " have been removed (expunged) from the players history."));
             }
             else
             {
-                sender.sendMessage("&9[Charter] &3Could not remove point(s) issued to " + charterPoint.getRecipient().getName() + ". DB error on update. Please notify HC.");
+                sender.sendMessage(Utils.color("&9[Charter] &3Could not remove point(s) issued to " + charterPoint.getRecipient().getName() + ". DB error on update. Please notify HC."));
             }
         }
     }
@@ -284,7 +285,7 @@ public class CharterCommand extends BaseCommand {
         long pardonPointSuccess = CharterPoint.pardonPlayer(name, player, removeFlag);
         if(pardonPointSuccess == 0)
         {
-            sender.sendMessage("&9[Charter] &3Could not pardon " + name + ". Either there is no player by this name, it has changed, or its misspelled.");
+            sender.sendMessage(Utils.color("&9[Charter] &3Could not pardon " + name + ". Either there is no player by this name, it has changed, or its misspelled."));
         }
         else
         {

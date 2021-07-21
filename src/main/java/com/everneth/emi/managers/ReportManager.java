@@ -117,7 +117,7 @@ public final class ReportManager {
 
     public void addReportRecord(Report report, int playerId)
     {
-        LocalDateTime now = LocalDateTime.now();
+        Date now = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         try {
@@ -148,7 +148,7 @@ public final class ReportManager {
 
     public void closeReport(UUID uuid)
     {
-        LocalDateTime now = LocalDateTime.now();
+        Date now = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         DbRow playerRow = PlayerUtils.getPlayerRow(uuid);
         DbRow reportRecord = getReportRecord(uuid);

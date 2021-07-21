@@ -59,8 +59,11 @@ public class ReportCommand extends BaseCommand {
         else {
             Report.buildPrivateChannel(player, message, "_staff");
             // Make the bot post the embed to the channel and notify the player
-            player.sendMessage(Utils.color("<&6The Wench&f> I have created a direct channel with staff. Please use &6/rr <message>&f to message staff directly! A staff member " +
-                    "will get back to you shortly. If you miss any replies, you will be notified the next time you join the server. &c&lIf your Discord is linked, please use that to reply and get missed messages. &d<3"));
+            if(Report.hasSynced(PlayerUtils.getPlayerRow(player.getUniqueId())))
+                player.sendMessage(Utils.color("<&6The Wench&f> I have created a direct channel with &9staff&f. &a&lProceed to Discord to continue the chat. &d<3"));
+            else
+                player.sendMessage(Utils.color("<&6The Wench&f> I have created a direct channel with &9staff&f. Please use &6/rr <message>&f to message staff directly! A staff member " +
+                        "will get back to you shortly. If you miss any replies, you will be notified the next time you join the server. &c&lYour Discord is NOT linked, please use that command to reply and get missed messages. &d<3"));
         }
     }
 }

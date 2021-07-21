@@ -7,8 +7,10 @@ import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.Utils;
 
 import com.everneth.emi.models.PostResponse;
+import com.everneth.emi.models.Report;
 import com.everneth.emi.models.WhitelistApp;
 import com.everneth.emi.services.WhitelistAppService;
+import com.everneth.emi.utils.PlayerUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -39,52 +41,47 @@ public class MessageReceivedListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event)
     {
-        if(event.isFromType(ChannelType.TEXT) && event.getChannel().getName().contains("_staff") && !event.getAuthor().isBot())
+        if(event.isFromType(ChannelType.TEXT) && (event.getChannel().getName().contains("_staff") || event.getChannel().getName().contains("_mint")) && !event.getAuthor().isBot())
         {
             ReportManager rm = ReportManager.getReportManager();
             String channelName = event.getChannel().getName();
-            String playerName = channelName.substring(0, channelName.indexOf('_'));
 
             UUID player_uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
 
             if(player_uuid != null) {
-                OfflinePlayer offlinePlayer = EMI.getPlugin().getServer().getOfflinePlayer(player_uuid);
+                if(!Report.hasSynced(PlayerUtils.getPlayerRow(player_uuid))) {
+                    OfflinePlayer offlinePlayer = EMI.getPlugin().getServer().getOfflinePlayer(player_uuid);
 
 
-                if (offlinePlayer.isOnline()) {
-                    Player player = offlinePlayer.getPlayer();
-                    String name;
+                    if (offlinePlayer.isOnline()) {
+                        Player player = offlinePlayer.getPlayer();
+                        String name;
 
-                    if(event.getMember().getNickname() == null)
-                    {
-                        name = event.getMember().getEffectiveName();
-                    }
-                    else
-                    {
-                        name = event.getMember().getNickname();
-                    }
-                    player.sendMessage(Utils.color("&o&d[REPORT]&f<&8" + name + "&f>&7 " + event.getMessage().getContentRaw()));
-                } else if (!offlinePlayer.isOnline() && !rm.hasDiscord(player_uuid)) {
-                    DbRow report = rm.getReportRecord(player_uuid);
-                    String author;
-                    if(event.getMember().getNickname() == null)
-                    {
-                        author = event.getMember().getEffectiveName();
-                    }
-                    else
-                    {
-                        author = event.getMember().getNickname();
-                    }
-                    try {
-                        DB.executeInsert("INSERT INTO report_messages (report_id, author, message, msg_read, date_read) " +
-                                        "VALUES (?, ?, ?, ?, ?)",
-                                report.getInt("report_id"),
-                                author,
-                                event.getMessage().getContentRaw(),
-                                0,
-                                null);
-                    } catch (SQLException e) {
-                        System.out.println(e.getMessage());
+                        if (event.getMember().getNickname() == null) {
+                            name = event.getMember().getEffectiveName();
+                        } else {
+                            name = event.getMember().getNickname();
+                        }
+                        player.sendMessage(Utils.color("&o&d[REPORT]&f<&8" + name + "&f>&7 " + event.getMessage().getContentRaw()));
+                    } else if (!offlinePlayer.isOnline() && !rm.hasDiscord(player_uuid)) {
+                        DbRow report = rm.getReportRecord(player_uuid);
+                        String author;
+                        if (event.getMember().getNickname() == null) {
+                            author = event.getMember().getEffectiveName();
+                        } else {
+                            author = event.getMember().getNickname();
+                        }
+                        try {
+                            DB.executeInsert("INSERT INTO report_messages (report_id, author, message, msg_read, date_read) " +
+                                            "VALUES (?, ?, ?, ?, ?)",
+                                    report.getInt("report_id"),
+                                    author,
+                                    event.getMessage().getContentRaw(),
+                                    0,
+                                    null);
+                        } catch (SQLException e) {
+                            System.out.println(e.getMessage());
+                        }
                     }
                 }
             }
