@@ -32,6 +32,16 @@ public class DevopCommand extends BaseCommand
     private Plugin plugin;
     private final String devopProjectTag = "&7[&dMint&5Projects] ";
 
+    /**
+     * This command is used by players to log any material gathering they completed.
+     *
+     * @param player         Automatic input from the player who executed the command
+     * @param devopProject   Input for specified project
+     * @param materialString Input for specified material
+     * @param amount         Input for the amount gathered
+     * @param time           Input for length of time worked
+     * @param description    Input for a short description of what the player did (if applicable)
+     */
     //TODO add tab-complete
     @Subcommand("log material")
     @Syntax("<Project> <Material> <Amount> <TimeWorked> <Description>")
@@ -41,6 +51,7 @@ public class DevopCommand extends BaseCommand
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
         DevopProject project = manager.getProject(devopProject);
 
+        // Basic tests to determine if the command has been issued correctly
         if(project == null)
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
@@ -75,6 +86,7 @@ public class DevopCommand extends BaseCommand
             return;
         }
 
+        // Valid information is then put into the project
         EMIPlayer logger = PlayerUtils.getEMIPlayer(player.getName());
         DevopLogMaterial log = new DevopLogMaterial(project.getId(), material.getId(), logger, null, 0, amount, timeWorked, Utils.getCurrentDate(), Utils.buildMessage(description, 0, false));
 
@@ -82,6 +94,14 @@ public class DevopCommand extends BaseCommand
         player.sendMessage(Utils.color(devopProjectTag + "&aMaterial log submitted for validation!"));
     }
 
+    /**
+     * This command is used by players to log any task they've completed.
+     *
+     * @param player       Automatic input from the player who executed the command
+     * @param devopProject Input for specified project
+     * @param time         Input for length of time worked
+     * @param description  Input for a short description of what the player did (if applicable)
+     */
     //TODO add tab-complete
     @Subcommand("log task")
     @Syntax("<Project> <TimeWorked> <Description>")
@@ -91,6 +111,7 @@ public class DevopCommand extends BaseCommand
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
         DevopProject project = manager.getProject(devopProject);
 
+        // Basic tests to determine if the command has been issued correctly
         if(project == null)
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
@@ -111,6 +132,7 @@ public class DevopCommand extends BaseCommand
             return;
         }
 
+        // Valid information is then into the project
         EMIPlayer logger = PlayerUtils.getEMIPlayer(player.getName());
         DevopLogTask log = new DevopLogTask(project.getId(), logger, null, 0, timeWorked, Utils.getCurrentDate(), Utils.buildMessage(description, 0, false));
 
@@ -118,6 +140,14 @@ public class DevopCommand extends BaseCommand
         player.sendMessage(Utils.color(devopProjectTag + "&aTask log submitted for validation!"));
     }
 
+
+    /**
+     * This command is used by project moderaters to mark a material as complete.
+     *
+     * @param player         Automatic input from the player who executed the command
+     * @param devopProject   Input for specified project
+     * @param materialString Input for specified material
+     */
     //TODO add tab-complete
     @Subcommand("material complete")
     @Syntax("<Project> <Material>")
@@ -127,6 +157,7 @@ public class DevopCommand extends BaseCommand
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
         DevopProject project = manager.getProject(devopProject);
 
+        // Basic tests to determine if the command has been issued correctly
         if(project == null)
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
@@ -152,10 +183,21 @@ public class DevopCommand extends BaseCommand
             player.sendMessage(Utils.color(devopProjectTag + "&cMaterial has already been completed!"));
             return;
         }
+
+        // Valid information is then put into the project
         project.completeMaterial(material.getId());
         player.sendMessage(Utils.color(devopProjectTag + "&aMaterial Completed!"));
     }
 
+
+    /**
+     * This command is used by project moderaters to add materials to a project.
+     *
+     * @param player         Automatic input from the player who executed the command
+     * @param devopProject   Input for specified project
+     * @param materialString Input for specified material
+     * @param amount         Input for how much material the project needs
+     */
     //TODO add tab-complete
     @Subcommand("material add")
     @Syntax("<Project> <Material> <Amount>")
@@ -165,6 +207,7 @@ public class DevopCommand extends BaseCommand
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
         DevopProject project = manager.getProject(devopProject);
 
+        // Basic tests to determine if the command has been issued correctly
         if(project == null)
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
@@ -177,12 +220,20 @@ public class DevopCommand extends BaseCommand
             return;
         }
 
+        // Valid information is then into the project
         DevopMaterial material = new DevopMaterial(project.getId(), materialString, amount, 0, 0, 0);
 
         project.addMaterial(material);
         player.sendMessage(Utils.color(devopProjectTag + "&aMaterial added!"));
     }
 
+    /**
+     * This command is used by project moderaters to delete materials from a project.
+     *
+     * @param player         Automatic input from the player who executed the command
+     * @param devopProject   Input for specified project
+     * @param materialString Input for specified material
+     */
     //TODO add tab-complete
     @Subcommand("material delete")
     @Syntax("<Project> <Material>")
@@ -192,6 +243,7 @@ public class DevopCommand extends BaseCommand
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
         DevopProject project = manager.getProject(devopProject);
 
+        // Basic tests to determine if the command has been issued correctly
         if(project == null)
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
@@ -212,10 +264,18 @@ public class DevopCommand extends BaseCommand
             return;
         }
 
+        // Valid information is then put into the project
         project.deleteMaterial(material);
         player.sendMessage(Utils.color(devopProjectTag + "&aMaterial deleted!"));
     }
 
+    /**
+     * This command is used by project moderaters to focus materials from a project.
+     *
+     * @param player         Automatic input from the player who executed the command
+     * @param devopProject   Input for specified project
+     * @param materialString Input for specified material
+     */
     //TODO add tab-complete
     @Subcommand("material focus")
     @Syntax("<Project> <Material>")
@@ -225,6 +285,7 @@ public class DevopCommand extends BaseCommand
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
         DevopProject project = manager.getProject(devopProject);
 
+        // Basic tests to determine if the command has been issued correctly
         if(project == null)
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
@@ -251,6 +312,7 @@ public class DevopCommand extends BaseCommand
             return;
         }
 
+        // If the specified material is focused, mark it as unfocused
         if(material.getFocused() == 1)
         {
             project.unFocusMaterial(material);
@@ -258,6 +320,7 @@ public class DevopCommand extends BaseCommand
             return;
         }
 
+        // Searches and marks current material as unfocused
         DevopMaterial formerMaterial = null;
 
         for(DevopMaterial devopMaterial : project.getMaterials().values())
@@ -269,10 +332,17 @@ public class DevopCommand extends BaseCommand
             }
         }
 
+        // Valid information is then put into the project
         project.switchMaterialFocus(material, formerMaterial);
         player.sendMessage(Utils.color(devopProjectTag + "&aMaterial focused!"));
     }
 
+    /**
+     * This command is used by players to view all materials from a project.
+     *
+     * @param player       Automatic input from the player who executed the command
+     * @param devopProject Input for specified project
+     */
     //TODO add tab-complete
     @Subcommand("material list")
     @Syntax("<Project>")
@@ -282,6 +352,7 @@ public class DevopCommand extends BaseCommand
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
         DevopProject project = manager.getProject(devopProject);
 
+        // Basic tests to determine if the command has been issued correctly
         if(project == null)
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
@@ -294,6 +365,7 @@ public class DevopCommand extends BaseCommand
             return;
         }
 
+        // Create empty objects and put materials in them based on their status
         DevopMaterial focusedMaterial = null;
         ArrayList<DevopMaterial> currentMaterials = new ArrayList<>();
         ArrayList<DevopMaterial> completeMaterials = new ArrayList<>();
@@ -314,6 +386,7 @@ public class DevopCommand extends BaseCommand
             }
         }
 
+        // Send player materials sorted by Focused Materials, Current Materials, and Completed Materials
         player.sendMessage(Utils.color(devopProjectTag + "&aMaterials for &6" + project.getName()));
 
         player.sendMessage(Utils.color(devopProjectTag + "&aMaterials:"));
@@ -334,6 +407,12 @@ public class DevopCommand extends BaseCommand
         }
     }
 
+    /**
+     * This command is used by project moderaters to complete a project.
+     *
+     * @param player       Automatic input from the player who executed the command
+     * @param devopProject Input for specified project
+     */
     //TODO Add tab-complete to devopProject, add complete check
     @Subcommand("project complete")
     @Syntax("<Project>")
@@ -343,6 +422,7 @@ public class DevopCommand extends BaseCommand
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
         DevopProject project = manager.getProject(devopProject);
 
+        // Basic tests to determine if the command has been issued correctly
         if(project == null)
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
@@ -360,10 +440,20 @@ public class DevopCommand extends BaseCommand
             player.sendMessage(Utils.color(devopProjectTag + "&cProject can't be completed because not all of the logs have been validated!"));
             return;
         }
+
+        // Valid information is then put into the project
         project.completeProject();
         player.sendMessage(Utils.color(devopProjectTag + "&aProject completed!"));
     }
 
+    /**
+     * This command is used by project moderaters to create a project.
+     *
+     * @param player      Automatic input from the player who executed the command
+     * @param projectName Input for project name
+     * @param lead        Input for project leader
+     * @param description Input for project description
+     */
     //TODO add tab-complete
     @Subcommand("project create")
     @Syntax("<Project> <Lead> <Description>")
@@ -373,6 +463,7 @@ public class DevopCommand extends BaseCommand
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
         DevopProject project = manager.getProject(projectName);
 
+        // Basic tests to determine if the command has been issued correctly
         if(project != null)
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cProject already exists!"));
@@ -387,15 +478,20 @@ public class DevopCommand extends BaseCommand
             return;
         }
 
+        // Valid information is then put into the project
         EMIPlayer playerLead = new EMIPlayer(dbPlayerLead.getString("player_uuid"), dbPlayerLead.getString("player_name"), dbPlayerLead.getInt("player_id"));
-
         project = new DevopProject(playerLead, projectName, Utils.getCurrentDate(), null, 0, 0, Utils.buildMessage(description, 0, false));
-
         manager.addProject(project);
         player.sendMessage(Utils.color(devopProjectTag + "&aSuccessfully created the project!"));
         player.performCommand("devop project join " + project.getName());
     }
 
+    /**
+     * This command is used by project moderaters to focus a project.
+     *
+     * @param player      Automatic input from the player who executed the command
+     * @param projectName Input for specified project
+     */
     //TODO add tab-complete
     @Subcommand("project focus")
     @Syntax("<Project>")
@@ -405,6 +501,7 @@ public class DevopCommand extends BaseCommand
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
         DevopProject project = manager.getProject(projectName);
 
+        // Basic tests to determine if the command has been issued correctly
         if(project == null)
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
@@ -417,6 +514,7 @@ public class DevopCommand extends BaseCommand
             return;
         }
 
+        // If the specified project is focused, mark it as unfocused
         if(project.getFocused() == 1)
         {
             manager.unFocus(project);
@@ -426,6 +524,7 @@ public class DevopCommand extends BaseCommand
 
         DevopProject formerProject = null;
 
+        // Searches and marks current project as unfocused
         for(DevopProject devopProject : manager.getProjects().values())
         {
             if(devopProject.getFocused() == 1)
@@ -435,10 +534,17 @@ public class DevopCommand extends BaseCommand
             }
         }
 
+        // Valid information is then put into the project
         manager.switchFocus(project, formerProject);
         player.sendMessage(Utils.color(devopProjectTag + "&aProject focused!"));
     }
 
+    /**
+     * This command is used by players to view basic project information.
+     *
+     * @param player      Automatic input from the player who executed the command
+     * @param projectName Input for specified project
+     */
     // TODO add tab-complete
     @Subcommand("project info")
     @Syntax("<Project>")
@@ -448,12 +554,14 @@ public class DevopCommand extends BaseCommand
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
         DevopProject project = manager.getProject(projectName);
 
+        // Basic tests to determine if the command has been issued correctly
         if(project == null)
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
+        // Gather basic information on the project
         String endDate = project.getEndDate();
         String focusedTaskString = "";
         String focusedMaterialString = "";
@@ -484,6 +592,7 @@ public class DevopCommand extends BaseCommand
             workers.add(emiPlayer.getName());
         }
 
+        // Send player the basic information about the project
         player.sendMessage(Utils.color(devopProjectTag + "&aInformation for &6" + project.getName() + " &aby &6" + project.getLeader().getName() + "\n" +
                 "&aDates: &6" + decodeDate(project.getStartDate()) + " &ato &6" + endDate + "\n" +
                 "&aDescription: &6" + project.getDescription() + "\n" +
@@ -492,6 +601,12 @@ public class DevopCommand extends BaseCommand
                 "&aWorkers: &6" + Utils.buildMessage(workers.toArray(new String[0]), 0, true)));
     }
 
+    /**
+     * This command is used by players to join a project.
+     *
+     * @param player       Automatic input from the player who executed the command
+     * @param devopProject Input for specified project
+     */
     //TODO add tab-complete
     @Subcommand("project join")
     @Syntax("<Project>")
@@ -501,6 +616,7 @@ public class DevopCommand extends BaseCommand
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
         DevopProject project = manager.getProject(devopProject);
 
+        // Basic tests to determine if the command has been issued correctly
         if(project == null)
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
@@ -522,24 +638,33 @@ public class DevopCommand extends BaseCommand
             }
         }
 
+        // Valid information is then put into the project
         EMIPlayer emiPlayer = PlayerUtils.getEMIPlayer(player.getName());
 
         project.addWorker(emiPlayer);
         player.sendMessage(Utils.color(devopProjectTag + "&aSuccessfully joined the project!"));
     }
 
+    /**
+     * This command is used by players to list all projects.
+     *
+     * @param player Automatic input from the player who executed the command
+     */
     @Subcommand("project list")
     @CommandPermission("emi.devop.project.list")
     public void onProjectList(Player player)
     {
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
 
+        // Basic test to determine if the command has been issued correctly
         if(manager.getProjects().isEmpty())
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cNo projects to list!"));
             return;
         }
 
+
+        // Create empty objects and put projects in them based on their status
         String focusedProject = null;
         ArrayList<String> currentProjects = new ArrayList<>();
         ArrayList<String> completeProjects = new ArrayList<>();
@@ -560,6 +685,7 @@ public class DevopCommand extends BaseCommand
             }
         }
 
+        // Send player the projects sorted by Focused Project, Current Projects, and Completed Projects
         player.sendMessage(Utils.color(devopProjectTag + "&6Projects:"));
 
         if(focusedProject != null)
@@ -578,6 +704,12 @@ public class DevopCommand extends BaseCommand
         }
     }
 
+    /**
+     * This command is used by plapyers to view all tasks and materials for a project.
+     *
+     * @param player       Automatic input from the player who executed the command
+     * @param devopProject Input for specified project
+     */
     @Subcommand("project work")
     @Syntax("<Project>")
     @CommandPermission("emi.devop.project.work")
@@ -586,6 +718,7 @@ public class DevopCommand extends BaseCommand
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
         DevopProject project = manager.getProject(devopProject);
 
+        // Basic test to determine if the command has been issued correctly
         if(project == null)
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
@@ -598,6 +731,7 @@ public class DevopCommand extends BaseCommand
             return;
         }
 
+        // Send player work for the project: Material then Tasks
         player.sendMessage(Utils.color(devopProjectTag + "&aWork needed:"));
 
         int totalLoops = 0;
@@ -643,6 +777,13 @@ public class DevopCommand extends BaseCommand
         }
     }
 
+    /**
+     * This command is used by project moderaters to set a task as complete.
+     *
+     * @param player       Automatic input from the player who executed the command
+     * @param devopProject Input for specified project
+     * @param taskID       Input for a specified Task
+     */
     @Subcommand("task complete")
     @Syntax("<Project> <taskID>")
     @CommandPermission("emi.devop.task.complete")
@@ -651,6 +792,7 @@ public class DevopCommand extends BaseCommand
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
         DevopProject project = manager.getProject(devopProject);
 
+        // Basic test to determine if the command has been issued correctly
         if(project == null)
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
@@ -674,10 +816,19 @@ public class DevopCommand extends BaseCommand
             player.sendMessage(Utils.color(devopProjectTag + "&cTask has already been completed!"));
             return;
         }
+
+        // Valid information is then put into the project
         project.completeTask(taskID);
         player.sendMessage(Utils.color(devopProjectTag + "&aTask completed!"));
     }
 
+    /**
+     * This command is used by project moderaters to add a task to a project.
+     *
+     * @param player       Automatic input from the player who executed the command
+     * @param devopProject Input for specified project
+     * @param taskParts    Input for a task
+     */
     @Subcommand("task add")
     @Syntax("<Project> <Task>")
     @CommandPermission("emi.devop.task.add")
@@ -686,6 +837,7 @@ public class DevopCommand extends BaseCommand
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
         DevopProject project = manager.getProject(devopProject);
 
+        // Basic test to determine if the command has been issued correctly
         if(project == null)
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
@@ -698,6 +850,7 @@ public class DevopCommand extends BaseCommand
             return;
         }
 
+        // Valid information is then put into the project
         String taskString = Utils.buildMessage(taskParts, 0, false);
         DevopTask task = new DevopTask(project.getId(), taskString, 0, 0);
 
@@ -705,6 +858,13 @@ public class DevopCommand extends BaseCommand
         player.sendMessage(Utils.color(devopProjectTag + "&aTask added!"));
     }
 
+    /**
+     * This command is used by project moderaters to delete a task from a project.
+     *
+     * @param player       Automatic input from the player who executed the command
+     * @param devopProject Input for specified project
+     * @param taskID       Input for a specified Task
+     */
     @Subcommand("task delete")
     @Syntax("<Project> <TaskID>")
     @CommandPermission("emi.devop.task.delete")
@@ -713,6 +873,7 @@ public class DevopCommand extends BaseCommand
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
         DevopProject project = manager.getProject(devopProject);
 
+        // Basic test to determine if the command has been issued correctly
         if (project == null)
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
@@ -733,10 +894,18 @@ public class DevopCommand extends BaseCommand
             return;
         }
 
+        // Valid information is then put into the project
         project.deleteTask(task);
         player.sendMessage(Utils.color(devopProjectTag + "&aTask deleted!"));
     }
 
+    /**
+     * This command is used by project moderaters to mark a task as focused.
+     *
+     * @param player       Automatic input from the player who executed the command
+     * @param devopProject Input for specified project
+     * @param taskID       Input for a specified Task
+     */
     @Subcommand("task focus")
     @Syntax("<Project> <taskID>")
     @CommandPermission("emi.devop.task.focus")
@@ -745,6 +914,7 @@ public class DevopCommand extends BaseCommand
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
         DevopProject project = manager.getProject(devopProject);
 
+        // Basic test to determine if the command has been issued correctly
         if(project == null)
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
@@ -771,6 +941,7 @@ public class DevopCommand extends BaseCommand
             return;
         }
 
+        // If the specified task is focused, mark it as unfocused
         if(task.getFocused() == 1)
         {
             project.unFocusTask(task);
@@ -780,6 +951,7 @@ public class DevopCommand extends BaseCommand
 
         DevopTask formerTask = null;
 
+        // Searches and marks current project as unfocused
         for(DevopTask devopTask : project.getTasks().values())
         {
             if(devopTask.getFocused() == 1)
@@ -789,10 +961,17 @@ public class DevopCommand extends BaseCommand
             }
         }
 
+        // Valid information is then put into the project
         project.switchTaskFocus(task, formerTask);
         player.sendMessage(Utils.color(devopProjectTag + "&aTask focused!"));
     }
 
+    /**
+     * This command is used by players to view tasks for a project.
+     *
+     * @param player       Automatic input from the player who executed the command
+     * @param devopProject Input for specified project
+     */
     @Subcommand("task list")
     @Syntax("<Project>")
     @CommandPermission("emi.devop.task.list")
@@ -801,6 +980,7 @@ public class DevopCommand extends BaseCommand
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
         DevopProject project = manager.getProject(devopProject);
 
+        // Basic test to determine if the command has been issued correctly
         if(project == null)
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
@@ -813,6 +993,7 @@ public class DevopCommand extends BaseCommand
             return;
         }
 
+        // Create empty objects and put tasks in them based on their status
         DevopTask focusedTask = null;
         ArrayList<DevopTask> currentTasks = new ArrayList<>();
         ArrayList<DevopTask> completeTasks = new ArrayList<>();
@@ -835,6 +1016,8 @@ public class DevopCommand extends BaseCommand
 
         player.sendMessage(Utils.color(devopProjectTag + "&aTasks for &6" + project.getName()));
 
+        // Send player the tasks sorted by Focused Task, Current Tasks, and Completed Tasks
+        // Also sends players the taskID, based on their persmissions
         if(focusedTask != null)
         {
             if(player.hasPermission("emi.devop.view.taskid"))
@@ -872,6 +1055,12 @@ public class DevopCommand extends BaseCommand
         }
     }
 
+    /**
+     * This command is used by project moderaters to validate player logs.
+     *
+     * @param player       Automatic input from the player who executed the command
+     * @param devopProject Input for specified project
+     */
     @Subcommand("validate")
     @Syntax("<Project>")
     @CommandPermission("emi.devop.validate")
@@ -880,6 +1069,7 @@ public class DevopCommand extends BaseCommand
         DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
         DevopProject project = manager.getProject(devopProject);
 
+        // Basic test to determine if the command has been issued correctly
         if(project == null)
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
@@ -892,6 +1082,7 @@ public class DevopCommand extends BaseCommand
             return;
         }
 
+        // If the player already submitted a validation request and hasn't responded, send them their queued validation with clickable message
         if(project.getQueuedValidateMaterial().containsKey(player.getUniqueId()) || project.getQueuedValidateTask().containsKey(player.getUniqueId()))
         {
             if(project.getQueuedValidateMaterial().containsKey(player.getUniqueId()))
@@ -917,12 +1108,14 @@ public class DevopCommand extends BaseCommand
             }
         }
 
+        // If there's no logs, simply return and tell the player
         if(project.getMaterialLogValidation().isEmpty() && project.getTaskLogValidation().isEmpty())
         {
             player.sendMessage(Utils.color(devopProjectTag + "&cNo logs to validate!"));
             return;
         }
 
+        // If there's material logs to validate, send the first log with a clickable message
         if(!project.getMaterialLogValidation().isEmpty())
         {
             DevopLogMaterial materialLog = project.getMaterialLogValidation().values().iterator().next();
@@ -936,6 +1129,7 @@ public class DevopCommand extends BaseCommand
             return;
         }
 
+        // If there's task logs to validate, send the first log with a clickable message
         if(!project.getTaskLogValidation().isEmpty())
         {
             DevopLogTask taskLog = project.getTaskLogValidation().values().iterator().next();
@@ -949,6 +1143,12 @@ public class DevopCommand extends BaseCommand
         }
     }
 
+    /**
+     * This command is used by the plugin as a clickable message to validate the log.
+     *
+     * @param player       Automatic input from the player who executed the command
+     * @param devopProject Input for specified project
+     */
     @Subcommand("validateyes")
     @Syntax("<Project>")
     @CommandPermission("emi.devop.validate")
@@ -959,6 +1159,7 @@ public class DevopCommand extends BaseCommand
         DevopProject project = manager.getProject(devopProject);
         EMIPlayer validator = PlayerUtils.getEMIPlayer(player.getName());
 
+        // Validate the material or task log
         if(project.getQueuedValidateMaterial().containsKey(player.getUniqueId()))
         {
             project.validateMaterial(project.getQueuedValidateMaterial().get(player.getUniqueId()), true, validator);
@@ -976,6 +1177,12 @@ public class DevopCommand extends BaseCommand
         player.sendMessage(Utils.color(devopProjectTag + "&aLog has been approved!"));
     }
 
+    /**
+     * This command is used by the plugin as a clickable message to reject the log.
+     *
+     * @param player       Automatic input from the player who executed the command
+     * @param devopProject Input for specified project
+     */
     @Subcommand("validateno")
     @Syntax("<Project>")
     @CommandPermission("emi.devop.validate")
@@ -986,6 +1193,7 @@ public class DevopCommand extends BaseCommand
         DevopProject project = manager.getProject(devopProject);
         EMIPlayer validator = PlayerUtils.getEMIPlayer(player.getName());
 
+        // Reject the material or task log
         if(project.getQueuedValidateMaterial().containsKey(player.getUniqueId()))
         {
             project.validateMaterial(project.getQueuedValidateMaterial().get(player.getUniqueId()), false, validator);
@@ -1003,6 +1211,13 @@ public class DevopCommand extends BaseCommand
         player.sendMessage(Utils.color(devopProjectTag + "&aLog has been rejected!"));
     }
 
+    /**
+     * This method generates the validation message for the player to click yes or no.
+     *
+     * @param devopProject Input for specified project
+     *
+     * @return Returns a TextComponent ready to send to a player
+     */
     private TextComponent buildValidationMessage(String devopProject)
     {
         TextComponent messageYes = new TextComponent(Utils.color("&aYes"));
@@ -1025,6 +1240,13 @@ public class DevopCommand extends BaseCommand
         return messagePart1;
     }
 
+    /**
+     * This method takes an input and tries to return a time measured in minutes.
+     *
+     * @param time Input for a time format HH:MM
+     *
+     * @return Time measured in minutes or -1 if the format was entered in wrong
+     */
     private int encodeTime(String time)
     {
         String[] timeSplit = time.split(":");
@@ -1056,6 +1278,13 @@ public class DevopCommand extends BaseCommand
         return ((hours*60) + minutes);
     }
 
+    /**
+     * This method takes in a time in minutes and returns a readable time.
+     *
+     * @param time Input for time measured in minutes
+     *
+     * @return Returns a string showing hours and minutes
+     */
     private String decodeTime(int time)
     {
         String hours = String.valueOf(time / 60);
@@ -1064,6 +1293,13 @@ public class DevopCommand extends BaseCommand
         return (hours + " hours " + minutes + " minutes");
     }
 
+    /**
+     * This method takes input for a date, splits it, and returns the first value.
+     *
+     * @param date Input for a formated date
+     *
+     * @return Returns the first value in the array
+     */
     private String decodeDate(String date)
     {
         String[] dateSplit = date.split(" ");
@@ -1071,6 +1307,14 @@ public class DevopCommand extends BaseCommand
         return dateSplit[0];
     }
 
+    /**
+     * This method takes an ArrayList of Tasks and appends them all together depending on if the player has a permission or not.
+     *
+     * @param tasks         Input for Tasks
+     * @param hasPermission Input for if the player has a permission
+     *
+     * @return Returns a string of all Tasks in the ArrayList of Tasks
+     */
     private String buildTaskList(ArrayList<DevopTask> tasks, boolean hasPermission)
     {
         StringBuilder builder = new StringBuilder();
@@ -1089,6 +1333,13 @@ public class DevopCommand extends BaseCommand
         return builder.toString();
     }
 
+    /**
+     * This method takes an ArrayList of Materials and appends them all together.
+     *
+     * @param materials Input for Materials
+     *
+     * @return Returns a string of all Materials in the ArrayList of Materials
+     */
     private String buildMaterialList(ArrayList<DevopMaterial> materials)
     {
         StringBuilder builder = new StringBuilder();

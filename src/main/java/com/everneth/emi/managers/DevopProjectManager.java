@@ -12,6 +12,7 @@ public class DevopProjectManager
     private static DevopProjectManager devopProjectManager;
     private DevopProjectManager() {}
     private HashMap<Long, DevopProject> projects = new HashMap<>();
+
     public static DevopProjectManager getDevopProjectManager()
     {
         if(devopProjectManager == null)
@@ -21,6 +22,13 @@ public class DevopProjectManager
         return devopProjectManager;
     }
 
+    /**
+     * This method gets the project if it exists.
+     *
+     * @param projectName Input for the project name
+     *
+     * @return Returns the project object or null if it doesnt exist
+     */
     public DevopProject getProject(String projectName)
     {
         for(DevopProject project : projects.values())
@@ -33,21 +41,44 @@ public class DevopProjectManager
         return null;
     }
 
+    /**
+     * This method gets the project if it exists.
+     *
+     * @param projectID Input for the projectID
+     *
+     * @return Returns the project object
+     */
     public DevopProject getProject(long projectID)
     {
         return projects.get(projectID);
     }
 
+    /**
+     * This method gets all of the projects currently in memory.
+     *
+     * @return Returns a hashmap of all of the projects
+     */
     public HashMap<Long, DevopProject> getProjects()
     {
         return projects;
     }
 
+    /**
+     * This method adds a project to the project list when the server first starts up.
+     *
+     * @param projectID Input for the projectID
+     * @param project   Input for the project object
+     */
     public void addProject(long projectID, DevopProject project)
     {
         projects.put(projectID, project);
     }
 
+    /**
+     * This method adds a project to the database and memory upon creation.
+     *
+     * @param devopProject Input for the project
+     */
     public void addProject(DevopProject devopProject)
     {
         try
@@ -67,6 +98,12 @@ public class DevopProjectManager
         }
     }
 
+    /**
+     * This method swiches the focus for the project in the database and memory.
+     *
+     * @param newFocus    Input for the new project
+     * @param formerFocus Input for the current project
+     */
     public void switchFocus(DevopProject newFocus, DevopProject formerFocus)
     {
         try
@@ -95,6 +132,11 @@ public class DevopProjectManager
         }
     }
 
+    /**
+     * This method unfocuses the current project in the database and memory.
+     *
+     * @param project Input for the project
+     */
     public void unFocus(DevopProject project)
     {
         try
