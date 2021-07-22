@@ -5,7 +5,7 @@ import co.aikar.idb.*;
 import com.everneth.emi.commands.*;
 import com.everneth.emi.commands.bot.*;
 import com.everneth.emi.commands.bot.par.WhitelistAppCommand;
-import com.everneth.emi.commands.devop.DevopCommand;
+import com.everneth.emi.commands.mint.DevopCommand;
 import com.everneth.emi.commands.par.CharterCommand;
 import com.everneth.emi.events.JoinEvent;
 import com.everneth.emi.events.LeaveEvent;
