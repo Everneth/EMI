@@ -5,8 +5,6 @@ import co.aikar.idb.*;
 import com.everneth.emi.commands.*;
 import com.everneth.emi.commands.bot.*;
 import com.everneth.emi.commands.bot.par.WhitelistAppCommand;
-import com.everneth.emi.commands.comm.CommCommand;
-import com.everneth.emi.commands.comp.CompCommand;
 import com.everneth.emi.commands.devop.DevopCommand;
 import com.everneth.emi.commands.par.CharterCommand;
 import com.everneth.emi.events.JoinEvent;
@@ -103,8 +101,6 @@ public class EMI extends JavaPlugin {
     {
         commandManager = new BukkitCommandManager(this);
         commandManager.registerCommand(new MintCommand());
-        commandManager.registerCommand(new CommCommand());
-        commandManager.registerCommand(new CompCommand());
         commandManager.registerCommand(new ReportCommand());
         commandManager.registerCommand(new ReportReplyCommand());
         commandManager.registerCommand(new GetRepliesCommand());
