@@ -11,7 +11,7 @@ public class DevopProjectManager
 {
     private static DevopProjectManager devopProjectManager;
     private DevopProjectManager() {}
-    private HashMap<Long, DevopProject> projects = new HashMap<>();
+    private final HashMap<Long, DevopProject> projects = new HashMap<>();
 
     public static DevopProjectManager getDevopProjectManager()
     {
@@ -39,18 +39,6 @@ public class DevopProjectManager
             }
         }
         return null;
-    }
-
-    /**
-     * This method gets the project if it exists.
-     *
-     * @param projectID Input for the projectID
-     *
-     * @return Returns the project object
-     */
-    public DevopProject getProject(long projectID)
-    {
-        return projects.get(projectID);
     }
 
     /**
@@ -99,7 +87,7 @@ public class DevopProjectManager
     }
 
     /**
-     * This method swiches the focus for the project in the database and memory.
+     * This method switches the focus for the project in the database and memory.
      *
      * @param newFocus    Input for the new project
      * @param formerFocus Input for the current project

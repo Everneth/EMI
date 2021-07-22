@@ -3,8 +3,8 @@ package com.everneth.emi.models.devop;
 public class DevopTask
 {
     private long id;
-    private long projectID;
-    private String task;
+    private final long projectID;
+    private final String task;
     private int complete;
     private int focused;
 
@@ -35,24 +35,9 @@ public class DevopTask
         this.id = id;
     }
 
-    public long getProjectID()
-    {
-        return projectID;
-    }
-
-    public void setProjectID(long projectID)
-    {
-        this.projectID = projectID;
-    }
-
     public String getTask()
     {
         return task;
-    }
-
-    public void setTask(String task)
-    {
-        this.task = task;
     }
 
     public int getComplete()

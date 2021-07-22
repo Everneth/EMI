@@ -5,15 +5,15 @@ import com.everneth.emi.models.EMIPlayer;
 public class DevopLogMaterial
 {
     private long id;
-    private long projectID;
-    private long materialID;
-    private EMIPlayer logger;
+    private final long projectID;
+    private final long materialID;
+    private final EMIPlayer logger;
     private EMIPlayer validater;
     private int validated;
-    private int materialCollected;
-    private int timeWorked;
-    private String logDate;
-    private String description;
+    private final int materialCollected;
+    private final int timeWorked;
+    private final String logDate;
+    private final String description;
 
     public DevopLogMaterial(long id, long projectID, long materialID, EMIPlayer logger, EMIPlayer validater, int validated, int materialCollected, int timeWorked, String logDate, String description)
     {
@@ -52,39 +52,14 @@ public class DevopLogMaterial
         this.id = id;
     }
 
-    public long getProjectID()
-    {
-        return projectID;
-    }
-
-    public void setProjectID(long projectID)
-    {
-        this.projectID = projectID;
-    }
-
     public long getMaterialID()
     {
         return materialID;
     }
 
-    public void setMaterialID(long materialID)
-    {
-        this.materialID = materialID;
-    }
-
     public EMIPlayer getLogger()
     {
         return logger;
-    }
-
-    public void setLogger(EMIPlayer logger)
-    {
-        this.logger = logger;
-    }
-
-    public EMIPlayer getValidater()
-    {
-        return validater;
     }
 
     public void setValidater(EMIPlayer validater)
@@ -107,19 +82,9 @@ public class DevopLogMaterial
         return materialCollected;
     }
 
-    public void setMaterialCollected(int materialCollected)
-    {
-        this.materialCollected = materialCollected;
-    }
-
     public int getTimeWorked()
     {
         return timeWorked;
-    }
-
-    public void setTimeWorked(int timeWorked)
-    {
-        this.timeWorked = timeWorked;
     }
 
     public String getLogDate()
@@ -127,18 +92,8 @@ public class DevopLogMaterial
         return logDate;
     }
 
-    public void setLogDate(String logDate)
-    {
-        this.logDate = logDate;
-    }
-
     public String getDescription()
     {
         return description;
-    }
-
-    public void setDescription(String description)
-    {
-        this.description = description;
     }
 }

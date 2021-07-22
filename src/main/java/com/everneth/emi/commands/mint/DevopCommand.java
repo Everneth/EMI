@@ -15,7 +15,6 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 
@@ -28,8 +27,6 @@ import java.util.ArrayList;
 @CommandAlias("devop|mint")
 public class DevopCommand extends BaseCommand
 {
-    @Dependency
-    private Plugin plugin;
     private final String devopProjectTag = "&7[&dMint&5Projects] ";
 
     /**
@@ -142,7 +139,7 @@ public class DevopCommand extends BaseCommand
 
 
     /**
-     * This command is used by project moderaters to mark a material as complete.
+     * This command is used by project moderators to mark a material as complete.
      *
      * @param player         Automatic input from the player who executed the command
      * @param devopProject   Input for specified project
@@ -191,7 +188,7 @@ public class DevopCommand extends BaseCommand
 
 
     /**
-     * This command is used by project moderaters to add materials to a project.
+     * This command is used by project moderators to add materials to a project.
      *
      * @param player         Automatic input from the player who executed the command
      * @param devopProject   Input for specified project
@@ -228,7 +225,7 @@ public class DevopCommand extends BaseCommand
     }
 
     /**
-     * This command is used by project moderaters to delete materials from a project.
+     * This command is used by project moderators to delete materials from a project.
      *
      * @param player         Automatic input from the player who executed the command
      * @param devopProject   Input for specified project
@@ -270,7 +267,7 @@ public class DevopCommand extends BaseCommand
     }
 
     /**
-     * This command is used by project moderaters to focus materials from a project.
+     * This command is used by project moderators to focus materials from a project.
      *
      * @param player         Automatic input from the player who executed the command
      * @param devopProject   Input for specified project
@@ -408,7 +405,7 @@ public class DevopCommand extends BaseCommand
     }
 
     /**
-     * This command is used by project moderaters to complete a project.
+     * This command is used by project moderators to complete a project.
      *
      * @param player       Automatic input from the player who executed the command
      * @param devopProject Input for specified project
@@ -447,7 +444,7 @@ public class DevopCommand extends BaseCommand
     }
 
     /**
-     * This command is used by project moderaters to create a project.
+     * This command is used by project moderators to create a project.
      *
      * @param player      Automatic input from the player who executed the command
      * @param projectName Input for project name
@@ -487,7 +484,7 @@ public class DevopCommand extends BaseCommand
     }
 
     /**
-     * This command is used by project moderaters to focus a project.
+     * This command is used by project moderators to focus a project.
      *
      * @param player      Automatic input from the player who executed the command
      * @param projectName Input for specified project
@@ -705,7 +702,7 @@ public class DevopCommand extends BaseCommand
     }
 
     /**
-     * This command is used by plapyers to view all tasks and materials for a project.
+     * This command is used by players to view all tasks and materials for a project.
      *
      * @param player       Automatic input from the player who executed the command
      * @param devopProject Input for specified project
@@ -778,7 +775,7 @@ public class DevopCommand extends BaseCommand
     }
 
     /**
-     * This command is used by project moderaters to set a task as complete.
+     * This command is used by project moderators to set a task as complete.
      *
      * @param player       Automatic input from the player who executed the command
      * @param devopProject Input for specified project
@@ -823,7 +820,7 @@ public class DevopCommand extends BaseCommand
     }
 
     /**
-     * This command is used by project moderaters to add a task to a project.
+     * This command is used by project moderators to add a task to a project.
      *
      * @param player       Automatic input from the player who executed the command
      * @param devopProject Input for specified project
@@ -859,7 +856,7 @@ public class DevopCommand extends BaseCommand
     }
 
     /**
-     * This command is used by project moderaters to delete a task from a project.
+     * This command is used by project moderators to delete a task from a project.
      *
      * @param player       Automatic input from the player who executed the command
      * @param devopProject Input for specified project
@@ -900,7 +897,7 @@ public class DevopCommand extends BaseCommand
     }
 
     /**
-     * This command is used by project moderaters to mark a task as focused.
+     * This command is used by project moderators to mark a task as focused.
      *
      * @param player       Automatic input from the player who executed the command
      * @param devopProject Input for specified project
@@ -1017,7 +1014,7 @@ public class DevopCommand extends BaseCommand
         player.sendMessage(Utils.color(devopProjectTag + "&aTasks for &6" + project.getName()));
 
         // Send player the tasks sorted by Focused Task, Current Tasks, and Completed Tasks
-        // Also sends players the taskID, based on their persmissions
+        // Also sends players the taskID, based on their permissions
         if(focusedTask != null)
         {
             if(player.hasPermission("emi.devop.view.taskid"))
@@ -1056,7 +1053,7 @@ public class DevopCommand extends BaseCommand
     }
 
     /**
-     * This command is used by project moderaters to validate player logs.
+     * This command is used by project moderators to validate player logs.
      *
      * @param player       Automatic input from the player who executed the command
      * @param devopProject Input for specified project
@@ -1296,7 +1293,7 @@ public class DevopCommand extends BaseCommand
     /**
      * This method takes input for a date, splits it, and returns the first value.
      *
-     * @param date Input for a formated date
+     * @param date Input for a formatted date
      *
      * @return Returns the first value in the array
      */

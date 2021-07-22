@@ -13,24 +13,24 @@ import java.util.UUID;
 public class DevopProject
 {
     private long id;
-    private EMIPlayer leader;
+    private final EMIPlayer leader;
     private String name;
-    private String startDate;
-    private String endDate;
+    private final String startDate;
+    private final String endDate;
     private int complete;
     private int focused;
-    private String description;
+    private final String description;
     private DevopTask focusedTask = null;
     private DevopMaterial focusedMaterial = null;
-    private ArrayList<EMIPlayer> workers = new ArrayList<>();
-    private HashMap<Long, DevopLogTask> taskLog = new HashMap<>();
-    private HashMap<Long, DevopLogTask> taskLogValidation = new HashMap<>();
-    private HashMap<Long, DevopLogMaterial> materialLog = new HashMap<>();
-    private HashMap<Long, DevopLogMaterial> materialLogValidation = new HashMap<>();
-    private HashMap<Long, DevopTask> tasks = new HashMap<>();
-    private HashMap<Long, DevopMaterial> materials = new HashMap<>();
-    private HashMap<UUID, DevopLogMaterial> queuedValidateMaterial = new HashMap<>();
-    private HashMap<UUID, DevopLogTask> queuedValidateTask = new HashMap<>();
+    private final ArrayList<EMIPlayer> workers = new ArrayList<>();
+    private final HashMap<Long, DevopLogTask> taskLog = new HashMap<>();
+    private final HashMap<Long, DevopLogTask> taskLogValidation = new HashMap<>();
+    private final HashMap<Long, DevopLogMaterial> materialLog = new HashMap<>();
+    private final HashMap<Long, DevopLogMaterial> materialLogValidation = new HashMap<>();
+    private final HashMap<Long, DevopTask> tasks = new HashMap<>();
+    private final HashMap<Long, DevopMaterial> materials = new HashMap<>();
+    private final HashMap<UUID, DevopLogMaterial> queuedValidateMaterial = new HashMap<>();
+    private final HashMap<UUID, DevopLogTask> queuedValidateTask = new HashMap<>();
 
     public DevopProject(EMIPlayer leader, String name, String startDate, String endDate, int complete, int focused, String description)
     {
@@ -145,7 +145,7 @@ public class DevopProject
     }
 
     /**
-     * This method swiches the task focus from one task to another through the database and memory.
+     * This method switches the task focus from one task to another through the database and memory.
      *
      * @param newTask    Input for the new task
      * @param formerTask Input for the current task
@@ -264,7 +264,7 @@ public class DevopProject
     }
 
     /**
-     * This method swiches the material focus from one material to another through the database and memory.
+     * This method switches the material focus from one material to another through the database and memory.
      *
      * @param newMaterial    Input for the new material
      * @param formerMaterial Input for the current material
@@ -432,7 +432,7 @@ public class DevopProject
     }
 
     /**
-     * This method marks the matieral as validated through the database and memory.
+     * This method marks the material as validated through the database and memory.
      *
      * @param devopLogMaterial Input for the material
      * @param validated        Input if the material was validated or rejected
@@ -540,11 +540,6 @@ public class DevopProject
         return leader;
     }
 
-    public void setLeader(EMIPlayer leader)
-    {
-        this.leader = leader;
-    }
-
     public String getName()
     {
         return name;
@@ -560,19 +555,9 @@ public class DevopProject
         return startDate;
     }
 
-    public void setStartDate(String startDate)
-    {
-        this.startDate = startDate;
-    }
-
     public String getEndDate()
     {
         return endDate;
-    }
-
-    public void setEndDate(String endDate)
-    {
-        this.endDate = endDate;
     }
 
     public int getComplete()
@@ -600,11 +585,6 @@ public class DevopProject
         return description;
     }
 
-    public void setDescription(String description)
-    {
-        this.description = description;
-    }
-
     public DevopTask getFocusedTask()
     {
         return focusedTask;
@@ -630,19 +610,9 @@ public class DevopProject
         return workers;
     }
 
-    public void setWorkers(ArrayList<EMIPlayer> workers)
-    {
-        this.workers = workers;
-    }
-
     public HashMap<Long, DevopLogTask> getTaskLog()
     {
         return taskLog;
-    }
-
-    public void setTaskLog(HashMap<Long, DevopLogTask> taskLog)
-    {
-        this.taskLog = taskLog;
     }
 
     public HashMap<Long, DevopLogTask> getTaskLogValidation()
@@ -650,19 +620,9 @@ public class DevopProject
         return taskLogValidation;
     }
 
-    public void setTaskLogValidation(HashMap<Long, DevopLogTask> taskLogValidation)
-    {
-        this.taskLogValidation = taskLogValidation;
-    }
-
     public HashMap<Long, DevopLogMaterial> getMaterialLog()
     {
         return materialLog;
-    }
-
-    public void setMaterialLog(HashMap<Long, DevopLogMaterial> materialLog)
-    {
-        this.materialLog = materialLog;
     }
 
     public HashMap<Long, DevopLogMaterial> getMaterialLogValidation()
@@ -670,19 +630,9 @@ public class DevopProject
         return materialLogValidation;
     }
 
-    public void setMaterialLogValidation(HashMap<Long, DevopLogMaterial> materialLogValidation)
-    {
-        this.materialLogValidation = materialLogValidation;
-    }
-
     public HashMap<Long, DevopTask> getTasks()
     {
         return tasks;
-    }
-
-    public void setTasks(HashMap<Long, DevopTask> tasks)
-    {
-        this.tasks = tasks;
     }
 
     public HashMap<Long, DevopMaterial> getMaterials()
@@ -690,29 +640,14 @@ public class DevopProject
         return materials;
     }
 
-    public void setMaterials(HashMap<Long, DevopMaterial> materials)
-    {
-        this.materials = materials;
-    }
-
     public HashMap<UUID, DevopLogMaterial> getQueuedValidateMaterial()
     {
         return queuedValidateMaterial;
     }
 
-    public void setQueuedValidateMaterial(HashMap<UUID, DevopLogMaterial> queuedValidateMaterial)
-    {
-        this.queuedValidateMaterial = queuedValidateMaterial;
-    }
-
     public HashMap<UUID, DevopLogTask> getQueuedValidateTask()
     {
         return queuedValidateTask;
-    }
-
-    public void setQueuedValidateTask(HashMap<UUID, DevopLogTask> queuedValidateTask)
-    {
-        this.queuedValidateTask = queuedValidateTask;
     }
 
     @Override

@@ -3,9 +3,9 @@ package com.everneth.emi.models.devop;
 public class DevopMaterial
 {
     private long id;
-    private long projectID;
-    private String material;
-    private int total;
+    private final long projectID;
+    private final String material;
+    private final int total;
     private int collected;
     private int complete;
     private int focused;
@@ -43,34 +43,14 @@ public class DevopMaterial
         this.id = id;
     }
 
-    public long getProjectID()
-    {
-        return projectID;
-    }
-
-    public void setProjectID(long projectID)
-    {
-        this.projectID = projectID;
-    }
-
     public String getMaterial()
     {
         return material;
     }
 
-    public void setMaterial(String material)
-    {
-        this.material = material;
-    }
-
     public int getTotal()
     {
         return total;
-    }
-
-    public void setTotal(int total)
-    {
-        this.total = total;
     }
 
     public int getCollected()
