@@ -31,32 +31,32 @@ Everneth Ministry Interface - This is a all-inclusive tool to open up commands a
 | /charter pardon \<player\> \[removeFlag\]     | emi.par.charter.pardon | Expire all active points, pardon the player, and issue 1 point as part of the process. Flag is removed by default.  |
 | /charter pg \[pg#\]     | emi.par.charter.pg | Cycle through history results |
 
-### Devop Projects
+### Mint Projects
 | Command | Permission Node | Description |
 | ------------- |:-------------:| ----- |
-| /devop project create \<projectName\> \<projectLead\> \<description\>| emi.devop.project.create | Initialy creates the project and adds you to the project |
-| /devop project join \<projectName\> | emi.devop.project.join | Lets you join specific projects |
-| /devop project info \<projectName\> | emi.devop.project.info | Lets you see basic information for the project |
-| /devop project work \<projectName\> | emi.devop.project.work | View all work needed for the project |
-| /devop project focus \<projectName\> | emi.devop.project.focus | Sets the project as the focused project |
-| /devop project complete \<projectName\> | emi.devop.project.complete | Sets the project as complete. Can't complete unless all logs have been validated |
-| /devop project list | emi.devop.project.list | Lists out all projects |
-| /devop task add \<projectName\> \<task\> | emi.devop.task.add | Lets you add a task to a project |
-| /devop task delete \<projectName\> \<taskID\> | emi.devop.task.delete | Delete any task from a project given the taskID (you can get the ID from /devop task list \<projectName\>) |
-| /devop task focus \<projectName\> \<taskID\> | emi.devop.task.focus | Set the task as focused in a pjroject given the taskID (you can get the ID from /devop task list \<projectName\>) |
-| /devop task complete \<projectName\> \<taskID\> | emi.devop.task.complete | Set the task as complete in a project given the taskID (you can get the ID from /devop task list \<projectName\>) |
-| /devop task list \<projectName\> | emi.devop.task.list | View all tasks needed for the project and display taskID for players who have the permission |
-|  | emi.devop.view.taskid | Lets players view the taskID when using the /devop task list command |
-| /devop material add \<projectName\> \<material\> \<amount\> | emi.devop.material.add | Lets you add a material to a project. Material is just a string input meaning you can put whatever you want |
-| /devop material delete \<projectName\> \<materialName\> | emi.devop.material.delete | Lets you delete a material given the name of the material set |
-| /devop material focus \<projectName\> \<materialName\> | emi.devop.material.focus | Set the material as focused in a project |
-| /devop material complete \<projectName\> \<materialName\> | emi.devop.material.complete | Set the material as complete |
-| /devop material list \<projectName\> | emi.devop.material.list | View all materials associated with project |
-| /devop log material \<projectName\> \<time\> \<materialName\> \<amount\> \<description\> | emi.devop.log | Log material gathering done |
-| /devop log task \<projectName\> \<time\> \<description\> | emi.devop.log | Log tasks or other work done |
-| /devop validate \<projectName\> | emi.devop.validate | Lets the player grab the next log that needs to be validated. Server will send them a message to validate or to not validate the log.
-| /devop validateyes \<projectName\> | emi.devop.validate | Internal command used by /devop validate |
-| /devop validateno \<projectName\> | emi.devop.validate | Internal command used by /devop validate |
+| /mint project create \<projectName\> \<projectLead\> \<description\>| emi.mint.project.create | Initialy creates the project and adds you to the project |
+| /mint project join \<projectName\> | emi.mint.project.join | Lets you join specific projects |
+| /mint project info \<projectName\> | emi.mint.project.info | Lets you see basic information for the project |
+| /mint project work \<projectName\> | emi.mint.project.work | View all work needed for the project |
+| /mint project focus \<projectName\> | emi.mint.project.focus | Sets the project as the focused project |
+| /mint project complete \<projectName\> | emi.mint.project.complete | Sets the project as complete. Can't complete unless all logs have been validated |
+| /mint project list | emi.mint.project.list | Lists out all projects |
+| /mint task add \<projectName\> \<task\> | emi.mint.task.add | Lets you add a task to a project |
+| /mint task delete \<projectName\> \<taskID\> | emi.mint.task.delete | Delete any task from a project given the taskID (you can get the ID from /mint task list \<projectName\>) |
+| /mint task focus \<projectName\> \<taskID\> | emi.mint.task.focus | Set the task as focused in a pjroject given the taskID (you can get the ID from /mint task list \<projectName\>) |
+| /mint task complete \<projectName\> \<taskID\> | emi.mint.task.complete | Set the task as complete in a project given the taskID (you can get the ID from /mint task list \<projectName\>) |
+| /mint task list \<projectName\> | emi.mint.task.list | View all tasks needed for the project and display taskID for players who have the permission |
+|  | emi.mint.view.taskid | Lets players view the taskID when using the /mint task list command |
+| /mint material add \<projectName\> \<material\> \<amount\> | emi.mint.material.add | Lets you add a material to a project. Material is just a string input meaning you can put whatever you want |
+| /mint material delete \<projectName\> \<materialName\> | emi.mint.material.delete | Lets you delete a material given the name of the material set |
+| /mint material focus \<projectName\> \<materialName\> | emi.mint.material.focus | Set the material as focused in a project |
+| /mint material complete \<projectName\> \<materialName\> | emi.mint.material.complete | Set the material as complete |
+| /mint material list \<projectName\> | emi.mint.material.list | View all materials associated with project |
+| /mint log material \<projectName\> \<time\> \<materialName\> \<amount\> \<description\> | emi.mint.log | Log material gathering done |
+| /mint log task \<projectName\> \<time\> \<description\> | emi.mint.log | Log tasks or other work done |
+| /mint validate \<projectName\> | emi.mint.validate | Lets the player grab the next log that needs to be validated. Server will send them a message to validate or to not validate the log.
+| /mint validateyes \<projectName\> | emi.mint.validate | Internal command used by /mint validate |
+| /mint validateno \<projectName\> | emi.mint.validate | Internal command used by /mint validate |
 
 ## API Endpoints
 EMI provides a basic playerdata API that exposes player stats, NBT, and advancements progress. All requests are `GET` calls and require an API key.
