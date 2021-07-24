@@ -1,4 +1,4 @@
-package com.everneth.emi.models.devop;
+package com.everneth.emi.models.mint;
 
 import co.aikar.idb.DB;
 import com.everneth.emi.Utils;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class DevopProject
+public class MintProject
 {
     private long id;
     private final EMIPlayer leader;
@@ -20,19 +20,19 @@ public class DevopProject
     private int complete;
     private int focused;
     private final String description;
-    private DevopTask focusedTask = null;
-    private DevopMaterial focusedMaterial = null;
+    private MintTask focusedTask = null;
+    private MintMaterial focusedMaterial = null;
     private final ArrayList<EMIPlayer> workers = new ArrayList<>();
-    private final HashMap<Long, DevopLogTask> taskLog = new HashMap<>();
-    private final HashMap<Long, DevopLogTask> taskLogValidation = new HashMap<>();
-    private final HashMap<Long, DevopLogMaterial> materialLog = new HashMap<>();
-    private final HashMap<Long, DevopLogMaterial> materialLogValidation = new HashMap<>();
-    private final HashMap<Long, DevopTask> tasks = new HashMap<>();
-    private final HashMap<Long, DevopMaterial> materials = new HashMap<>();
-    private final HashMap<UUID, DevopLogMaterial> queuedValidateMaterial = new HashMap<>();
-    private final HashMap<UUID, DevopLogTask> queuedValidateTask = new HashMap<>();
+    private final HashMap<Long, MintLogTask> taskLog = new HashMap<>();
+    private final HashMap<Long, MintLogTask> taskLogValidation = new HashMap<>();
+    private final HashMap<Long, MintLogMaterial> materialLog = new HashMap<>();
+    private final HashMap<Long, MintLogMaterial> materialLogValidation = new HashMap<>();
+    private final HashMap<Long, MintTask> tasks = new HashMap<>();
+    private final HashMap<Long, MintMaterial> materials = new HashMap<>();
+    private final HashMap<UUID, MintLogMaterial> queuedValidateMaterial = new HashMap<>();
+    private final HashMap<UUID, MintLogTask> queuedValidateTask = new HashMap<>();
 
-    public DevopProject(EMIPlayer leader, String name, String startDate, String endDate, int complete, int focused, String description)
+    public MintProject(EMIPlayer leader, String name, String startDate, String endDate, int complete, int focused, String description)
     {
         this.leader = leader;
         this.name = name;
@@ -43,7 +43,7 @@ public class DevopProject
         this.description = description;
     }
 
-    public DevopProject(long id, EMIPlayer leader, String name, String startDate, String endDate, int complete, int focused, String description)
+    public MintProject(long id, EMIPlayer leader, String name, String startDate, String endDate, int complete, int focused, String description)
     {
         this.id = id;
         this.leader = leader;
@@ -70,7 +70,7 @@ public class DevopProject
         }
         catch (SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: DevopProject/addWorker: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/addWorker: " + e.toString());
         }
     }
 
@@ -89,7 +89,7 @@ public class DevopProject
         }
         catch (SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: DevopProject/complete: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/complete: " + e.toString());
         }
     }
 
@@ -98,7 +98,7 @@ public class DevopProject
      *
      * @param task Input for task
      */
-    public void addTask(DevopTask task)
+    public void addTask(MintTask task)
     {
         try
         {
@@ -110,7 +110,7 @@ public class DevopProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: DevopProject/addTask: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/addTask: " + e.toString());
         }
     }
 
@@ -140,7 +140,7 @@ public class DevopProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: DevopProject/completeTask: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/completeTask: " + e.toString());
         }
     }
 
@@ -150,7 +150,7 @@ public class DevopProject
      * @param newTask    Input for the new task
      * @param formerTask Input for the current task
      */
-    public void switchTaskFocus(DevopTask newTask, DevopTask formerTask)
+    public void switchTaskFocus(MintTask newTask, MintTask formerTask)
     {
         try
         {
@@ -168,7 +168,7 @@ public class DevopProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: DevopProject/switchTaskFocus: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/switchTaskFocus: " + e.toString());
         }
     }
 
@@ -177,7 +177,7 @@ public class DevopProject
      *
      * @param task Input for the task
      */
-    public void unFocusTask(DevopTask task)
+    public void unFocusTask(MintTask task)
     {
         try
         {
@@ -188,7 +188,7 @@ public class DevopProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: DevopProject/unFocusTask: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/unFocusTask: " + e.toString());
         }
     }
 
@@ -197,7 +197,7 @@ public class DevopProject
      *
      * @param task Input for the task
      */
-    public void deleteTask(DevopTask task)
+    public void deleteTask(MintTask task)
     {
         try
         {
@@ -207,7 +207,7 @@ public class DevopProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: DevopProject/deleteTask: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/deleteTask: " + e.toString());
         }
     }
 
@@ -216,7 +216,7 @@ public class DevopProject
      *
      * @param material Input for the material
      */
-    public void addMaterial(DevopMaterial material)
+    public void addMaterial(MintMaterial material)
     {
         try
         {
@@ -229,7 +229,7 @@ public class DevopProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: DevopProject/addMaterial: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/addMaterial: " + e.toString());
         }
     }
 
@@ -259,7 +259,7 @@ public class DevopProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: DevopProject/completeMaterial: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/completeMaterial: " + e.toString());
         }
     }
 
@@ -269,7 +269,7 @@ public class DevopProject
      * @param newMaterial    Input for the new material
      * @param formerMaterial Input for the current material
      */
-    public void switchMaterialFocus(DevopMaterial newMaterial, DevopMaterial formerMaterial)
+    public void switchMaterialFocus(MintMaterial newMaterial, MintMaterial formerMaterial)
     {
         try
         {
@@ -287,7 +287,7 @@ public class DevopProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: DevopProject/switchMaterialFocus: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/switchMaterialFocus: " + e.toString());
         }
     }
 
@@ -296,7 +296,7 @@ public class DevopProject
      *
      * @param material Input for the material
      */
-    public void deleteMaterial(DevopMaterial material)
+    public void deleteMaterial(MintMaterial material)
     {
         try
         {
@@ -306,7 +306,7 @@ public class DevopProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: DevopProject/deleteMaterial: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/deleteMaterial: " + e.toString());
         }
     }
 
@@ -315,7 +315,7 @@ public class DevopProject
      *
      * @param log Input for the task log
      */
-    public void addTaskLog(DevopLogTask log)
+    public void addTaskLog(MintLogTask log)
     {
         try
         {
@@ -331,7 +331,7 @@ public class DevopProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: DevopProject/addTaskLog: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/addTaskLog: " + e.toString());
         }
     }
 
@@ -340,7 +340,7 @@ public class DevopProject
      *
      * @param log Input for the material log
      */
-    public void addMaterialLog(DevopLogMaterial log)
+    public void addMaterialLog(MintLogMaterial log)
     {
         try
         {
@@ -359,7 +359,7 @@ public class DevopProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: DevopProject/addMaterialLog: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/addMaterialLog: " + e.toString());
         }
     }
 
@@ -370,9 +370,9 @@ public class DevopProject
      *
      * @return Returns the material object
      */
-    public DevopMaterial getMaterial(String name)
+    public MintMaterial getMaterial(String name)
     {
-        for(DevopMaterial material : materials.values())
+        for(MintMaterial material : materials.values())
         {
             if(material.getMaterial().equalsIgnoreCase(name))
             {
@@ -387,7 +387,7 @@ public class DevopProject
      *
      * @param material Input for the material
      */
-    public void unFocusMaterial(DevopMaterial material)
+    public void unFocusMaterial(MintMaterial material)
     {
         try
         {
@@ -398,7 +398,7 @@ public class DevopProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: DevopProject/unFocusMaterial: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/unFocusMaterial: " + e.toString());
         }
     }
 
@@ -410,7 +410,7 @@ public class DevopProject
      */
     private void updateMaterial(long materialID, int collected)
     {
-        DevopMaterial material = materials.get(materialID);
+        MintMaterial material = materials.get(materialID);
         int totalCollected = (material.getCollected() + collected);
 
         try
@@ -422,7 +422,7 @@ public class DevopProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: DevopProject/updateMaterial: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/updateMaterial: " + e.toString());
         }
 
         if(totalCollected >= material.getTotal())
@@ -434,28 +434,28 @@ public class DevopProject
     /**
      * This method marks the material as validated through the database and memory.
      *
-     * @param devopLogMaterial Input for the material
+     * @param mintLogMaterial Input for the material
      * @param validated        Input if the material was validated or rejected
      * @param validator        Input for the player who validated
      */
-    public void validateMaterial(DevopLogMaterial devopLogMaterial, boolean validated, EMIPlayer validator)
+    public void validateMaterial(MintLogMaterial mintLogMaterial, boolean validated, EMIPlayer validator)
     {
-        DevopMaterial devopMaterial = materials.get(devopLogMaterial.getMaterialID());
+        MintMaterial mintMaterial = materials.get(mintLogMaterial.getMaterialID());
         if(!validated)
         {
             try
             {
                 DB.executeUpdate("DELETE FROM devop_log_material WHERE log_id = ?",
-                        devopLogMaterial.getId());
+                        mintLogMaterial.getId());
 
                 DB.executeUpdate("UPDATE devop_material set collected = ? WHERE material_id = ?",
-                        (devopMaterial.getCollected() - devopLogMaterial.getMaterialCollected()),
-                        devopMaterial.getId());
-                devopMaterial.setCollected(devopMaterial.getCollected() - devopLogMaterial.getMaterialCollected());
+                        (mintMaterial.getCollected() - mintLogMaterial.getMaterialCollected()),
+                        mintMaterial.getId());
+                mintMaterial.setCollected(mintMaterial.getCollected() - mintLogMaterial.getMaterialCollected());
             }
             catch(SQLException e)
             {
-                Bukkit.getLogger().info("ERROR: DevopProject/validateMaterial/No: " + e.toString());
+                Bukkit.getLogger().info("ERROR: MintProject/validateMaterial/No: " + e.toString());
                 return;
             }
         }
@@ -465,41 +465,41 @@ public class DevopProject
             {
                 DB.executeUpdate("UPDATE devop_log_material set validated_by = ?, validated = 1 WHERE log_id = ?",
                         validator.getId(),
-                        devopLogMaterial.getId());
+                        mintLogMaterial.getId());
             }
             catch(SQLException e)
             {
-                Bukkit.getLogger().info("ERROR: DevopProject/validateMaterial/Yes: " + e.toString());
+                Bukkit.getLogger().info("ERROR: MintProject/validateMaterial/Yes: " + e.toString());
                 return;
             }
-            devopLogMaterial.setValidater(validator);
-            devopLogMaterial.setValidated(1);
-            materialLog.put(devopLogMaterial.getId(), devopLogMaterial);
+            mintLogMaterial.setValidater(validator);
+            mintLogMaterial.setValidated(1);
+            materialLog.put(mintLogMaterial.getId(), mintLogMaterial);
         }
 
         queuedValidateMaterial.remove(UUID.fromString(validator.getUniqueId()));
-        materialLogValidation.remove(devopLogMaterial.getId());
+        materialLogValidation.remove(mintLogMaterial.getId());
     }
 
     /**
      * This method marks the task as validated through the database and memory.
      *
-     * @param devopLogTask Input for the task
+     * @param mintLogTask Input for the task
      * @param validated    Input if the task was validated or rejected
      * @param validator    Input for the player who validated
      */
-    public void validateTask(DevopLogTask devopLogTask, boolean validated, EMIPlayer validator)
+    public void validateTask(MintLogTask mintLogTask, boolean validated, EMIPlayer validator)
     {
         if(!validated)
         {
             try
             {
                 DB.executeUpdate("DELETE FROM devop_log_task WHERE log_id = ?",
-                        devopLogTask.getId());
+                        mintLogTask.getId());
             }
             catch(SQLException e)
             {
-                Bukkit.getLogger().info("ERROR: DevopProject/validateTask/No: " + e.toString());
+                Bukkit.getLogger().info("ERROR: MintProject/validateTask/No: " + e.toString());
                 return;
             }
         }
@@ -509,20 +509,20 @@ public class DevopProject
             {
                 DB.executeUpdate("UPDATE devop_log_task set validated_by = ?, validated = 1 WHERE log_id = ?",
                         validator.getId(),
-                        devopLogTask.getId());
+                        mintLogTask.getId());
             }
             catch(SQLException e)
             {
-                Bukkit.getLogger().info("ERROR: DevopProject/validateTask/Yes: " + e.toString());
+                Bukkit.getLogger().info("ERROR: MintProject/validateTask/Yes: " + e.toString());
                 return;
             }
-            devopLogTask.setValidater(validator);
-            devopLogTask.setValidated(1);
-            taskLog.put(devopLogTask.getId(), devopLogTask);
+            mintLogTask.setValidater(validator);
+            mintLogTask.setValidated(1);
+            taskLog.put(mintLogTask.getId(), mintLogTask);
         }
 
         queuedValidateTask.remove(UUID.fromString(validator.getUniqueId()));
-        taskLogValidation.remove(devopLogTask.getId());
+        taskLogValidation.remove(mintLogTask.getId());
     }
 
     public long getId()
@@ -585,22 +585,22 @@ public class DevopProject
         return description;
     }
 
-    public DevopTask getFocusedTask()
+    public MintTask getFocusedTask()
     {
         return focusedTask;
     }
 
-    public void setFocusedTask(DevopTask focusedTask)
+    public void setFocusedTask(MintTask focusedTask)
     {
         this.focusedTask = focusedTask;
     }
 
-    public DevopMaterial getFocusedMaterial()
+    public MintMaterial getFocusedMaterial()
     {
         return focusedMaterial;
     }
 
-    public void setFocusedMaterial(DevopMaterial focusedMaterial)
+    public void setFocusedMaterial(MintMaterial focusedMaterial)
     {
         this.focusedMaterial = focusedMaterial;
     }
@@ -610,42 +610,42 @@ public class DevopProject
         return workers;
     }
 
-    public HashMap<Long, DevopLogTask> getTaskLog()
+    public HashMap<Long, MintLogTask> getTaskLog()
     {
         return taskLog;
     }
 
-    public HashMap<Long, DevopLogTask> getTaskLogValidation()
+    public HashMap<Long, MintLogTask> getTaskLogValidation()
     {
         return taskLogValidation;
     }
 
-    public HashMap<Long, DevopLogMaterial> getMaterialLog()
+    public HashMap<Long, MintLogMaterial> getMaterialLog()
     {
         return materialLog;
     }
 
-    public HashMap<Long, DevopLogMaterial> getMaterialLogValidation()
+    public HashMap<Long, MintLogMaterial> getMaterialLogValidation()
     {
         return materialLogValidation;
     }
 
-    public HashMap<Long, DevopTask> getTasks()
+    public HashMap<Long, MintTask> getTasks()
     {
         return tasks;
     }
 
-    public HashMap<Long, DevopMaterial> getMaterials()
+    public HashMap<Long, MintMaterial> getMaterials()
     {
         return materials;
     }
 
-    public HashMap<UUID, DevopLogMaterial> getQueuedValidateMaterial()
+    public HashMap<UUID, MintLogMaterial> getQueuedValidateMaterial()
     {
         return queuedValidateMaterial;
     }
 
-    public HashMap<UUID, DevopLogTask> getQueuedValidateTask()
+    public HashMap<UUID, MintLogTask> getQueuedValidateTask()
     {
         return queuedValidateTask;
     }
@@ -653,6 +653,6 @@ public class DevopProject
     @Override
     public String toString()
     {
-        return "DevopProject{" + "lead=" + leader + ", name='" + name + '\'' + ", startDate='" + startDate + '\'' + ", endDate='" + endDate + '\'' + ", complete=" + complete + ", focused=" + focused + ", description='" + description + '\'' + ", workLog=" + taskLog + ", materialLog=" + materialLog + ", taskRequirements=" + tasks + ", materialRequirements=" + materials + '}';
+        return "MintProject{" + "lead=" + leader + ", name='" + name + '\'' + ", startDate='" + startDate + '\'' + ", endDate='" + endDate + '\'' + ", complete=" + complete + ", focused=" + focused + ", description='" + description + '\'' + ", workLog=" + taskLog + ", materialLog=" + materialLog + ", taskRequirements=" + tasks + ", materialRequirements=" + materials + '}';
     }
 }

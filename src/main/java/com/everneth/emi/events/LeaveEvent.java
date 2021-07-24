@@ -1,12 +1,12 @@
 package com.everneth.emi.events;
 
 import com.everneth.emi.EMI;
-import com.everneth.emi.managers.DevopProjectManager;
+import com.everneth.emi.managers.MintProjectManager;
 import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.models.Report;
-import com.everneth.emi.models.devop.DevopLogMaterial;
-import com.everneth.emi.models.devop.DevopLogTask;
-import com.everneth.emi.models.devop.DevopProject;
+import com.everneth.emi.models.mint.MintLogMaterial;
+import com.everneth.emi.models.mint.MintLogTask;
+import com.everneth.emi.models.mint.MintProject;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -33,20 +33,20 @@ public class LeaveEvent implements Listener {
             EMI.getJda().getTextChannelById(report.getChannelId()).sendMessage("***" + player.getName() + "** has left the game.*").queue();
         }
 
-        DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        for(DevopProject project : manager.getProjects().values())
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        for(MintProject project : manager.getProjects().values())
         {
             if(project.getQueuedValidateMaterial().containsKey(player.getUniqueId()))
             {
-                DevopLogMaterial devopLogMaterial = project.getQueuedValidateMaterial().get(player.getUniqueId());
+                MintLogMaterial devopLogMaterial = project.getQueuedValidateMaterial().get(player.getUniqueId());
                 project.getMaterialLogValidation().put(devopLogMaterial.getId(), devopLogMaterial);
                 project.getQueuedValidateMaterial().remove(player.getUniqueId());
             }
 
             if(project.getQueuedValidateTask().containsKey(player.getUniqueId()))
             {
-                DevopLogTask devopLogTask = project.getQueuedValidateTask().get(player.getUniqueId());
-                project.getTaskLogValidation().put(devopLogTask.getId(), devopLogTask);
+                MintLogTask mintLogTask = project.getQueuedValidateTask().get(player.getUniqueId());
+                project.getTaskLogValidation().put(mintLogTask.getId(), mintLogTask);
                 project.getQueuedValidateTask().remove(player.getUniqueId());
             }
         }

@@ -1,6 +1,6 @@
-package com.everneth.emi.models.devop;
+package com.everneth.emi.models.mint;
 
-public class DevopTask
+public class MintTask
 {
     private long id;
     private final long projectID;
@@ -8,7 +8,7 @@ public class DevopTask
     private int complete;
     private int focused;
 
-    public DevopTask(long id, long projectID, String task, int complete, int focused)
+    public MintTask(long id, long projectID, String task, int complete, int focused)
     {
         this.id = id;
         this.projectID = projectID;
@@ -17,7 +17,7 @@ public class DevopTask
         this.focused = focused;
     }
 
-    public DevopTask(long projectID, String task, int complete, int focused)
+    public MintTask(long projectID, String task, int complete, int focused)
     {
         this.projectID = projectID;
         this.task = task;

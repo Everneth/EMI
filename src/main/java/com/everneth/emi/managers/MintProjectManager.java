@@ -1,25 +1,25 @@
 package com.everneth.emi.managers;
 
 import co.aikar.idb.DB;
-import com.everneth.emi.models.devop.DevopProject;
+import com.everneth.emi.models.mint.MintProject;
 import org.bukkit.Bukkit;
 
 import java.sql.SQLException;
 import java.util.HashMap;
 
-public class DevopProjectManager
+public class MintProjectManager
 {
-    private static DevopProjectManager devopProjectManager;
-    private DevopProjectManager() {}
-    private final HashMap<Long, DevopProject> projects = new HashMap<>();
+    private static MintProjectManager mintProjectManager;
+    private MintProjectManager() {}
+    private final HashMap<Long, MintProject> projects = new HashMap<>();
 
-    public static DevopProjectManager getDevopProjectManager()
+    public static MintProjectManager getMintProjectManager()
     {
-        if(devopProjectManager == null)
+        if(mintProjectManager == null)
         {
-            devopProjectManager = new DevopProjectManager();
+            mintProjectManager = new MintProjectManager();
         }
-        return devopProjectManager;
+        return mintProjectManager;
     }
 
     /**
@@ -29,9 +29,9 @@ public class DevopProjectManager
      *
      * @return Returns the project object or null if it doesnt exist
      */
-    public DevopProject getProject(String projectName)
+    public MintProject getProject(String projectName)
     {
-        for(DevopProject project : projects.values())
+        for(MintProject project : projects.values())
         {
             if(projectName.equalsIgnoreCase(project.getName()))
             {
@@ -46,7 +46,7 @@ public class DevopProjectManager
      *
      * @return Returns a hashmap of all of the projects
      */
-    public HashMap<Long, DevopProject> getProjects()
+    public HashMap<Long, MintProject> getProjects()
     {
         return projects;
     }
@@ -57,7 +57,7 @@ public class DevopProjectManager
      * @param projectID Input for the projectID
      * @param project   Input for the project object
      */
-    public void addProject(long projectID, DevopProject project)
+    public void addProject(long projectID, MintProject project)
     {
         projects.put(projectID, project);
     }
@@ -65,24 +65,24 @@ public class DevopProjectManager
     /**
      * This method adds a project to the database and memory upon creation.
      *
-     * @param devopProject Input for the project
+     * @param mintProject Input for the project
      */
-    public void addProject(DevopProject devopProject)
+    public void addProject(MintProject mintProject)
     {
         try
         {
             long projectID = DB.executeInsert("INSERT INTO devop_project (leader, name, start_date, end_date, complete, focused, description) VALUES (?, ?, ?, ?, 0, 0, ?)",
-                    devopProject.getLeader().getId(),
-                    devopProject.getName(),
-                    devopProject.getStartDate(),
+                    mintProject.getLeader().getId(),
+                    mintProject.getName(),
+                    mintProject.getStartDate(),
                     null,
-                    devopProject.getDescription());
-            devopProject.setId(projectID);
-            projects.put(projectID, devopProject);
+                    mintProject.getDescription());
+            mintProject.setId(projectID);
+            projects.put(projectID, mintProject);
         }
         catch (SQLException e)
         {
-            Bukkit.getLogger().info("DevopProjectManager/addProject(DevopProject) ERROR: " + e.toString());
+            Bukkit.getLogger().info("MintProjectManager/addProject(MintProject) ERROR: " + e.toString());
         }
     }
 
@@ -92,7 +92,7 @@ public class DevopProjectManager
      * @param newFocus    Input for the new project
      * @param formerFocus Input for the current project
      */
-    public void switchFocus(DevopProject newFocus, DevopProject formerFocus)
+    public void switchFocus(MintProject newFocus, MintProject formerFocus)
     {
         try
         {
@@ -116,7 +116,7 @@ public class DevopProjectManager
         }
         catch (SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: DevopProjectManager/switchFocus: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProjectManager/switchFocus: " + e.toString());
         }
     }
 
@@ -125,7 +125,7 @@ public class DevopProjectManager
      *
      * @param project Input for the project
      */
-    public void unFocus(DevopProject project)
+    public void unFocus(MintProject project)
     {
         try
         {
@@ -135,7 +135,7 @@ public class DevopProjectManager
         }
         catch (SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: DevopProjectManager/unFocus: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProjectManager/unFocus: " + e.toString());
         }
     }
 }

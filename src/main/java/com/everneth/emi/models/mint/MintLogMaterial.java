@@ -1,36 +1,42 @@
-package com.everneth.emi.models.devop;
+package com.everneth.emi.models.mint;
 
 import com.everneth.emi.models.EMIPlayer;
 
-public class DevopLogTask
+public class MintLogMaterial
 {
     private long id;
     private final long projectID;
+    private final long materialID;
     private final EMIPlayer logger;
     private EMIPlayer validater;
     private int validated;
+    private final int materialCollected;
     private final int timeWorked;
     private final String logDate;
     private final String description;
 
-    public DevopLogTask(long id, long projectID, EMIPlayer logger, EMIPlayer validater, int validated, int timeWorked, String logDate, String description)
+    public MintLogMaterial(long id, long projectID, long materialID, EMIPlayer logger, EMIPlayer validater, int validated, int materialCollected, int timeWorked, String logDate, String description)
     {
         this.id = id;
         this.projectID = projectID;
+        this.materialID = materialID;
         this.logger = logger;
         this.validater = validater;
         this.validated = validated;
+        this.materialCollected = materialCollected;
         this.timeWorked = timeWorked;
         this.logDate = logDate;
         this.description = description;
     }
 
-    public DevopLogTask(long projectID, EMIPlayer logger, EMIPlayer validater, int validated, int timeWorked, String logDate, String description)
+    public MintLogMaterial(long projectID, long materialID, EMIPlayer logger, EMIPlayer validater, int validated, int materialCollected, int timeWorked, String logDate, String description)
     {
         this.projectID = projectID;
+        this.materialID = materialID;
         this.logger = logger;
         this.validater = validater;
         this.validated = validated;
+        this.materialCollected = materialCollected;
         this.timeWorked = timeWorked;
         this.logDate = logDate;
         this.description = description;
@@ -44,6 +50,11 @@ public class DevopLogTask
     public void setId(long id)
     {
         this.id = id;
+    }
+
+    public long getMaterialID()
+    {
+        return materialID;
     }
 
     public EMIPlayer getLogger()
@@ -64,6 +75,11 @@ public class DevopLogTask
     public void setValidated(int validated)
     {
         this.validated = validated;
+    }
+
+    public int getMaterialCollected()
+    {
+        return materialCollected;
     }
 
     public int getTimeWorked()

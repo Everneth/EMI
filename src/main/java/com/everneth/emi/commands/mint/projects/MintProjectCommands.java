@@ -7,11 +7,11 @@ import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.Utils;
-import com.everneth.emi.managers.DevopProjectManager;
+import com.everneth.emi.managers.MintProjectManager;
 import com.everneth.emi.models.EMIPlayer;
-import com.everneth.emi.models.devop.DevopMaterial;
-import com.everneth.emi.models.devop.DevopProject;
-import com.everneth.emi.models.devop.DevopTask;
+import com.everneth.emi.models.mint.MintMaterial;
+import com.everneth.emi.models.mint.MintProject;
+import com.everneth.emi.models.mint.MintTask;
 import com.everneth.emi.utils.PlayerUtils;
 import org.bukkit.entity.Player;
 
@@ -26,45 +26,45 @@ import java.util.ArrayList;
 @CommandAlias("mint")
 public class MintProjectCommands extends BaseCommand
 {
-    private final String devopProjectTag = "&7[&dMint&5Projects] ";
+    private final String mintProjectTag = "&7[&dMint&5Projects] ";
 
     /**
      * This command is used by project moderators to complete a project.
      *
      * @param player       Automatic input from the player who executed the command
-     * @param devopProject Input for specified project
+     * @param mintProject Input for specified project
      */
-    //TODO Add tab-complete to devopProject, add complete check
+    //TODO Add tab-complete to mintProject, add complete check
     @Subcommand("project complete")
     @Syntax("<Project>")
-    @CommandPermission("emi.devop.project.complete")
-    public void onProjectComplete(Player player, String devopProject)
+    @CommandPermission("emi.mint.project.complete")
+    public void onProjectComplete(Player player, String mintProject)
     {
-        DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(devopProject);
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(mintProject);
 
         // Basic tests to determine if the command has been issued correctly
         if(project == null)
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cProject has already been completed!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject has already been completed!"));
             return;
         }
 
         if(!project.getMaterialLogValidation().isEmpty() && !project.getTaskLogValidation().isEmpty())
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cProject can't be completed because not all of the logs have been validated!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject can't be completed because not all of the logs have been validated!"));
             return;
         }
 
         // Valid information is then put into the project
         project.completeProject();
-        player.sendMessage(Utils.color(devopProjectTag + "&aProject completed!"));
+        player.sendMessage(Utils.color(mintProjectTag + "&aProject completed!"));
     }
 
     /**
@@ -78,16 +78,16 @@ public class MintProjectCommands extends BaseCommand
     //TODO add tab-complete
     @Subcommand("project create")
     @Syntax("<Project> <Lead> <Description>")
-    @CommandPermission("emi.devop.project.create")
+    @CommandPermission("emi.mint.project.create")
     public void onProjectCreate(Player player, String projectName, String lead, String[] description)
     {
-        DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(projectName);
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(projectName);
 
         // Basic tests to determine if the command has been issued correctly
         if(project != null)
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cProject already exists!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject already exists!"));
             return;
         }
 
@@ -95,16 +95,16 @@ public class MintProjectCommands extends BaseCommand
 
         if(dbPlayerLead == null || dbPlayerLead.isEmpty())
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cUnrecognized player, did you spell the name correctly?"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cUnrecognized player, did you spell the name correctly?"));
             return;
         }
 
         // Valid information is then put into the project
         EMIPlayer playerLead = new EMIPlayer(dbPlayerLead.getString("player_uuid"), dbPlayerLead.getString("player_name"), dbPlayerLead.getInt("player_id"));
-        project = new DevopProject(playerLead, projectName, Utils.getCurrentDate(), null, 0, 0, Utils.buildMessage(description, 0, false));
+        project = new MintProject(playerLead, projectName, Utils.getCurrentDate(), null, 0, 0, Utils.buildMessage(description, 0, false));
         manager.addProject(project);
-        player.sendMessage(Utils.color(devopProjectTag + "&aSuccessfully created the project!"));
-        player.performCommand("devop project join " + project.getName());
+        player.sendMessage(Utils.color(mintProjectTag + "&aSuccessfully created the project!"));
+        player.performCommand("mint project join " + project.getName());
     }
 
     /**
@@ -116,22 +116,22 @@ public class MintProjectCommands extends BaseCommand
     //TODO add tab-complete
     @Subcommand("project focus")
     @Syntax("<Project>")
-    @CommandPermission("emi.devop.project.focus")
+    @CommandPermission("emi.mint.project.focus")
     public void onProjectFocus(Player player, String projectName)
     {
-        DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(projectName);
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(projectName);
 
         // Basic tests to determine if the command has been issued correctly
         if(project == null)
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cProject can't be focused because it's complete!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject can't be focused because it's complete!"));
             return;
         }
 
@@ -139,25 +139,25 @@ public class MintProjectCommands extends BaseCommand
         if(project.getFocused() == 1)
         {
             manager.unFocus(project);
-            player.sendMessage(Utils.color(devopProjectTag + "&aProject unfocused!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&aProject unfocused!"));
             return;
         }
 
-        DevopProject formerProject = null;
+        MintProject formerProject = null;
 
         // Searches and marks current project as unfocused
-        for(DevopProject devopProject : manager.getProjects().values())
+        for(MintProject mintProject : manager.getProjects().values())
         {
-            if(devopProject.getFocused() == 1)
+            if(mintProject.getFocused() == 1)
             {
-                formerProject = devopProject;
+                formerProject = mintProject;
                 break;
             }
         }
 
         // Valid information is then put into the project
         manager.switchFocus(project, formerProject);
-        player.sendMessage(Utils.color(devopProjectTag + "&aProject focused!"));
+        player.sendMessage(Utils.color(mintProjectTag + "&aProject focused!"));
     }
 
     /**
@@ -169,16 +169,16 @@ public class MintProjectCommands extends BaseCommand
     // TODO add tab-complete
     @Subcommand("project info")
     @Syntax("<Project>")
-    @CommandPermission("emi.devop.project.info")
+    @CommandPermission("emi.mint.project.info")
     public void onProjectInfo(Player player, String projectName)
     {
-        DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(projectName);
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(projectName);
 
         // Basic tests to determine if the command has been issued correctly
         if(project == null)
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
@@ -186,8 +186,8 @@ public class MintProjectCommands extends BaseCommand
         String endDate = project.getEndDate();
         String focusedTaskString = "";
         String focusedMaterialString = "";
-        DevopTask focusedTask = project.getFocusedTask();
-        DevopMaterial focusedMaterial = project.getFocusedMaterial();
+        MintTask focusedTask = project.getFocusedTask();
+        MintMaterial focusedMaterial = project.getFocusedMaterial();
 
         if(endDate == null)
         {
@@ -214,7 +214,7 @@ public class MintProjectCommands extends BaseCommand
         }
 
         // Send player the basic information about the project
-        player.sendMessage(Utils.color(devopProjectTag + "&aInformation for &6" + project.getName() + " &aby &6" + project.getLeader().getName() + "\n" +
+        player.sendMessage(Utils.color(mintProjectTag + "&aInformation for &6" + project.getName() + " &aby &6" + project.getLeader().getName() + "\n" +
                 "&aDates: &6" + decodeDate(project.getStartDate()) + " &ato &6" + endDate + "\n" +
                 "&aDescription: &6" + project.getDescription() + "\n" +
                 "&aFocused task: &6" + focusedTaskString + "\n" +
@@ -226,27 +226,27 @@ public class MintProjectCommands extends BaseCommand
      * This command is used by players to join a project.
      *
      * @param player       Automatic input from the player who executed the command
-     * @param devopProject Input for specified project
+     * @param mintProject Input for specified project
      */
     //TODO add tab-complete
     @Subcommand("project join")
     @Syntax("<Project>")
-    @CommandPermission("emi.devop.project.join")
-    public void onProjectJoin(Player player, String devopProject)
+    @CommandPermission("emi.mint.project.join")
+    public void onProjectJoin(Player player, String mintProject)
     {
-        DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(devopProject);
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(mintProject);
 
         // Basic tests to determine if the command has been issued correctly
         if(project == null)
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cCan't join project because it's complete!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cCan't join project because it's complete!"));
             return;
         }
 
@@ -254,7 +254,7 @@ public class MintProjectCommands extends BaseCommand
         {
             if(emiPlayer.getUniqueId().equalsIgnoreCase(player.getUniqueId().toString()))
             {
-                player.sendMessage(Utils.color(devopProjectTag + "&cYou're already part of this project!"));
+                player.sendMessage(Utils.color(mintProjectTag + "&cYou're already part of this project!"));
                 return;
             }
         }
@@ -263,7 +263,7 @@ public class MintProjectCommands extends BaseCommand
         EMIPlayer emiPlayer = PlayerUtils.getEMIPlayer(player.getName());
 
         project.addWorker(emiPlayer);
-        player.sendMessage(Utils.color(devopProjectTag + "&aSuccessfully joined the project!"));
+        player.sendMessage(Utils.color(mintProjectTag + "&aSuccessfully joined the project!"));
     }
 
     /**
@@ -272,15 +272,15 @@ public class MintProjectCommands extends BaseCommand
      * @param player Automatic input from the player who executed the command
      */
     @Subcommand("project list")
-    @CommandPermission("emi.devop.project.list")
+    @CommandPermission("emi.mint.project.list")
     public void onProjectList(Player player)
     {
-        DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
 
         // Basic test to determine if the command has been issued correctly
         if(manager.getProjects().isEmpty())
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cNo projects to list!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cNo projects to list!"));
             return;
         }
 
@@ -290,7 +290,7 @@ public class MintProjectCommands extends BaseCommand
         ArrayList<String> currentProjects = new ArrayList<>();
         ArrayList<String> completeProjects = new ArrayList<>();
 
-        for(DevopProject project : manager.getProjects().values())
+        for(MintProject project : manager.getProjects().values())
         {
             if(project.getFocused() == 1)
             {
@@ -307,7 +307,7 @@ public class MintProjectCommands extends BaseCommand
         }
 
         // Send player the projects sorted by Focused Project, Current Projects, and Completed Projects
-        player.sendMessage(Utils.color(devopProjectTag + "&6Projects:"));
+        player.sendMessage(Utils.color(mintProjectTag + "&6Projects:"));
 
         if(focusedProject != null)
         {
@@ -329,36 +329,36 @@ public class MintProjectCommands extends BaseCommand
      * This command is used by players to view all tasks and materials for a project.
      *
      * @param player       Automatic input from the player who executed the command
-     * @param devopProject Input for specified project
+     * @param mintProject Input for specified project
      */
     @Subcommand("project work")
     @Syntax("<Project>")
-    @CommandPermission("emi.devop.project.work")
-    public void onWork(Player player, String devopProject)
+    @CommandPermission("emi.mint.project.work")
+    public void onWork(Player player, String mintProject)
     {
-        DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(devopProject);
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(mintProject);
 
         // Basic test to determine if the command has been issued correctly
         if(project == null)
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cNo work for this project because it's complete!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cNo work for this project because it's complete!"));
             return;
         }
 
         // Send player work for the project: Material then Tasks
-        player.sendMessage(Utils.color(devopProjectTag + "&aWork needed:"));
+        player.sendMessage(Utils.color(mintProjectTag + "&aWork needed:"));
 
         int totalLoops = 0;
         boolean isThereWork = false;
 
-        for(DevopMaterial material : project.getMaterials().values())
+        for(MintMaterial material : project.getMaterials().values())
         {
             if(totalLoops == 3)
             {
@@ -376,7 +376,7 @@ public class MintProjectCommands extends BaseCommand
 
         totalLoops = 0;
 
-        for(DevopTask task : project.getTasks().values())
+        for(MintTask task : project.getTasks().values())
         {
             if(totalLoops == 3)
             {

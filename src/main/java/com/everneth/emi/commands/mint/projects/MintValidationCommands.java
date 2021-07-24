@@ -6,11 +6,11 @@ import co.aikar.commands.annotation.Private;
 import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
 import com.everneth.emi.Utils;
-import com.everneth.emi.managers.DevopProjectManager;
+import com.everneth.emi.managers.MintProjectManager;
 import com.everneth.emi.models.EMIPlayer;
-import com.everneth.emi.models.devop.DevopLogMaterial;
-import com.everneth.emi.models.devop.DevopLogTask;
-import com.everneth.emi.models.devop.DevopProject;
+import com.everneth.emi.models.mint.MintLogMaterial;
+import com.everneth.emi.models.mint.MintLogTask;
+import com.everneth.emi.models.mint.MintProject;
 import com.everneth.emi.utils.PlayerUtils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -27,32 +27,32 @@ import org.bukkit.entity.Player;
 
 public class MintValidationCommands extends BaseCommand
 {
-    private final String devopProjectTag = "&7[&dMint&5Projects] ";
+    private final String mintProjectTag = "&7[&dMint&5Projects] ";
 
     /**
      * This command is used by project moderators to validate player logs.
      *
      * @param player       Automatic input from the player who executed the command
-     * @param devopProject Input for specified project
+     * @param mintProject Input for specified project
      */
     @Subcommand("validate")
     @Syntax("<Project>")
-    @CommandPermission("emi.devop.validate")
-    public void onValidate(Player player, String devopProject)
+    @CommandPermission("emi.mint.validate")
+    public void onValidate(Player player, String mintProject)
     {
-        DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(devopProject);
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(mintProject);
 
         // Basic test to determine if the command has been issued correctly
         if(project == null)
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cProject doesn't exist!"));
             return;
         }
 
         if(project.getComplete() == 1)
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cNothing to validate because project is complete!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cNothing to validate because project is complete!"));
             return;
         }
 
@@ -61,23 +61,23 @@ public class MintValidationCommands extends BaseCommand
         {
             if(project.getQueuedValidateMaterial().containsKey(player.getUniqueId()))
             {
-                DevopLogMaterial devopLogMaterial = project.getQueuedValidateMaterial().get(player.getUniqueId());
-                player.spigot().sendMessage(buildValidationMessage(devopProject));
-                player.sendMessage(Utils.color(devopProjectTag + "&6" + devopLogMaterial.getLogger().getName() +
-                        " &agathered &6" + devopLogMaterial.getMaterialCollected() + " " + project.getMaterials().get(devopLogMaterial.getMaterialID()).getMaterial() +
-                        " &ain the time of &6" + decodeTime(devopLogMaterial.getTimeWorked()) +
-                        " &aon the date of: &6" + decodeDate(devopLogMaterial.getLogDate()) + "."));
+                MintLogMaterial mintLogMaterial = project.getQueuedValidateMaterial().get(player.getUniqueId());
+                player.spigot().sendMessage(buildValidationMessage(mintProject));
+                player.sendMessage(Utils.color(mintProjectTag + "&6" + mintLogMaterial.getLogger().getName() +
+                        " &agathered &6" + mintLogMaterial.getMaterialCollected() + " " + project.getMaterials().get(mintLogMaterial.getMaterialID()).getMaterial() +
+                        " &ain the time of &6" + decodeTime(mintLogMaterial.getTimeWorked()) +
+                        " &aon the date of: &6" + decodeDate(mintLogMaterial.getLogDate()) + "."));
                 return;
             }
 
             if(project.getQueuedValidateTask().containsKey(player.getUniqueId()))
             {
-                DevopLogTask devopLogTask = project.getQueuedValidateTask().get(player.getUniqueId());
-                player.spigot().sendMessage(buildValidationMessage(devopProject));
-                player.sendMessage(Utils.color(devopProjectTag + "&6" + devopLogTask.getLogger().getName() +
-                        " &aworked on: &6" + devopLogTask.getDescription() +
-                        " &ain the time of &6" + decodeTime(devopLogTask.getTimeWorked()) +
-                        " &aon the date of: &6" + decodeDate(devopLogTask.getLogDate()) + "."));
+                MintLogTask mintLogTask = project.getQueuedValidateTask().get(player.getUniqueId());
+                player.spigot().sendMessage(buildValidationMessage(mintProject));
+                player.sendMessage(Utils.color(mintProjectTag + "&6" + mintLogTask.getLogger().getName() +
+                        " &aworked on: &6" + mintLogTask.getDescription() +
+                        " &ain the time of &6" + decodeTime(mintLogTask.getTimeWorked()) +
+                        " &aon the date of: &6" + decodeDate(mintLogTask.getLogDate()) + "."));
                 return;
             }
         }
@@ -85,18 +85,18 @@ public class MintValidationCommands extends BaseCommand
         // If there's no logs, simply return and tell the player
         if(project.getMaterialLogValidation().isEmpty() && project.getTaskLogValidation().isEmpty())
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cNo logs to validate!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cNo logs to validate!"));
             return;
         }
 
         // If there's material logs to validate, send the first log with a clickable message
         if(!project.getMaterialLogValidation().isEmpty())
         {
-            DevopLogMaterial materialLog = project.getMaterialLogValidation().values().iterator().next();
+            MintLogMaterial materialLog = project.getMaterialLogValidation().values().iterator().next();
             project.getQueuedValidateMaterial().put(player.getUniqueId(), materialLog);
             project.getMaterialLogValidation().remove(materialLog.getId());
-            player.spigot().sendMessage(buildValidationMessage(devopProject));
-            player.sendMessage(Utils.color(devopProjectTag + "&6" + materialLog.getLogger().getName() +
+            player.spigot().sendMessage(buildValidationMessage(mintProject));
+            player.sendMessage(Utils.color(mintProjectTag + "&6" + materialLog.getLogger().getName() +
                     " &agathered &6" + materialLog.getMaterialCollected() + " " + project.getMaterials().get(materialLog.getMaterialID()).getMaterial() +
                     " &ain the time of &6" + decodeTime(materialLog.getTimeWorked()) +
                     " &aon the date of: &6" + decodeDate(materialLog.getLogDate()) + "."));
@@ -106,11 +106,11 @@ public class MintValidationCommands extends BaseCommand
         // If there's task logs to validate, send the first log with a clickable message
         if(!project.getTaskLogValidation().isEmpty())
         {
-            DevopLogTask taskLog = project.getTaskLogValidation().values().iterator().next();
+            MintLogTask taskLog = project.getTaskLogValidation().values().iterator().next();
             project.getQueuedValidateTask().put(player.getUniqueId(), taskLog);
             project.getTaskLogValidation().remove(taskLog.getId());
-            player.spigot().sendMessage(buildValidationMessage(devopProject));
-            player.sendMessage(Utils.color(devopProjectTag + "&6" + taskLog.getLogger().getName() +
+            player.spigot().sendMessage(buildValidationMessage(mintProject));
+            player.sendMessage(Utils.color(mintProjectTag + "&6" + taskLog.getLogger().getName() +
                     " &aworked on: &6" + taskLog.getDescription() +
                     " &ain the time of &6" + decodeTime(taskLog.getTimeWorked()) +
                     " &aon the date of: &6" + decodeDate(taskLog.getLogDate()) + "."));
@@ -121,16 +121,16 @@ public class MintValidationCommands extends BaseCommand
      * This command is used by the plugin as a clickable message to validate the log.
      *
      * @param player       Automatic input from the player who executed the command
-     * @param devopProject Input for specified project
+     * @param mintProject Input for specified project
      */
     @Subcommand("validateyes")
     @Syntax("<Project>")
-    @CommandPermission("emi.devop.validate")
+    @CommandPermission("emi.mint.validate")
     @Private
-    public void onValidateYes(Player player, String devopProject)
+    public void onValidateYes(Player player, String mintProject)
     {
-        DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(devopProject);
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(mintProject);
         EMIPlayer validator = PlayerUtils.getEMIPlayer(player.getName());
 
         // Validate the material or task log
@@ -144,27 +144,27 @@ public class MintValidationCommands extends BaseCommand
         }
         else
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cNo logs have been queued for you!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cNo logs have been queued for you!"));
             return;
         }
 
-        player.sendMessage(Utils.color(devopProjectTag + "&aLog has been approved!"));
+        player.sendMessage(Utils.color(mintProjectTag + "&aLog has been approved!"));
     }
 
     /**
      * This command is used by the plugin as a clickable message to reject the log.
      *
      * @param player       Automatic input from the player who executed the command
-     * @param devopProject Input for specified project
+     * @param mintProject Input for specified project
      */
     @Subcommand("validateno")
     @Syntax("<Project>")
-    @CommandPermission("emi.devop.validate")
+    @CommandPermission("emi.mint.validate")
     @Private
-    public void onValidateNo(Player player, String devopProject)
+    public void onValidateNo(Player player, String mintProject)
     {
-        DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        DevopProject project = manager.getProject(devopProject);
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        MintProject project = manager.getProject(mintProject);
         EMIPlayer validator = PlayerUtils.getEMIPlayer(player.getName());
 
         // Reject the material or task log
@@ -178,31 +178,31 @@ public class MintValidationCommands extends BaseCommand
         }
         else
         {
-            player.sendMessage(Utils.color(devopProjectTag + "&cNo logs have been queued for you!"));
+            player.sendMessage(Utils.color(mintProjectTag + "&cNo logs have been queued for you!"));
             return;
         }
 
-        player.sendMessage(Utils.color(devopProjectTag + "&aLog has been rejected!"));
+        player.sendMessage(Utils.color(mintProjectTag + "&aLog has been rejected!"));
     }
 
     /**
      * This method generates the validation message for the player to click yes or no.
      *
-     * @param devopProject Input for specified project
+     * @param mintProject Input for specified project
      *
      * @return Returns a TextComponent ready to send to a player
      */
-    private TextComponent buildValidationMessage(String devopProject)
+    private TextComponent buildValidationMessage(String mintProject)
     {
         TextComponent messageYes = new TextComponent(Utils.color("&aYes"));
-        messageYes.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/devop validateyes " + devopProject));
+        messageYes.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mint validateyes " + mintProject));
         messageYes.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to validate this log").color(ChatColor.DARK_GREEN).create()));
 
         TextComponent messageNo = new TextComponent(Utils.color("&cNo"));
-        messageNo.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/devop validateno " + devopProject));
+        messageNo.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mint validateno " + mintProject));
         messageNo.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to deny the log").color(ChatColor.DARK_RED).create()));
 
-        TextComponent messagePart1 = new TextComponent(Utils.color(devopProjectTag + "&6Do you want to validate this log? &7["));
+        TextComponent messagePart1 = new TextComponent(Utils.color(mintProjectTag + "&6Do you want to validate this log? &7["));
         TextComponent messagePart2 = new TextComponent(Utils.color("&7] &6or &7["));
         TextComponent messagePart3 = new TextComponent(Utils.color("&7]"));
 

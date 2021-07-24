@@ -16,11 +16,11 @@ import com.everneth.emi.events.bot.GuildLeaveListener;
 import com.everneth.emi.events.bot.MessageReceivedListener;
 import com.everneth.emi.events.bot.ReactionListener;
 import com.everneth.emi.events.bot.RoleChangeListener;
-import com.everneth.emi.managers.DevopProjectManager;
+import com.everneth.emi.managers.MintProjectManager;
 import com.everneth.emi.managers.MotdManager;
 import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.models.*;
-import com.everneth.emi.models.devop.*;
+import com.everneth.emi.models.mint.*;
 import com.everneth.emi.utils.PlayerUtils;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -77,7 +77,7 @@ public class EMI extends JavaPlugin {
         registerCommands();
         registerListeners();
         initBot();
-        initDevop();
+        initMint();
         initMotds();
     }
     @Override
@@ -85,15 +85,15 @@ public class EMI extends JavaPlugin {
         getLogger().info("Ministry Interface stopped.");
         DB.close();
 
-        DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
-        for(DevopProject project : manager.getProjects().values())
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
+        for(MintProject project : manager.getProjects().values())
         {
-            for(DevopLogMaterial logMaterial : project.getQueuedValidateMaterial().values())
+            for(MintLogMaterial logMaterial : project.getQueuedValidateMaterial().values())
             {
                 project.getMaterialLogValidation().put(logMaterial.getId(), logMaterial);
             }
 
-            for(DevopLogTask logTask : project.getQueuedValidateTask().values())
+            for(MintLogTask logTask : project.getQueuedValidateTask().values())
             {
                 project.getTaskLogValidation().put(logTask.getId(), logTask);
             }
@@ -157,9 +157,9 @@ public class EMI extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new LeaveEvent(this), this);
     }
 
-    private void initDevop()
+    private void initMint()
     {
-        DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
+        MintProjectManager manager = MintProjectManager.getMintProjectManager();
 
         ArrayList<DbRow> projects;
         ArrayList<DbRow> tasks;
@@ -195,7 +195,7 @@ public class EMI extends JavaPlugin {
                 endDate = endDateTime.toString();
             }
 
-            DevopProject project = new DevopProject(
+            MintProject project = new MintProject(
                     projectRow.getInt("project_id"),
                     playerLead,
                     projectRow.getString("name"),
@@ -225,7 +225,7 @@ public class EMI extends JavaPlugin {
                     continue;
                 }
 
-                DevopTask task = new DevopTask(
+                MintTask task = new MintTask(
                         taskRow.getInt("task_id"),
                         taskRow.getInt("project_id"),
                         taskRow.getString("task"),
@@ -246,7 +246,7 @@ public class EMI extends JavaPlugin {
                     continue;
                 }
 
-                DevopMaterial material = new DevopMaterial(
+                MintMaterial material = new MintMaterial(
                         materialRow.getInt("material_id"),
                         materialRow.getInt("project_id"),
                         materialRow.getString("material"),
@@ -283,7 +283,7 @@ public class EMI extends JavaPlugin {
                     validatedBy = null;
                 }
 
-                DevopLogTask log = new DevopLogTask(
+                MintLogTask log = new MintLogTask(
                         taskLogRow.getInt("log_id"),
                         taskLogRow.getInt("project_id"),
                         loggedBy,
@@ -324,7 +324,7 @@ public class EMI extends JavaPlugin {
                     validatedBy = null;
                 }
 
-                DevopLogMaterial log = new DevopLogMaterial(
+                MintLogMaterial log = new MintLogMaterial(
                         materialLogRow.getInt("log_id"),
                         materialLogRow.getInt("project_id"),
                         materialLogRow.getInt("material_id"),
