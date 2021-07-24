@@ -17,6 +17,12 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 
+/**
+ * This class defines and adds functionality to any mint command that handels tasks.
+ *
+ * @author Sterling (@sterlingheaton)
+ */
+
 @CommandAlias("mint")
 public class MintTaskCommands extends BaseCommand
 {

@@ -19,6 +19,12 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 
+/**
+ * This class defines and adds functionality to any mint command that handels validation.
+ *
+ * @author Sterling (@sterlingheaton)
+ */
+
 public class MintValidationCommands extends BaseCommand
 {
     private final String devopProjectTag = "&7[&dMint&5Projects] ";
