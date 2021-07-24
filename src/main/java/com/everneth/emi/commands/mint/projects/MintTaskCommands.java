@@ -1,0 +1,412 @@
+package com.everneth.emi.commands.mint.projects;
+
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandPermission;
+import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.Syntax;
+import com.everneth.emi.Utils;
+import com.everneth.emi.managers.DevopProjectManager;
+import com.everneth.emi.models.EMIPlayer;
+import com.everneth.emi.models.devop.DevopLogTask;
+import com.everneth.emi.models.devop.DevopProject;
+import com.everneth.emi.models.devop.DevopTask;
+import com.everneth.emi.utils.PlayerUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+
+@CommandAlias("mint")
+public class MintTaskCommands extends BaseCommand
+{
+    private final String devopProjectTag = "&7[&dMint&5Projects] ";
+
+    /**
+     * This command is used by players to log any task they've completed.
+     *
+     * @param player       Automatic input from the player who executed the command
+     * @param devopProject Input for specified project
+     * @param time         Input for length of time worked
+     * @param description  Input for a short description of what the player did (if applicable)
+     */
+    //TODO add tab-complete
+    @Subcommand("log task")
+    @Syntax("<Project> <TimeWorked> <Description>")
+    @CommandPermission("emi.devop.log")
+    public void onLogTask(Player player, String devopProject, String time, String[] description)
+    {
+        DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
+        DevopProject project = manager.getProject(devopProject);
+
+        // Basic tests to determine if the command has been issued correctly
+        if(project == null)
+        {
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
+            return;
+        }
+
+        if(project.getComplete() == 1)
+        {
+            player.sendMessage(Utils.color(devopProjectTag + "&cLog can't be sent because the project is complete!"));
+            return;
+        }
+
+        int timeWorked = encodeTime(time);
+
+        if(timeWorked == -1)
+        {
+            player.sendMessage(Utils.color(devopProjectTag + "&cInvalid time format, must be HOURS:MINUTES (00:00)!"));
+            return;
+        }
+
+        // Valid information is then into the project
+        EMIPlayer logger = PlayerUtils.getEMIPlayer(player.getName());
+        DevopLogTask log = new DevopLogTask(project.getId(), logger, null, 0, timeWorked, Utils.getCurrentDate(), Utils.buildMessage(description, 0, false));
+
+        project.addTaskLog(log);
+        player.sendMessage(Utils.color(devopProjectTag + "&aTask log submitted for validation!"));
+    }
+
+    /**
+     * This command is used by project moderators to set a task as complete.
+     *
+     * @param player       Automatic input from the player who executed the command
+     * @param devopProject Input for specified project
+     * @param taskID       Input for a specified Task
+     */
+    @Subcommand("task complete")
+    @Syntax("<Project> <taskID>")
+    @CommandPermission("emi.devop.task.complete")
+    public void onTaskComplete(Player player, String devopProject, long taskID)
+    {
+        DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
+        DevopProject project = manager.getProject(devopProject);
+
+        // Basic test to determine if the command has been issued correctly
+        if(project == null)
+        {
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
+            return;
+        }
+
+        if(project.getComplete() == 1)
+        {
+            player.sendMessage(Utils.color(devopProjectTag + "&cTask can't be completed because the project is complete!"));
+            return;
+        }
+
+        if(project.getTasks().get(taskID) == null)
+        {
+            player.sendMessage(Utils.color(devopProjectTag + "&cTaskID isn't associated with any tasks!"));
+            return;
+        }
+
+        if(project.getTasks().get(taskID).getComplete() == 1)
+        {
+            player.sendMessage(Utils.color(devopProjectTag + "&cTask has already been completed!"));
+            return;
+        }
+
+        // Valid information is then put into the project
+        project.completeTask(taskID);
+        player.sendMessage(Utils.color(devopProjectTag + "&aTask completed!"));
+    }
+
+    /**
+     * This command is used by project moderators to add a task to a project.
+     *
+     * @param player       Automatic input from the player who executed the command
+     * @param devopProject Input for specified project
+     * @param taskParts    Input for a task
+     */
+    @Subcommand("task add")
+    @Syntax("<Project> <Task>")
+    @CommandPermission("emi.devop.task.add")
+    public void onTaskCreate(Player player, String devopProject, String[] taskParts)
+    {
+        DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
+        DevopProject project = manager.getProject(devopProject);
+
+        // Basic test to determine if the command has been issued correctly
+        if(project == null)
+        {
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
+            return;
+        }
+
+        if(project.getComplete() == 1)
+        {
+            player.sendMessage(Utils.color(devopProjectTag + "&cTask cant be added because the project is complete!"));
+            return;
+        }
+
+        // Valid information is then put into the project
+        String taskString = Utils.buildMessage(taskParts, 0, false);
+        DevopTask task = new DevopTask(project.getId(), taskString, 0, 0);
+
+        project.addTask(task);
+        player.sendMessage(Utils.color(devopProjectTag + "&aTask added!"));
+    }
+
+    /**
+     * This command is used by project moderators to delete a task from a project.
+     *
+     * @param player       Automatic input from the player who executed the command
+     * @param devopProject Input for specified project
+     * @param taskID       Input for a specified Task
+     */
+    @Subcommand("task delete")
+    @Syntax("<Project> <TaskID>")
+    @CommandPermission("emi.devop.task.delete")
+    public void onTaskDelete(Player player, String devopProject, long taskID)
+    {
+        DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
+        DevopProject project = manager.getProject(devopProject);
+
+        // Basic test to determine if the command has been issued correctly
+        if (project == null)
+        {
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
+            return;
+        }
+
+        if(project.getComplete() == 1)
+        {
+            player.sendMessage(Utils.color(devopProjectTag + "&cTask can't be deleted because the project is complete!"));
+            return;
+        }
+
+        DevopTask task = project.getTasks().get(taskID);
+
+        if(task == null)
+        {
+            player.sendMessage(Utils.color(devopProjectTag + "&cTaskID isn't associated with any tasks!"));
+            return;
+        }
+
+        // Valid information is then put into the project
+        project.deleteTask(task);
+        player.sendMessage(Utils.color(devopProjectTag + "&aTask deleted!"));
+    }
+
+    /**
+     * This command is used by project moderators to mark a task as focused.
+     *
+     * @param player       Automatic input from the player who executed the command
+     * @param devopProject Input for specified project
+     * @param taskID       Input for a specified Task
+     */
+    @Subcommand("task focus")
+    @Syntax("<Project> <taskID>")
+    @CommandPermission("emi.devop.task.focus")
+    public void onTaskFocus(Player player, String devopProject, long taskID)
+    {
+        DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
+        DevopProject project = manager.getProject(devopProject);
+
+        // Basic test to determine if the command has been issued correctly
+        if(project == null)
+        {
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
+            return;
+        }
+
+        if(project.getComplete() == 1)
+        {
+            player.sendMessage(Utils.color(devopProjectTag + "&cTask can't be focused because the project is complete!"));
+            return;
+        }
+
+        DevopTask task = project.getTasks().get(taskID);
+
+        if(task == null)
+        {
+            player.sendMessage(Utils.color(devopProjectTag + "&cTaskID isn't associated with any tasks."));
+            return;
+        }
+
+        if(task.getComplete() == 1)
+        {
+            player.sendMessage(Utils.color(devopProjectTag + "&cTask can't be focused because the task is complete!"));
+            return;
+        }
+
+        // If the specified task is focused, mark it as unfocused
+        if(task.getFocused() == 1)
+        {
+            project.unFocusTask(task);
+            player.sendMessage(Utils.color(devopProjectTag + "&cTask unfocused!"));
+            return;
+        }
+
+        DevopTask formerTask = null;
+
+        // Searches and marks current project as unfocused
+        for(DevopTask devopTask : project.getTasks().values())
+        {
+            if(devopTask.getFocused() == 1)
+            {
+                formerTask = devopTask;
+                break;
+            }
+        }
+
+        // Valid information is then put into the project
+        project.switchTaskFocus(task, formerTask);
+        player.sendMessage(Utils.color(devopProjectTag + "&aTask focused!"));
+    }
+
+    /**
+     * This command is used by players to view tasks for a project.
+     *
+     * @param player       Automatic input from the player who executed the command
+     * @param devopProject Input for specified project
+     */
+    @Subcommand("task list")
+    @Syntax("<Project>")
+    @CommandPermission("emi.devop.task.list")
+    public void onTaskList(Player player, String devopProject)
+    {
+        DevopProjectManager manager = DevopProjectManager.getDevopProjectManager();
+        DevopProject project = manager.getProject(devopProject);
+
+        // Basic test to determine if the command has been issued correctly
+        if(project == null)
+        {
+            player.sendMessage(Utils.color(devopProjectTag + "&cProject doesn't exist!"));
+            return;
+        }
+
+        if(project.getTasks().isEmpty())
+        {
+            player.sendMessage(Utils.color(devopProjectTag + "&cNo tasks to list!"));
+            return;
+        }
+
+        // Create empty objects and put tasks in them based on their status
+        DevopTask focusedTask = null;
+        ArrayList<DevopTask> currentTasks = new ArrayList<>();
+        ArrayList<DevopTask> completeTasks = new ArrayList<>();
+
+        for(DevopTask task : project.getTasks().values())
+        {
+            if(task.getFocused() == 1)
+            {
+                focusedTask = task;
+            }
+            else if(task.getComplete() == 1)
+            {
+                completeTasks.add(task);
+            }
+            else
+            {
+                currentTasks.add(task);
+            }
+        }
+
+        player.sendMessage(Utils.color(devopProjectTag + "&aTasks for &6" + project.getName()));
+
+        // Send player the tasks sorted by Focused Task, Current Tasks, and Completed Tasks
+        // Also sends players the taskID, based on their permissions
+        if(focusedTask != null)
+        {
+            if(player.hasPermission("emi.devop.view.taskid"))
+            {
+                player.sendMessage(Utils.color("&aFocused: &7[&9" + focusedTask.getId() + "&7] &6" + focusedTask.getTask()));
+            }
+            else
+            {
+                player.sendMessage(Utils.color("&aFocused: &7[&9*&7] &6" + focusedTask.getTask()));
+            }
+        }
+
+        if(!currentTasks.isEmpty())
+        {
+            if(player.hasPermission("emi.devop.view.taskid"))
+            {
+                player.sendMessage(Utils.color("&aCurrent: " + buildTaskList(currentTasks, true)));
+            }
+            else
+            {
+                player.sendMessage(Utils.color("&aCurrent: " + buildTaskList(currentTasks, false)));
+            }
+        }
+
+        if(!completeTasks.isEmpty())
+        {
+            if(player.hasPermission("emi.devop.view.taskid"))
+            {
+                player.sendMessage(Utils.color("&aComplete: " + buildTaskList(completeTasks, true)));
+            }
+            else
+            {
+                player.sendMessage(Utils.color("&aComplete: " + buildTaskList(completeTasks, false)));
+            }
+        }
+    }
+
+    /**
+     * This method takes an ArrayList of Tasks and appends them all together depending on if the player has a permission or not.
+     *
+     * @param tasks         Input for Tasks
+     * @param hasPermission Input for if the player has a permission
+     *
+     * @return Returns a string of all Tasks in the ArrayList of Tasks
+     */
+    private String buildTaskList(ArrayList<DevopTask> tasks, boolean hasPermission)
+    {
+        StringBuilder builder = new StringBuilder();
+
+        for(DevopTask task : tasks)
+        {
+            if(hasPermission)
+            {
+                builder.append("&7[&9").append(task.getId()).append("&7] &6").append(task.getTask().trim()).append(" ");
+            }
+            else
+            {
+                builder.append("&7[&9*&7] &6").append(task.getTask().trim()).append(" ");
+            }
+        }
+        return builder.toString();
+    }
+
+    /**
+     * This method takes an input and tries to return a time measured in minutes.
+     *
+     * @param time Input for a time format HH:MM
+     *
+     * @return Time measured in minutes or -1 if the format was entered in wrong
+     */
+    private int encodeTime(String time)
+    {
+        String[] timeSplit = time.split(":");
+
+        if(timeSplit.length != 2)
+        {
+            return -1;
+        }
+
+        int hours;
+        int minutes;
+
+        try
+        {
+            hours = Integer.parseInt(timeSplit[0]);
+            minutes = Integer.parseInt(timeSplit[1]);
+        }
+        catch(NumberFormatException e)
+        {
+            Bukkit.getLogger().info("ERROR: devopCommand/processTimeString: " + e.toString());
+            return -1;
+        }
+
+        if(hours > 99 || minutes > 59)
+        {
+            return -1;
+        }
+
+        return ((hours*60) + minutes);
+    }
+}
