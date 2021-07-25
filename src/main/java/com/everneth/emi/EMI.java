@@ -5,10 +5,7 @@ import co.aikar.idb.*;
 import com.everneth.emi.commands.*;
 import com.everneth.emi.commands.bot.*;
 import com.everneth.emi.commands.bot.par.WhitelistAppCommand;
-import com.everneth.emi.commands.mint.projects.MintMaterialCommands;
-import com.everneth.emi.commands.mint.projects.MintProjectCommands;
-import com.everneth.emi.commands.mint.projects.MintTaskCommands;
-import com.everneth.emi.commands.mint.projects.MintValidationCommands;
+import com.everneth.emi.commands.mint.projects.*;
 import com.everneth.emi.commands.par.CharterCommand;
 import com.everneth.emi.events.JoinEvent;
 import com.everneth.emi.events.LeaveEvent;
@@ -114,6 +111,7 @@ public class EMI extends JavaPlugin {
         commandManager.registerCommand(new MintMaterialCommands());
         commandManager.registerCommand(new MintTaskCommands());
         commandManager.registerCommand(new MintValidationCommands());
+        commandManager.registerCommand(new MintViewCommands());
         commandManager.registerCommand(new MotdCommand());
     }
 

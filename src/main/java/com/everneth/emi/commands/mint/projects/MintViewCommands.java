@@ -14,7 +14,7 @@ import com.everneth.emi.utils.PlayerUtils;
 import org.bukkit.entity.Player;
 
 /**
- * This class defines and adds functionality to any mint command that handels view.
+ * This class defines and adds functionality to any mint command that handles view.
  *
  * @author Sterling (@sterlingheaton)
  */
@@ -26,7 +26,7 @@ public class MintViewCommands extends BaseCommand
 
 
     /**
-     * This command allows project moderaters to check what tasks have been done by a specified player.
+     * This command allows project moderators to check what tasks have been done by a specified player.
      *
      * @param player      Automatic input for the command sender
      * @param mintProject Input for the project name
@@ -83,7 +83,7 @@ public class MintViewCommands extends BaseCommand
     }
 
     /**
-     * This command allows project moderaters to check what materials have been harvested by a specified player.
+     * This command allows project moderators to check what materials have been harvested by a specified player.
      *
      * @param player      Automatic input for the command sender
      * @param mintProject Input for the project name
@@ -142,7 +142,7 @@ public class MintViewCommands extends BaseCommand
     }
 
     /**
-     * This command allows project moderaters to check what players gathered a specified material.
+     * This command allows project moderators to check what players gathered a specified material.
      *
      * @param player         Automatic input for command sender
      * @param mintProject    Input for the project name
