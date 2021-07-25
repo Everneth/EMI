@@ -32,7 +32,7 @@ public class MintMaterialCommands extends BaseCommand
      * This command is used by players to log any material gathering they completed.
      *
      * @param player         Automatic input from the player who executed the command
-     * @param mintProject   Input for specified project
+     * @param mintProject    Input for specified project
      * @param materialString Input for specified material
      * @param amount         Input for the amount gathered
      * @param time           Input for length of time worked
@@ -94,7 +94,7 @@ public class MintMaterialCommands extends BaseCommand
      * This command is used by project moderators to mark a material as complete.
      *
      * @param player         Automatic input from the player who executed the command
-     * @param mintProject   Input for specified project
+     * @param mintProject    Input for specified project
      * @param materialString Input for specified material
      */
     //TODO add tab-complete
@@ -143,7 +143,7 @@ public class MintMaterialCommands extends BaseCommand
      * This command is used by project moderators to add materials to a project.
      *
      * @param player         Automatic input from the player who executed the command
-     * @param mintProject   Input for specified project
+     * @param mintProject    Input for specified project
      * @param materialString Input for specified material
      * @param amount         Input for how much material the project needs
      */
@@ -180,7 +180,7 @@ public class MintMaterialCommands extends BaseCommand
      * This command is used by project moderators to delete materials from a project.
      *
      * @param player         Automatic input from the player who executed the command
-     * @param mintProject   Input for specified project
+     * @param mintProject    Input for specified project
      * @param materialString Input for specified material
      */
     //TODO add tab-complete
@@ -222,7 +222,7 @@ public class MintMaterialCommands extends BaseCommand
      * This command is used by project moderators to focus materials from a project.
      *
      * @param player         Automatic input from the player who executed the command
-     * @param mintProject   Input for specified project
+     * @param mintProject    Input for specified project
      * @param materialString Input for specified material
      */
     //TODO add tab-complete
@@ -289,7 +289,7 @@ public class MintMaterialCommands extends BaseCommand
     /**
      * This command is used by players to view all materials from a project.
      *
-     * @param player       Automatic input from the player who executed the command
+     * @param player      Automatic input from the player who executed the command
      * @param mintProject Input for specified project
      */
     //TODO add tab-complete

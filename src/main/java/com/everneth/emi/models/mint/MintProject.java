@@ -435,8 +435,8 @@ public class MintProject
      * This method marks the material as validated through the database and memory.
      *
      * @param mintLogMaterial Input for the material
-     * @param validated        Input if the material was validated or rejected
-     * @param validator        Input for the player who validated
+     * @param validated       Input if the material was validated or rejected
+     * @param validator       Input for the player who validated
      */
     public void validateMaterial(MintLogMaterial mintLogMaterial, boolean validated, EMIPlayer validator)
     {
@@ -485,8 +485,8 @@ public class MintProject
      * This method marks the task as validated through the database and memory.
      *
      * @param mintLogTask Input for the task
-     * @param validated    Input if the task was validated or rejected
-     * @param validator    Input for the player who validated
+     * @param validated   Input if the task was validated or rejected
+     * @param validator   Input for the player who validated
      */
     public void validateTask(MintLogTask mintLogTask, boolean validated, EMIPlayer validator)
     {

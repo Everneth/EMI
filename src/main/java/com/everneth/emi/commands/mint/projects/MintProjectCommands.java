@@ -31,7 +31,7 @@ public class MintProjectCommands extends BaseCommand
     /**
      * This command is used by project moderators to complete a project.
      *
-     * @param player       Automatic input from the player who executed the command
+     * @param player      Automatic input from the player who executed the command
      * @param mintProject Input for specified project
      */
     //TODO Add tab-complete to mintProject, add complete check
@@ -225,7 +225,7 @@ public class MintProjectCommands extends BaseCommand
     /**
      * This command is used by players to join a project.
      *
-     * @param player       Automatic input from the player who executed the command
+     * @param player      Automatic input from the player who executed the command
      * @param mintProject Input for specified project
      */
     //TODO add tab-complete
@@ -328,7 +328,7 @@ public class MintProjectCommands extends BaseCommand
     /**
      * This command is used by players to view all tasks and materials for a project.
      *
-     * @param player       Automatic input from the player who executed the command
+     * @param player      Automatic input from the player who executed the command
      * @param mintProject Input for specified project
      */
     @Subcommand("project work")

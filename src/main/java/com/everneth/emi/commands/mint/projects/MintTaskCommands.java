@@ -31,10 +31,10 @@ public class MintTaskCommands extends BaseCommand
     /**
      * This command is used by players to log any task they've completed.
      *
-     * @param player       Automatic input from the player who executed the command
+     * @param player      Automatic input from the player who executed the command
      * @param mintProject Input for specified project
-     * @param time         Input for length of time worked
-     * @param description  Input for a short description of what the player did (if applicable)
+     * @param time        Input for length of time worked
+     * @param description Input for a short description of what the player did (if applicable)
      */
     //TODO add tab-complete
     @Subcommand("log task")
@@ -77,9 +77,9 @@ public class MintTaskCommands extends BaseCommand
     /**
      * This command is used by project moderators to set a task as complete.
      *
-     * @param player       Automatic input from the player who executed the command
+     * @param player      Automatic input from the player who executed the command
      * @param mintProject Input for specified project
-     * @param taskID       Input for a specified Task
+     * @param taskID      Input for a specified Task
      */
     @Subcommand("task complete")
     @Syntax("<Project> <taskID>")
@@ -122,9 +122,9 @@ public class MintTaskCommands extends BaseCommand
     /**
      * This command is used by project moderators to add a task to a project.
      *
-     * @param player       Automatic input from the player who executed the command
+     * @param player      Automatic input from the player who executed the command
      * @param mintProject Input for specified project
-     * @param taskParts    Input for a task
+     * @param taskParts   Input for a task
      */
     @Subcommand("task add")
     @Syntax("<Project> <Task>")
@@ -158,9 +158,9 @@ public class MintTaskCommands extends BaseCommand
     /**
      * This command is used by project moderators to delete a task from a project.
      *
-     * @param player       Automatic input from the player who executed the command
+     * @param player      Automatic input from the player who executed the command
      * @param mintProject Input for specified project
-     * @param taskID       Input for a specified Task
+     * @param taskID      Input for a specified Task
      */
     @Subcommand("task delete")
     @Syntax("<Project> <TaskID>")
@@ -199,9 +199,9 @@ public class MintTaskCommands extends BaseCommand
     /**
      * This command is used by project moderators to mark a task as focused.
      *
-     * @param player       Automatic input from the player who executed the command
+     * @param player      Automatic input from the player who executed the command
      * @param mintProject Input for specified project
-     * @param taskID       Input for a specified Task
+     * @param taskID      Input for a specified Task
      */
     @Subcommand("task focus")
     @Syntax("<Project> <taskID>")
@@ -266,7 +266,7 @@ public class MintTaskCommands extends BaseCommand
     /**
      * This command is used by players to view tasks for a project.
      *
-     * @param player       Automatic input from the player who executed the command
+     * @param player      Automatic input from the player who executed the command
      * @param mintProject Input for specified project
      */
     @Subcommand("task list")

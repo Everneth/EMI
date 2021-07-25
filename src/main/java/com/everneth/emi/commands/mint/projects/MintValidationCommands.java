@@ -32,7 +32,7 @@ public class MintValidationCommands extends BaseCommand
     /**
      * This command is used by project moderators to validate player logs.
      *
-     * @param player       Automatic input from the player who executed the command
+     * @param player      Automatic input from the player who executed the command
      * @param mintProject Input for specified project
      */
     @Subcommand("validate")
@@ -120,7 +120,7 @@ public class MintValidationCommands extends BaseCommand
     /**
      * This command is used by the plugin as a clickable message to validate the log.
      *
-     * @param player       Automatic input from the player who executed the command
+     * @param player      Automatic input from the player who executed the command
      * @param mintProject Input for specified project
      */
     @Subcommand("validateyes")
@@ -154,7 +154,7 @@ public class MintValidationCommands extends BaseCommand
     /**
      * This command is used by the plugin as a clickable message to reject the log.
      *
-     * @param player       Automatic input from the player who executed the command
+     * @param player      Automatic input from the player who executed the command
      * @param mintProject Input for specified project
      */
     @Subcommand("validateno")
