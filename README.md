@@ -57,6 +57,9 @@ Everneth Ministry Interface - This is a all-inclusive tool to open up commands a
 | /mint validate \<projectName\> | emi.mint.validate | Lets the player grab the next log that needs to be validated. Server will send them a message to validate or to not validate the log.
 | /mint validateyes \<projectName\> | emi.mint.validate | Internal command used by /mint validate |
 | /mint validateno \<projectName\> | emi.mint.validate | Internal command used by /mint validate |
+| /mint view material \<projectName\> \<worker\> | emi.mint.view | Lists all materials the player has collected for the specific project |
+| /mint view materialworkers \<projectName\> \<material\> | emi.mint.view | Lists all workers that gathered specified material for the specified project|
+| /mint view task \<projectName\> \<worker\> | emi.mint.view | Lists all tasks the player has completed for the specified project |
 
 ## API Endpoints
 EMI provides a basic playerdata API that exposes player stats, NBT, and advancements progress. All requests are `GET` calls and require an API key.

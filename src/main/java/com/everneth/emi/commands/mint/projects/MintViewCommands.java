@@ -148,7 +148,7 @@ public class MintViewCommands extends BaseCommand
      * @param mintProject    Input for the project name
      * @param materialString Input for the material name
      */
-    @Subcommand("view material")
+    @Subcommand("view materialworkers")
     @Syntax("<Project> <Material>")
     @CommandPermission("emi.mint.view")
     public void onMaterialViewNoWorker(Player player, String mintProject, String materialString)
