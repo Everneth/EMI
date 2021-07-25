@@ -70,7 +70,7 @@ public class MintProject
         }
         catch (SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/addWorker: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/addWorker: " + e);
         }
     }
 
@@ -89,7 +89,7 @@ public class MintProject
         }
         catch (SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/complete: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/complete: " + e);
         }
     }
 
@@ -110,7 +110,7 @@ public class MintProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/addTask: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/addTask: " + e);
         }
     }
 
@@ -140,7 +140,7 @@ public class MintProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/completeTask: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/completeTask: " + e);
         }
     }
 
@@ -168,7 +168,7 @@ public class MintProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/switchTaskFocus: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/switchTaskFocus: " + e);
         }
     }
 
@@ -188,7 +188,7 @@ public class MintProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/unFocusTask: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/unFocusTask: " + e);
         }
     }
 
@@ -207,7 +207,7 @@ public class MintProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/deleteTask: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/deleteTask: " + e);
         }
     }
 
@@ -229,7 +229,7 @@ public class MintProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/addMaterial: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/addMaterial: " + e);
         }
     }
 
@@ -259,7 +259,7 @@ public class MintProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/completeMaterial: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/completeMaterial: " + e);
         }
     }
 
@@ -287,7 +287,7 @@ public class MintProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/switchMaterialFocus: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/switchMaterialFocus: " + e);
         }
     }
 
@@ -306,7 +306,7 @@ public class MintProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/deleteMaterial: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/deleteMaterial: " + e);
         }
     }
 
@@ -331,7 +331,7 @@ public class MintProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/addTaskLog: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/addTaskLog: " + e);
         }
     }
 
@@ -359,7 +359,7 @@ public class MintProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/addMaterialLog: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/addMaterialLog: " + e);
         }
     }
 
@@ -398,7 +398,7 @@ public class MintProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/unFocusMaterial: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/unFocusMaterial: " + e);
         }
     }
 
@@ -422,7 +422,7 @@ public class MintProject
         }
         catch(SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProject/updateMaterial: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProject/updateMaterial: " + e);
         }
 
         if(totalCollected >= material.getTotal())
@@ -455,7 +455,7 @@ public class MintProject
             }
             catch(SQLException e)
             {
-                Bukkit.getLogger().info("ERROR: MintProject/validateMaterial/No: " + e.toString());
+                Bukkit.getLogger().info("ERROR: MintProject/validateMaterial/No: " + e);
                 return;
             }
         }
@@ -469,7 +469,7 @@ public class MintProject
             }
             catch(SQLException e)
             {
-                Bukkit.getLogger().info("ERROR: MintProject/validateMaterial/Yes: " + e.toString());
+                Bukkit.getLogger().info("ERROR: MintProject/validateMaterial/Yes: " + e);
                 return;
             }
             mintLogMaterial.setValidater(validator);
@@ -499,7 +499,7 @@ public class MintProject
             }
             catch(SQLException e)
             {
-                Bukkit.getLogger().info("ERROR: MintProject/validateTask/No: " + e.toString());
+                Bukkit.getLogger().info("ERROR: MintProject/validateTask/No: " + e);
                 return;
             }
         }
@@ -513,7 +513,7 @@ public class MintProject
             }
             catch(SQLException e)
             {
-                Bukkit.getLogger().info("ERROR: MintProject/validateTask/Yes: " + e.toString());
+                Bukkit.getLogger().info("ERROR: MintProject/validateTask/Yes: " + e);
                 return;
             }
             mintLogTask.setValidater(validator);

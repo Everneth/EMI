@@ -82,14 +82,4 @@ public class MintMaterial
     {
         this.focused = focused;
     }
-
-    public boolean isValidated()
-    {
-        return validated;
-    }
-
-    public void setValidated(boolean validated)
-    {
-        this.validated = validated;
-    }
 }

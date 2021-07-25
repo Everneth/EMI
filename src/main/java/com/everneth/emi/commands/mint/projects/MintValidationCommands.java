@@ -20,7 +20,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 
 /**
- * This class defines and adds functionality to any mint command that handels validation.
+ * This class defines and adds functionality to any mint command that handles validation.
  *
  * @author Sterling (@sterlingheaton)
  */

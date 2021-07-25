@@ -18,7 +18,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 
 /**
- * This class defines and adds functionality to any mint command that handels tasks.
+ * This class defines and adds functionality to any mint command that handles tasks.
  *
  * @author Sterling (@sterlingheaton)
  */
@@ -404,7 +404,7 @@ public class MintTaskCommands extends BaseCommand
         }
         catch(NumberFormatException e)
         {
-            Bukkit.getLogger().info("ERROR: mintCommand/processTimeString: " + e.toString());
+            Bukkit.getLogger().info("ERROR: mintCommand/processTimeString: " + e);
             return -1;
         }
 

@@ -18,7 +18,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 
 /**
- * This class defines and adds functionality to any mint command that handels projects.
+ * This class defines and adds functionality to any mint command that handles projects.
  *
  * @author Sterling (@sterlingheaton)
  */

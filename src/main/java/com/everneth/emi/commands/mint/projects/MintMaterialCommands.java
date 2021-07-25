@@ -18,7 +18,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 
 /**
- * This class defines and adds functionality to any mint command that handels materials.
+ * This class defines and adds functionality to any mint command that handles materials.
  *
  * @author Sterling (@sterlingheaton)
  */
@@ -407,7 +407,7 @@ public class MintMaterialCommands extends BaseCommand
         }
         catch(NumberFormatException e)
         {
-            Bukkit.getLogger().info("ERROR: mintCommand/processTimeString: " + e.toString());
+            Bukkit.getLogger().info("ERROR: mintCommand/processTimeString: " + e);
             return -1;
         }
 

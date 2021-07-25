@@ -82,7 +82,7 @@ public class MintProjectManager
         }
         catch (SQLException e)
         {
-            Bukkit.getLogger().info("MintProjectManager/addProject(MintProject) ERROR: " + e.toString());
+            Bukkit.getLogger().info("MintProjectManager/addProject(MintProject) ERROR: " + e);
         }
     }
 
@@ -116,7 +116,7 @@ public class MintProjectManager
         }
         catch (SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProjectManager/switchFocus: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProjectManager/switchFocus: " + e);
         }
     }
 
@@ -135,7 +135,7 @@ public class MintProjectManager
         }
         catch (SQLException e)
         {
-            Bukkit.getLogger().info("ERROR: MintProjectManager/unFocus: " + e.toString());
+            Bukkit.getLogger().info("ERROR: MintProjectManager/unFocus: " + e);
         }
     }
 }
