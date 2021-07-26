@@ -1,16 +1,16 @@
-package com.everneth.emi.models.devop;
+package com.everneth.emi.models.mint;
 
-public class DevopMaterial
+public class MintMaterial
 {
     private long id;
-    private long projectID;
-    private String material;
-    private int total;
+    private final long projectID;
+    private final String material;
+    private final int total;
     private int collected;
     private int complete;
     private int focused;
 
-    public DevopMaterial(long id, long projectID, String material, int total, int collected, int complete, int focused)
+    public MintMaterial(long id, long projectID, String material, int total, int collected, int complete, int focused)
     {
         this.id = id;
         this.projectID = projectID;
@@ -21,7 +21,7 @@ public class DevopMaterial
         this.focused = focused;
     }
 
-    public DevopMaterial(long projectID, String material, int total, int collected, int complete, int focused)
+    public MintMaterial(long projectID, String material, int total, int collected, int complete, int focused)
     {
         this.projectID = projectID;
         this.material = material;
@@ -43,34 +43,14 @@ public class DevopMaterial
         this.id = id;
     }
 
-    public long getProjectID()
-    {
-        return projectID;
-    }
-
-    public void setProjectID(long projectID)
-    {
-        this.projectID = projectID;
-    }
-
     public String getMaterial()
     {
         return material;
     }
 
-    public void setMaterial(String material)
-    {
-        this.material = material;
-    }
-
     public int getTotal()
     {
         return total;
-    }
-
-    public void setTotal(int total)
-    {
-        this.total = total;
     }
 
     public int getCollected()
@@ -101,15 +81,5 @@ public class DevopMaterial
     public void setFocused(int focused)
     {
         this.focused = focused;
-    }
-
-    public boolean isValidated()
-    {
-        return validated;
-    }
-
-    public void setValidated(boolean validated)
-    {
-        this.validated = validated;
     }
 }
