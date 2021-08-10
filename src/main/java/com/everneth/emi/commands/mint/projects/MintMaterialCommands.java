@@ -26,7 +26,7 @@ import java.util.ArrayList;
 @CommandAlias("mint")
 public class MintMaterialCommands extends BaseCommand
 {
-    private final String mintProjectTag = "&7[&dMint&5Projects] ";
+    private final String mintProjectTag = "&7[&dMint&5Projects&7] ";
 
     /**
      * This command is used by players to log any material gathering they completed.
