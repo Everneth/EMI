@@ -22,8 +22,7 @@ import org.bukkit.entity.Player;
 @CommandAlias("mint")
 public class MintViewCommands extends BaseCommand
 {
-    private final String mintProjectTag = "&7[&dMint&5Projects] ";
-
+    private final String mintProjectTag = "&7[&dMint&5Projects&7] ";
 
     /**
      * This command allows project moderators to check what tasks have been done by a specified player.
@@ -62,7 +61,7 @@ public class MintViewCommands extends BaseCommand
 
         for(MintLogTask task : project.getTaskLog().values())
         {
-            if(!task.getLogger().equals(playerWorker))
+            if(task.getLogger().getId() != playerWorker.getId())
             {
                 continue;
             }
@@ -70,13 +69,13 @@ public class MintViewCommands extends BaseCommand
             if(task.getValidated() == 1)
             {
                 player.sendMessage(Utils.color("&7[&aValidated&7] &6" + task.getDescription().trim() +
-                        " &awas done at &6" + decodeDate(task.getLogDate()) +
+                        " &awas done on &6" + decodeDate(task.getLogDate()) +
                         " &aand took &6" + decodeTime(task.getTimeWorked())));
             }
             else
             {
                 player.sendMessage(Utils.color("&7[&cNot Validated&7] &6" + task.getDescription().trim() +
-                        " &awas done at &6" + decodeDate(task.getLogDate()) +
+                        " &awas done on &6" + decodeDate(task.getLogDate()) +
                         " &aand took &6" + decodeTime(task.getTimeWorked())));
             }
         }
@@ -115,11 +114,11 @@ public class MintViewCommands extends BaseCommand
         // Searches for and displays materials that meet the right project and worker
         EMIPlayer playerWorker = new EMIPlayer(dbWorker.getString("player_uuid"), dbWorker.getString("player_name"), dbWorker.getInt("player_id"));
 
-        player.sendMessage(Utils.color(mintProjectTag + "&Material logs submitted by &6" + playerWorker.getName() + " &afor project &6" + project.getName() + "&a:"));
+        player.sendMessage(Utils.color(mintProjectTag + "&aMaterial logs submitted by &6" + playerWorker.getName() + " &afor project &6" + project.getName() + "&a:"));
 
         for(MintLogMaterial material : project.getMaterialLog().values())
         {
-            if(!material.getLogger().equals(playerWorker))
+            if(material.getLogger().getId() != playerWorker.getId())
             {
                 continue;
             }
@@ -127,16 +126,16 @@ public class MintViewCommands extends BaseCommand
             if(material.getValidated() == 1)
             {
                 player.sendMessage(Utils.color("&7[&aValidated&7] &6" +
-                        "&6Material&8(&6" + material.getMaterialCollected() + "&8) " +
-                        " &awas gathered at &6" + decodeDate(material.getLogDate()) +
-                        "&a and took" + decodeTime(material.getTimeWorked())));
+                        "&6" + project.getMaterials().get(material.getMaterialID()).getMaterial() + "&8(&6" + material.getMaterialCollected() + "&8) " +
+                        " &awas gathered on &6" + decodeDate(material.getLogDate()) +
+                        "&a and took &6" + decodeTime(material.getTimeWorked())));
             }
             else
             {
                 player.sendMessage(Utils.color("&7[&cNot Validated&7] &6" +
-                        "&6Material&8(&6" + material.getMaterialCollected() + "&8) " +
-                        " &awas gathered at &6" + decodeDate(material.getLogDate()) +
-                        "&a and took" + decodeTime(material.getTimeWorked())));
+                        "&6" + project.getMaterials().get(material.getMaterialID()).getMaterial() +"&8(&6" + material.getMaterialCollected() + "&8) " +
+                        " &awas gathered on &6" + decodeDate(material.getLogDate()) +
+                        "&a and took &6" + decodeTime(material.getTimeWorked())));
             }
         }
     }

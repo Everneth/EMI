@@ -27,7 +27,7 @@ import org.bukkit.entity.Player;
 
 public class MintValidationCommands extends BaseCommand
 {
-    private final String mintProjectTag = "&7[&dMint&5Projects] ";
+    private final String mintProjectTag = "&7[&dMint&5Projects&7] ";
 
     /**
      * This command is used by project moderators to validate player logs.
