@@ -1,10 +1,7 @@
 package com.everneth.emi.commands.mint.projects;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CommandPermission;
-import co.aikar.commands.annotation.Private;
-import co.aikar.commands.annotation.Subcommand;
-import co.aikar.commands.annotation.Syntax;
+import co.aikar.commands.annotation.*;
 import com.everneth.emi.Utils;
 import com.everneth.emi.managers.MintProjectManager;
 import com.everneth.emi.models.EMIPlayer;
@@ -25,6 +22,7 @@ import org.bukkit.entity.Player;
  * @author Sterling (@sterlingheaton)
  */
 
+@CommandAlias("mint")
 public class MintValidationCommands extends BaseCommand
 {
     private final String mintProjectTag = "&7[&dMint&5Projects&7] ";
