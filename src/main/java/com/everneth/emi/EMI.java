@@ -36,6 +36,7 @@ import com.everneth.emi.commands.mint.MintCommand;
 import java.io.File;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 /**
@@ -185,7 +186,7 @@ public class EMI extends JavaPlugin {
         {
             DbRow playerRow = PlayerUtils.getPlayerRow(projectRow.getInt("leader"));
             EMIPlayer playerLead = new EMIPlayer(playerRow.getString("player_uuid"), playerRow.getString("player_name"), playerRow.getInt("player_id"));
-            Timestamp endDateTime = projectRow.get("end_date");
+            LocalDateTime endDateTime = projectRow.get("end_date");
             String endDate = null;
 
             if(endDateTime != null)

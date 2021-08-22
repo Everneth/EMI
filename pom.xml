@@ -6,7 +6,7 @@
 
     <groupId>com.everneth</groupId>
     <artifactId>EMI</artifactId>
-    <version>1.4.12</version>
+    <version>1.4.13</version>
 
     <repositories>
         <repository>
