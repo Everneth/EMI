@@ -35,7 +35,6 @@ import com.everneth.emi.commands.mint.MintCommand;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -82,6 +81,7 @@ public class EMI extends JavaPlugin {
     public void onDisable() {
         getLogger().info("Ministry Interface stopped.");
         DB.close();
+        jda.shutdown();
 
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
         for(MintProject project : manager.getProjects().values())
@@ -106,7 +106,7 @@ public class EMI extends JavaPlugin {
         commandManager.registerCommand(new ReportReplyCommand());
         commandManager.registerCommand(new GetRepliesCommand());
         commandManager.registerCommand(new SupportCommand());
-        commandManager.registerCommand(new DiscordsyncCommand());
+        commandManager.registerCommand(new DiscordSyncCommands());
         commandManager.registerCommand(new CharterCommand());
         commandManager.registerCommand(new MintProjectCommands());
         commandManager.registerCommand(new MintMaterialCommands());
@@ -114,6 +114,7 @@ public class EMI extends JavaPlugin {
         commandManager.registerCommand(new MintValidationCommands());
         commandManager.registerCommand(new MintViewCommands());
         commandManager.registerCommand(new MotdCommand());
+        commandManager.registerCommand(new AltAccountCommands());
     }
 
     private void initBot()
@@ -143,6 +144,9 @@ public class EMI extends JavaPlugin {
                     .enableIntents(GatewayIntent.DIRECT_MESSAGES)
                     .build();
             jda.awaitReady();
+
+            // send an API for all Everneth guild members on startup, which will then be stored in the cache
+            EMI.getJda().getGuildById(plugin.getConfig().getLong("guild-id")).loadMembers();
         }
         catch(Exception e)
         {
