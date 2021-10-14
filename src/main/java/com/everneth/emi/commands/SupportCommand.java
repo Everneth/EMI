@@ -1,9 +1,7 @@
 package com.everneth.emi.commands;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.Default;
-import co.aikar.commands.annotation.Dependency;
+import co.aikar.commands.annotation.*;
 import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -32,6 +30,8 @@ public class SupportCommand extends BaseCommand {
 
     @Default
     @CommandAlias("support")
+    @Description("Send a message requesting support in the discord's #help channel.")
+    @Syntax("[message]")
     public void onSupport(CommandSender sender, String message)
     {
         // Get the player and supply all potentially useful

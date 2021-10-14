@@ -36,6 +36,7 @@ public class MotdCommand extends BaseCommand
     }
 
     @Subcommand("set")
+    @Syntax("<tag> [message]")
     @CommandPermission("emi.motd.set")
     public void onMotdSet(Player player, String tag, String[] message)
     {
@@ -60,6 +61,7 @@ public class MotdCommand extends BaseCommand
     }
 
     @Subcommand("delete")
+    @Syntax("<tag>")
     @CommandPermission("emi.motd.delete")
     public void onMotdDelete(Player player, String tag)
     {

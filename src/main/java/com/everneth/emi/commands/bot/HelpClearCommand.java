@@ -39,7 +39,7 @@ public class HelpClearCommand extends Command {
         // Lets check them
         for(Role role : roleList)
         {
-            if(role.getName().equals("Staff") || role.getName().equals("Ministry Member (Helper)"))
+            if(role.getName().equals("Staff"))
             {
                 // Found a required role, no need to find the other, break from the loop
                 hasRequiredRoles = true;
@@ -53,6 +53,7 @@ public class HelpClearCommand extends Command {
             {
                 // Got the role! Lets build a list of messages to clear.
                 List<Message> messageList = event.getTextChannel().getIterableHistory().complete();
+
                 if(messageList.size() == 2) {
                     // Hold up! Theres only the root message and the command! Delete the command, instruct the user
                     event.getChannel().deleteMessageById(event.getChannel().getLatestMessageIdLong()).queue();
