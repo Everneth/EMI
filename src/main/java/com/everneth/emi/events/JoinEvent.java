@@ -9,6 +9,7 @@ import com.everneth.emi.Utils;
 import com.everneth.emi.EMI;
 import com.everneth.emi.models.Motd;
 
+import com.everneth.emi.utils.PlayerUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -37,7 +38,7 @@ public class JoinEvent implements Listener {
 
     private List<Motd> motdList;
     private CompletableFuture<List<DbRow>> futureList;
-    private CompletableFuture<DbRow> playerOjbectFuture;
+    private CompletableFuture<DbRow> playerObjectFuture;
     private DbRow playerRow;
     private List<DbRow> rows;
 
@@ -50,22 +51,8 @@ public class JoinEvent implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event)
     {
         Player player = event.getPlayer();
+        DbRow playerRow = PlayerUtils.getPlayerRow(player.getUniqueId());
 
-        //Check if the player exists in the EMI database
-        //Query the database and put it in a future
-        playerOjbectFuture = DB.getFirstRowAsync(
-                "SELECT * FROM players WHERE player_uuid = ?",
-                player.getUniqueId().toString()
-        );
-        try {
-            //Try to get the row from the future and put it into a DbRow object
-            playerRow = playerOjbectFuture.get();
-        }
-        catch (Exception e)
-        {
-            //Something went wrong, record the error. This should never happen.
-            EMI.getPlugin().getLogger().warning(e.getMessage());
-        }
         // Did we find anything?
         if (playerRow == null) {
             //No records returned. Add player to database.
@@ -79,15 +66,24 @@ public class JoinEvent implements Listener {
                 EMI.getPlugin().getLogger().warning(e.getMessage());
             }
         }
-        else if(!playerRow.getString("player_name").equals(player.getName())
+        else if (!playerRow.getString("player_name").equals(player.getName())
                 && playerRow.getString("player_uuid").equals(player.getUniqueId().toString()))
         {
-          //Record found, name mismatch. Update the record with the players current name.
-          DB.executeUpdateAsync(
+            //Record found, name mismatch. Update the record with the players current name.
+            DB.executeUpdateAsync(
                   "UPDATE players SET player_name = ? WHERE player_uuid = ?",
                   player.getName(),
                   player.getUniqueId().toString()
-          );
+            );
+        }
+        else if (playerRow.getString("alt_name") != null
+                && !playerRow.getString("alt_name").equals(player.getName())
+                && playerRow.getString("alt_uuid").equals(player.getUniqueId().toString()))
+        {
+            // Name mismatch on the alt account, update it.
+            DB.executeUpdateAsync("UPDATE players SET alt_name = ? WHERE player_uuid = ?",
+                    player.getName(),
+                    player.getUniqueId().toString());
         }
 
         // Display MOTDs to player upon login.
