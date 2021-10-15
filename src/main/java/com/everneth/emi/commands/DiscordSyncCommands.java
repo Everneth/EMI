@@ -102,7 +102,7 @@ public class DiscordSyncCommands extends BaseCommand {
         Role syncRole = guild.getRoleById(EMI.getPlugin().getConfig().getLong("sync-role-id"));
         guild.removeRoleFromMember(member, syncRole).queue();
 
-        DB.executeUpdateAsync("UPDATE players SET discord_id = 0 WHERE player_uuid = ?", player.getUniqueId().toString());
+        DB.executeUpdateAsync("UPDATE players SET discord_id = 0 WHERE ? IN (player_uuid,alt_uuid)", player.getUniqueId().toString());
         player.sendMessage(Utils.color("Your discord account has been successfully unsynced. Please use &a/discord sync &fto set up with a new account."));
     }
 }

@@ -89,7 +89,10 @@ public class AltAccountCommands extends BaseCommand {
         // Use our calendar to calculate if 3 days have passed and if user is staff, don't allow if both are not true
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, -3);
-        if (!cal.after(playerRow.get("date_alt_added")) && !player.hasPermission("emi.par.alt.remove")) {
+        if (playerRow.get("date_alt_added") != null
+                && !cal.after(playerRow.get("date_alt_added"))
+                && !player.hasPermission("emi.par.alt.remove"))
+        {
             player.sendMessage(Utils.color("&cYou must wait at least &f3 days &cafter adding an alternate account before removing it."));
             return;
         }
@@ -99,7 +102,7 @@ public class AltAccountCommands extends BaseCommand {
         }
         else {
             EMI.getPlugin().getServer().dispatchCommand(Bukkit.getConsoleSender(), "whitelist remove " + altUsername);
-            DB.executeUpdateAsync("UPDATE players SET alt_name = NULL, alt_uuid = NULL, date_alt_added = NULL WHERE player_uuid = ?",
+            DB.executeUpdateAsync("UPDATE players SET alt_name = NULL, alt_uuid = NULL, date_alt_added = NULL WHERE ? IN (player_uuid,alt_uuid)",
                     player.getUniqueId().toString());
             player.sendMessage(Utils.color("Your alt, &6" + altUsername + "&f, has been removed from the whitelist."));
         }
