@@ -22,6 +22,8 @@ public class ReactionListener extends ListenerAdapter {
     private final String REJECT_REACTION = "\u26D4";
     @Override
     public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
+        if (!event.getReactionEmote().isEmoji()) return;
+
         if (VotingService.getService().isVotingMessage(event.getMessageIdLong()) && !event.getUser().isBot()) {
             // ignore events fired for bots and reactions added outside of the voting channel
             if (event.getChannel().getIdLong() == EMI.getPlugin().getConfig().getLong("voting-channel-id")) {

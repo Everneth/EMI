@@ -8,7 +8,7 @@ import com.everneth.emi.Utils;
 import com.everneth.emi.managers.DiscordSyncManager;
 import com.everneth.emi.EMI;
 import com.everneth.emi.utils.PlayerUtils;
-import com.jagrosh.jdautilities.command.annotation.JDACommand;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
