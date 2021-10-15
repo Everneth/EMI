@@ -158,7 +158,7 @@ public class PlayerUtils {
         if (playerRow != null)
             discordId = playerRow.getLong("discord_id");
 
-        return discordId != 0;
+        return discordId != null && discordId != 0;
     }
 
     public static boolean isMemberAlready(long discordId)

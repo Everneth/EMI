@@ -23,7 +23,7 @@ public class ReactionListener extends ListenerAdapter {
     @Override
     public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
         if (VotingService.getService().isVotingMessage(event.getMessageIdLong()) && !event.getUser().isBot()) {
-            // ignore events fired for bots and reactions added outside of staff chat
+            // ignore events fired for bots and reactions added outside of the voting channel
             if (event.getChannel().getIdLong() == EMI.getPlugin().getConfig().getLong("voting-channel-id")) {
                 // is this message even a vote message?
                 if (event.getReactionEmote().getEmoji().equals(APPROVE_REACTION) ||

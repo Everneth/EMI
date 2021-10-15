@@ -8,10 +8,15 @@ import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
 import com.everneth.emi.utils.PlayerUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Locale;
-import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -32,6 +37,10 @@ public class AltAccountCommands extends BaseCommand {
             player.sendMessage("You cannot add yourself as an alt account");
             return;
         }
+        if (!PlayerUtils.syncExists(player.getUniqueId())) {
+            player.sendMessage(Utils.color("&7You must have a synced discord account to add an alt."));
+            return;
+        }
         UUID uuid = PlayerUtils.getPlayerUUID(requestedName);
         if (uuid == null) {
             player.sendMessage("Could not find a minecraft user by that name.");
@@ -42,6 +51,8 @@ public class AltAccountCommands extends BaseCommand {
         String dbUsername = dbRow.getString("player_name");
         String altUsername = dbRow.getString("alt_name");
 
+        Date now = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         // the player does not have an alt already whitelisted, we want to check if the requested account is already whitelisted
         if (altUsername == null) {
             DbRow requestedAltRow = PlayerUtils.getPlayerRow(requestedName);
@@ -49,9 +60,10 @@ public class AltAccountCommands extends BaseCommand {
             // if the last query returned null, the account has not been whitelisted already
             if (requestedAltRow == null) {
                 EMI.getPlugin().getServer().dispatchCommand(Bukkit.getConsoleSender(), "whitelist add " + requestedName);
-                DB.executeUpdateAsync("UPDATE players SET alt_name = ?, alt_uuid = ? WHERE player_uuid = ?",
+                DB.executeUpdateAsync("UPDATE players SET alt_name = ?, alt_uuid = ?, date_alt_added = ? WHERE player_uuid = ?",
                         requestedName,
                         uuid.toString(),
+                        format.format(now),
                         player.getUniqueId().toString());
                 player.sendMessage(Utils.color("&6" + requestedName + " &fhas been whitelisted as your alt."));
             }
@@ -74,20 +86,47 @@ public class AltAccountCommands extends BaseCommand {
         String playerUsername = playerRow.getString("player_name");
         String altUsername = playerRow.getString("alt_name");
 
-        if (player.getName().equals(playerUsername)) {
-            if (altUsername == null) {
-                player.sendMessage("You do not have an alternate account whitelisted.");
-            }
-            else {
-                EMI.getPlugin().getServer().dispatchCommand(Bukkit.getConsoleSender(), "whitelist remove " + altUsername);
-                DB.executeUpdateAsync("UPDATE players SET alt_name = NULL, alt_uuid = NULL WHERE player_uuid = ?",
-                        player.getUniqueId().toString());
-                player.sendMessage(Utils.color("Your alt, &6" + altUsername + "&f, has been removed from the whitelist."));
-            }
+        // Use our calendar to calculate if 3 days have passed and if user is staff, don't allow if both are not true
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_MONTH, -3);
+        if (!cal.after(playerRow.get("date_alt_added")) && !player.hasPermission("emi.par.alt.remove")) {
+            player.sendMessage(Utils.color("&cYou must wait at least &f3 days &cafter adding an alternate account before removing it."));
+            return;
+        }
 
+        if (altUsername == null) {
+            player.sendMessage("You do not have an alternate account whitelisted.");
         }
         else {
-            player.sendMessage("You must use your main account to remove your alt from the whitelist.");
+            EMI.getPlugin().getServer().dispatchCommand(Bukkit.getConsoleSender(), "whitelist remove " + altUsername);
+            DB.executeUpdateAsync("UPDATE players SET alt_name = NULL, alt_uuid = NULL, date_alt_added = NULL WHERE player_uuid = ?",
+                    player.getUniqueId().toString());
+            player.sendMessage(Utils.color("Your alt, &6" + altUsername + "&f, has been removed from the whitelist."));
+        }
+    }
+
+    @Subcommand("remove")
+    @Description("Force remove an alternate account from a player's account.")
+    @Syntax("<user>")
+    @CommandPermission("emi.par.alt.remove")
+    public void onRemoveAlt(CommandSender sender, String username)
+    {
+        DbRow playerRow = PlayerUtils.getPlayerRow(username);
+        if (playerRow == null) {
+            sender.sendMessage(Utils.color("&cThere is nobody with that username."));
+            return;
+        }
+        String playerUsername = playerRow.getString("player_name");
+        String altUsername = playerRow.getString("alt_name");
+
+        if (altUsername == null) {
+            sender.sendMessage("There is no alternate account associated with that name.");
+        }
+        else {
+            EMI.getPlugin().getServer().dispatchCommand(Bukkit.getConsoleSender(), "whitelist remove " + altUsername);
+            DB.executeUpdateAsync("UPDATE players SET alt_name = NULL, alt_uuid = NULL, date_alt_added = NULL WHERE ? IN (player_name,alt_name)",
+                    username);
+            sender.sendMessage(Utils.color("&c" + playerUsername+ "'s alt, &f" + altUsername + "&c, has been removed from the whitelist."));
         }
     }
 }
