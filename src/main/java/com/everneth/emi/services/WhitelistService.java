@@ -42,7 +42,7 @@ public class WhitelistService {
                     DB.executeUpdateAsync("DELETE FROM players WHERE player_name = ?", name);
                 }
             }
-        }, 20L * 60 * 1);
+        }, 20L * 60 * 5);
     }
 
     public boolean isWhitelisted(String name) {
