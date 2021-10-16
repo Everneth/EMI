@@ -109,7 +109,7 @@ public class PlayerUtils {
         {
             System.out.println(e.getMessage());
         }
-        if(record.isEmpty())
+        if(record == null)
         {
             return null;
         }

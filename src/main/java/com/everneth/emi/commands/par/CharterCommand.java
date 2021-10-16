@@ -115,23 +115,10 @@ public class CharterCommand extends BaseCommand {
                     recipientRecord.getString("player_name"),
                     recipientRecord.getInt("player_id")
             );
-            if(Bukkit.getBanList(BanList.Type.NAME).isBanned(recipient.getName()))
-            {
-                Bukkit.getBanList(BanList.Type.NAME).pardon(recipient.getName());
-            }
-            Bukkit.getBanList(BanList.Type.NAME).addBan(
-                    recipient.getName(),
-                    Utils.color("&c" + reason + "&c"),
-                    null,
-                    "Parliament");
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + player + Utils.color(" &c" + reason));
             String altName = recipientRecord.getString("alt_name");
             if (altName != null) {
-                Bukkit.getBanList(BanList.Type.NAME).addBan(
-                        altName,
-                        Utils.color("&c" + reason + "&c"),
-                        null,
-                        "Parliament"
-                );
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + player + Utils.color(" &c" + reason));
             }
             sender.sendMessage(Utils.color("&9[Charter] &3" + recipient.getName() + " and any whitelisted alts have been permanently banned."));
         }
@@ -301,7 +288,7 @@ public class CharterCommand extends BaseCommand {
         long pardonPointSuccess = CharterPoint.pardonPlayer(name, player, removeFlag);
         if(pardonPointSuccess == 0)
         {
-            sender.sendMessage(Utils.color("&9[Charter] &3Could not pardon " + name + ". Either there is no player by this name, it has changed, or its misspelled."));
+            player.sendMessage(Utils.color("&9[Charter] &3Could not pardon " + name + ". Either there is no player by this name, it has changed, or its misspelled."));
         }
         else
         {
@@ -312,7 +299,7 @@ public class CharterCommand extends BaseCommand {
             if (altName != null) {
                 Bukkit.getBanList(BanList.Type.NAME).pardon(altName);
             }
-            sender.sendMessage(Utils.color("&9[Charter] &3" + name + " and any listed alts have been pardoned and had their points set to 1."));
+            player.sendMessage(Utils.color("&9[Charter] &3" + name + " and any listed alts have been pardoned and had their points set to 1."));
         }
     }
 
