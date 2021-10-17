@@ -50,7 +50,7 @@ public class ConfirmSyncCommand extends Command {
                 } else {
                     int playerId = syncAccount(toFind);
                     if (playerId == 0) {
-                        event.replyInDm("ERROR: Could not sync account. No player record found.");
+                        event.replyInDm("Could not sync account, no player record found.");
                     } else {
                         dsm.removeSyncRequest(this.getPlayerRow(playerId).getString("player_uuid"));
                         EMI.getJda().getGuildById(guildId).addRoleToMember(

@@ -29,6 +29,7 @@ import java.util.*;
 @CommandAlias("charter")
 public class CharterCommand extends BaseCommand {
     @CommandPermission("emi.par.charter.pg")
+    @Syntax("<page #>")
     @Subcommand("pg")
     public void onPageCommand(CommandSender sender, int page)
     {
@@ -64,6 +65,7 @@ public class CharterCommand extends BaseCommand {
     @CommandPermission("emi.par.charter.issue")
     @Subcommand("issue")
     @CommandAlias("cissue")
+    @Syntax("<player> <amount> <reason>")
     public void onIssueCommand(CommandSender sender, String player, int amount, String reason)
     {
         Player issuer = (Player) sender;
@@ -93,13 +95,14 @@ public class CharterCommand extends BaseCommand {
     @CommandPermission("emi.par.charter.ban")
     @Subcommand("ban")
     @CommandAlias("cban")
+    @Syntax("<player> [reason]")
     public void onBanCommand(CommandSender sender, String player, @Optional String reason)
     {
         Player issuer = (Player) sender;
         DbRow recipientRecord = PlayerUtils.getPlayerRow(player);
         if(reason == null)
         {
-            reason = "You have exceeded 5 charter points and are permanently banned. Please appeal on the forums.";
+            reason = "You have exceeded 5 charter points and are permanently banned. Please contact staff on discord if you wish to appeal.";
         }
         if(recipientRecord == null)
         {
@@ -112,21 +115,18 @@ public class CharterCommand extends BaseCommand {
                     recipientRecord.getString("player_name"),
                     recipientRecord.getInt("player_id")
             );
-            if(Bukkit.getBanList(BanList.Type.NAME).isBanned(recipient.getName()))
-            {
-                Bukkit.getBanList(BanList.Type.NAME).pardon(recipient.getName());
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + player + Utils.color(" &c" + reason));
+            String altName = recipientRecord.getString("alt_name");
+            if (altName != null) {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + player + Utils.color(" &c" + reason));
             }
-            Bukkit.getBanList(BanList.Type.NAME).addBan(
-                    recipient.getName(),
-                    Utils.color("&c" + reason + "&c"),
-                    null,
-                    "Parliament");
-            sender.sendMessage(Utils.color("&9[Charter] &3" + recipient.getName() + " has been permanently banned."));
+            sender.sendMessage(Utils.color("&9[Charter] &3" + recipient.getName() + " and any whitelisted alts have been permanently banned."));
         }
     }
     @CommandPermission("emi.par.charter.history")
     @Subcommand("history")
     @CommandAlias("chistory")
+    @Syntax("<name> [<include expired>]")
     public void onHistoryCommand(CommandSender sender, String name, @Default("false") boolean includeExpired)
     {
         //before doing anything does this player exist?
@@ -216,6 +216,7 @@ public class CharterCommand extends BaseCommand {
     @CommandPermission("emi.par.charter.edit")
     @Subcommand("edit")
     @CommandAlias("cedit")
+    @Syntax("<id> <new amount> [new reason]")
     public void onEditCommand(CommandSender sender, int pointId, int newPointAmt, @Optional String newReason)
     {
         CharterPoint charterPoint = CharterPoint.getCharterPoint(pointId);
@@ -257,6 +258,7 @@ public class CharterCommand extends BaseCommand {
     @CommandPermission("emi.par.charter.remove")
     @Subcommand("remove")
     @CommandAlias("cremove")
+    @Syntax("<id>")
     public void onRemoveCommand(CommandSender sender, int pointId)
     {
         CharterPoint charterPoint = CharterPoint.getCharterPoint(pointId);
@@ -279,18 +281,25 @@ public class CharterCommand extends BaseCommand {
     @CommandPermission("emi.par.charter.pardon")
     @Subcommand("pardon")
     @CommandAlias("cpardon")
+    @Syntax("<name? [<remove flag>]")
     public void onPardonCommand(CommandSender sender, String name, @Default("true") boolean removeFlag)
     {
         Player player = (Player) sender;
         long pardonPointSuccess = CharterPoint.pardonPlayer(name, player, removeFlag);
         if(pardonPointSuccess == 0)
         {
-            sender.sendMessage(Utils.color("&9[Charter] &3Could not pardon " + name + ". Either there is no player by this name, it has changed, or its misspelled."));
+            player.sendMessage(Utils.color("&9[Charter] &3Could not pardon " + name + ". Either there is no player by this name, it has changed, or its misspelled."));
         }
         else
         {
-            Bukkit.getBanList(BanList.Type.NAME).pardon(name);
-            sender.sendMessage(Utils.color("&9[Charter] &3" + name + " has been pardoned and points set to 1."));
+            DbRow playerRow = PlayerUtils.getPlayerRow(name);
+            String playerName = playerRow.getString("player_name");
+            String altName = playerRow.getString("alt_name");
+            Bukkit.getBanList(BanList.Type.NAME).pardon(playerName);
+            if (altName != null) {
+                Bukkit.getBanList(BanList.Type.NAME).pardon(altName);
+            }
+            player.sendMessage(Utils.color("&9[Charter] &3" + name + " and any listed alts have been pardoned and had their points set to 1."));
         }
     }
 

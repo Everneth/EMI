@@ -1,9 +1,7 @@
 package com.everneth.emi.commands;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.Default;
-import co.aikar.commands.annotation.Dependency;
+import co.aikar.commands.annotation.*;
 import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -13,7 +11,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 /**
@@ -31,15 +31,14 @@ public class SupportCommand extends BaseCommand {
     private Plugin plugin;
 
     @Default
-    @CommandAlias("support")
+    @Description("Send a message requesting support in the discord's #help channel.")
+    @Syntax("[message]")
     public void onSupport(CommandSender sender, String message)
     {
         // Get the player and supply all potentially useful
         // information to the embed builder
         Player player = (Player)sender;
-
-        LocalDateTime now = LocalDateTime.now();
-        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
 
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle(player.getName());
@@ -50,7 +49,7 @@ public class SupportCommand extends BaseCommand {
         eb.addField("Y", Double.toString(player.getLocation().getY()), true);
         eb.addField("Z", Double.toString(player.getLocation().getZ()), true);
         eb.addField("Dimension", player.getWorld().getEnvironment().toString(), true);
-        eb.addField("Time Reported (EST)", format.format(now), true);
+        eb.addField("Time Reported (EST)", now, true);
         eb.addField("Description", message, false);
         eb.setFooter("Help requested!", null);
 

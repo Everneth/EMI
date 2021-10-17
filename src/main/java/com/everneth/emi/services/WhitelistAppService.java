@@ -15,6 +15,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.bukkit.entity.Player;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -267,34 +268,10 @@ public class WhitelistAppService {
         switch(step)
         {
             case 1:
-                CloseableHttpClient httpclient = HttpClients.createDefault();
-                HttpGet httpGet = new HttpGet("https://api.mojang.com/users/profiles/minecraft/" + data);
-                try {
-                    CloseableHttpResponse response = httpclient.execute(httpGet);
-                    if(response.getStatusLine().getStatusCode() != 204)
-                    {
-                        JSONObject obj = new JSONObject(EntityUtils.toString(response.getEntity()));
-
-                        StringBuffer sb = new StringBuffer(obj.getString("id"));
-                        sb.insert(8, "-");
-
-                        sb = new StringBuffer(sb.toString());
-                        sb.insert(13, "-");
-
-                        sb = new StringBuffer(sb.toString());
-                        sb.insert(18, "-");
-
-                        sb = new StringBuffer(sb.toString());
-                        sb.insert(23, "-");
-                        appMap.get(id).setMinecraftUuid(UUID.fromString(sb.toString()));
-                        appMap.get(id).setInGameName(data);
-                    }
-                    else
-                        return;
-                }
-                catch(IOException e)
-                {
-                    EMI.getPlugin().getLogger().warning(e.getMessage());
+                UUID playerUuid = PlayerUtils.getPlayerUUID(data);
+                if (playerUuid != null) {
+                    appMap.get(id).setMinecraftUuid(playerUuid);
+                    appMap.get(id).setInGameName(data);
                 }
                 break;
             case 2:

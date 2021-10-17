@@ -49,7 +49,7 @@ public class MessageReceivedListener extends ListenerAdapter {
             UUID player_uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
 
             if(player_uuid != null) {
-                if(!Report.hasSynced(PlayerUtils.getPlayerRow(player_uuid))) {
+                if(!PlayerUtils.syncExists(player_uuid)) {
                     OfflinePlayer offlinePlayer = EMI.getPlugin().getServer().getOfflinePlayer(player_uuid);
 
 

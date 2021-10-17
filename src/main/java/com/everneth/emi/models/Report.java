@@ -93,15 +93,16 @@ public class Report {
                 ebs.addField("Description", message, false);
                 ebs.setFooter("Staff help requested!", null);
 
-                if(hasSynced(playerRow)) {
+                if(PlayerUtils.syncExists(player.getUniqueId())) {
+                    long userPermissions = Permission.ALL_TEXT_PERMISSIONS
+                            + Permission.VIEW_CHANNEL.getRawValue()
+                            - Permission.MESSAGE_MANAGE.getRawValue();
                     discordMember = guildManager.getGuild().getMemberById(playerRow.getLong("discord_id"));
                     ChannelAction<TextChannel> channelAction = guildManager.getGuild().createTextChannel(player.getName().toLowerCase() + reportType);
                     channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
                             .addPermissionOverride(staffRole, Permission.ALL_CHANNEL_PERMISSIONS, 0)
                             .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0)
-                            .addPermissionOverride(discordMember, Permission.MESSAGE_READ.getRawValue(), 0)
-                            .addPermissionOverride(discordMember, Permission.MESSAGE_HISTORY.getRawValue(), 0)
-                            .addPermissionOverride(discordMember, Permission.MESSAGE_WRITE.getRawValue(), 0).queue(
+                            .addPermissionOverride(discordMember, userPermissions, 0).queue(
                             channel -> {
                                 Report reportToAdd = new Report(channel.getIdLong());
                                 reportToAdd.setDiscordUserId(discordMember.getUser().getIdLong());
@@ -138,16 +139,17 @@ public class Report {
                 ebm.addField("Description", message, false);
                 ebm.setFooter("MINT help requested!", null);
 
-                if(hasSynced(playerRow)) {
+                if(PlayerUtils.syncExists(player.getUniqueId())) {
+                    long userPermissions = Permission.ALL_TEXT_PERMISSIONS
+                            + Permission.VIEW_CHANNEL.getRawValue()
+                            - Permission.MESSAGE_MANAGE.getRawValue();
                     discordMember = guildManager.getGuild().getMemberById(playerRow.getLong("discord_id"));
                     ChannelAction<TextChannel> channelAction = guildManager.getGuild().createTextChannel(player.getName().toLowerCase() + reportType);
                     channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
                             .addPermissionOverride(staffRole, Permission.ALL_CHANNEL_PERMISSIONS, 0)
                             .addPermissionOverride(mintRole, Permission.ALL_CHANNEL_PERMISSIONS, 0)
                             .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0)
-                            .addPermissionOverride(discordMember, Permission.MESSAGE_READ.getRawValue(), 0)
-                            .addPermissionOverride(discordMember, Permission.MESSAGE_HISTORY.getRawValue(), 0)
-                            .addPermissionOverride(discordMember, Permission.MESSAGE_WRITE.getRawValue(), 0).queue(
+                            .addPermissionOverride(discordMember, userPermissions, 0).queue(
                             channel -> {
                                 Report reportToAdd = new Report(channel.getIdLong());
                                 reportToAdd.setDiscordUserId(discordMember.getUser().getIdLong());
@@ -172,10 +174,5 @@ public class Report {
                 }
                 break;
         }
-    }
-
-    public static boolean hasSynced(DbRow row)
-    {
-        return row.getLong("discord_id") != null && row.getLong("discord_id") != 0;
     }
 }

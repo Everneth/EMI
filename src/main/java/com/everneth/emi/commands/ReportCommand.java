@@ -22,7 +22,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import javax.xml.soap.Text;
 import java.nio.channels.Channel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -59,7 +58,7 @@ public class ReportCommand extends BaseCommand {
         else {
             Report.buildPrivateChannel(player, message, "_staff");
             // Make the bot post the embed to the channel and notify the player
-            if(Report.hasSynced(PlayerUtils.getPlayerRow(player.getUniqueId())))
+            if(PlayerUtils.syncExists(player.getUniqueId()))
                 player.sendMessage(Utils.color("<&6The Wench&f> I have created a direct channel with &9staff&f. &a&lProceed to Discord to continue the chat. &d<3"));
             else
                 player.sendMessage(Utils.color("<&6The Wench&f> I have created a direct channel with &9staff&f. Please use &6/rr <message>&f to message staff directly! A staff member " +
