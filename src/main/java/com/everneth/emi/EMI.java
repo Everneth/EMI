@@ -26,6 +26,8 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -145,9 +147,13 @@ public class EMI extends JavaPlugin {
                     .enableIntents(GatewayIntent.DIRECT_MESSAGES)
                     .build();
             jda.awaitReady();
+            Guild guild = EMI.getJda().getGuildById(plugin.getConfig().getLong("guild-id"));
 
-            // send an API for all Everneth guild members on startup, which will then be stored in the cache
-            EMI.getJda().getGuildById(plugin.getConfig().getLong("guild-id")).loadMembers();
+            // send an API request for all Everneth guild members on startup, which will then be stored in the cache
+            guild.loadMembers();
+
+            // cache the help channel history so message history persists through a reset
+            guild.getTextChannelById(plugin.getConfig().getLong("help-channel-id")).getHistoryFromBeginning(100).complete();
         }
         catch(Exception e)
         {
