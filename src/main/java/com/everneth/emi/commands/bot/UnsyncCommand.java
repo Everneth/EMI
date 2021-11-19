@@ -7,6 +7,7 @@ import com.everneth.emi.utils.PlayerUtils;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitScheduler;
 
 public class UnsyncCommand extends Command {
 
@@ -22,9 +23,12 @@ public class UnsyncCommand extends Command {
         String playerUsername = playerRow.getString("player_name");
         String altUsername = playerRow.getString("alt_name");
 
-        EMI.getPlugin().getServer().dispatchCommand(Bukkit.getConsoleSender(), "whitelist remove " + playerUsername);
+        BukkitScheduler scheduler = EMI.getPlugin().getServer().getScheduler();
+        scheduler.callSyncMethod(EMI.getPlugin(), () ->
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "whitelist remove " + playerUsername));
         if (altUsername != null) {
-            EMI.getPlugin().getServer().dispatchCommand(Bukkit.getConsoleSender(), "whitelist remove " + altUsername);
+            scheduler.callSyncMethod(EMI.getPlugin(), () ->
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "whitelist remove " + altUsername));
         }
 
         // remove the user from the DB so their accounts are not read as already whitelisted
