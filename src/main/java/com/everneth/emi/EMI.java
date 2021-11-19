@@ -212,9 +212,11 @@ public class EMI extends JavaPlugin {
                 }
 
                 DbRow player = PlayerUtils.getPlayerRow(worker.getInt("player_id"));
-                EMIPlayer emiPlayer = new EMIPlayer(player.getString("player_uuid"), player.getString("player_name"), player.getInt("player_id"));
+                if (player != null) {
+                    EMIPlayer emiPlayer = new EMIPlayer(player.getString("player_uuid"), player.getString("player_name"), player.getInt("player_id"));
 
-                project.getWorkers().add(emiPlayer);
+                    project.getWorkers().add(emiPlayer);
+                }
             }
 
             for(DbRow taskRow : tasks)
@@ -269,7 +271,10 @@ public class EMI extends JavaPlugin {
                 }
 
                 DbRow loggedByRow = PlayerUtils.getPlayerRow(taskLogRow.getInt("logged_by"));
-                EMIPlayer loggedBy = new EMIPlayer(loggedByRow.getString("player_uuid"), loggedByRow.getString("player_name"), loggedByRow.getInt("player_id"));
+                EMIPlayer loggedBy = null;
+                if (loggedByRow != null) {
+                    loggedBy = new EMIPlayer(loggedByRow.getString("player_uuid"), loggedByRow.getString("player_name"), loggedByRow.getInt("player_id"));
+                }
                 EMIPlayer validatedBy;
 
                 try
@@ -310,7 +315,10 @@ public class EMI extends JavaPlugin {
                 }
 
                 DbRow loggedByRow = PlayerUtils.getPlayerRow(materialLogRow.getInt("logged_by"));
-                EMIPlayer loggedBy = new EMIPlayer(loggedByRow.getString("player_uuid"), loggedByRow.getString("player_name"), loggedByRow.getInt("player_id"));
+                EMIPlayer loggedBy = null;
+                if (loggedByRow != null) {
+                    loggedBy = new EMIPlayer(loggedByRow.getString("player_uuid"), loggedByRow.getString("player_name"), loggedByRow.getInt("player_id"));
+                }
                 EMIPlayer validatedBy;
 
                 try
