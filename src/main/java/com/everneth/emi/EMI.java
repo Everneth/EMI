@@ -131,6 +131,7 @@ public class EMI extends JavaPlugin {
         builder.addCommand(new ApplyCommand());
         builder.addCommand(new WhitelistAppCommand());
         builder.addCommand(new RequestWhitelistCommand());
+        builder.addCommand(new UnsyncCommand());
         builder.setOwnerId(this.getConfig().getString("bot-owner-id"));
 
         CommandClient client = builder.build();

@@ -7,7 +7,6 @@ import com.everneth.emi.utils.PlayerUtils;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
-import org.bukkit.Statistic;
 
 public class RoleChangeListener extends ListenerAdapter {
     private final String APPROVE_REACTION = "\u2705";
@@ -30,7 +29,7 @@ public class RoleChangeListener extends ListenerAdapter {
                         msg.addReaction(REJECT_REACTION).queue();
                     }
             );
-        else if(PlayerUtils.isMemberAlready(event.getUser().getIdLong()))
+        else if(PlayerUtils.isMember(event.getUser().getIdLong()))
         {
             if(event.getGuild().getMemberById(event.getUser().getIdLong()).getRoles().isEmpty()) {
                 event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("whitelist-channel-id"))

@@ -161,7 +161,7 @@ public class PlayerUtils {
         return discordId != null && discordId != 0;
     }
 
-    public static boolean isMemberAlready(long discordId)
+    public static boolean isMember(long discordId)
     {
         CompletableFuture<DbRow> futurePlayer;
         DbRow player = new DbRow();
