@@ -6,6 +6,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.Role;
 
 import java.io.File;
@@ -39,7 +40,7 @@ public class HelpClearCommand extends Command {
         // Lets check them
         for(Role role : roleList)
         {
-            if(role.getName().equals("Staff") || role.getName().equals("Ministry Member (Helper)"))
+            if(role.getName().equals("Staff"))
             {
                 // Found a required role, no need to find the other, break from the loop
                 hasRequiredRoles = true;

@@ -3,6 +3,7 @@ package com.everneth.emi.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
+import co.aikar.commands.annotation.Syntax;
 import com.everneth.emi.EMI;
 import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.Utils;
@@ -15,6 +16,7 @@ import org.bukkit.entity.Player;
 public class ReportReplyCommand extends BaseCommand {
     private JDA bot = EMI.getJda();
     @Default
+    @Syntax("<message>")
     public void onReportReply(CommandSender sender, String message) {
         Player player = (Player) sender;
         ReportManager rm = ReportManager.getReportManager();

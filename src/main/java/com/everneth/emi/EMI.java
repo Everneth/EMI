@@ -26,6 +26,8 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -35,7 +37,6 @@ import com.everneth.emi.commands.mint.MintCommand;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -82,6 +83,7 @@ public class EMI extends JavaPlugin {
     public void onDisable() {
         getLogger().info("Ministry Interface stopped.");
         DB.close();
+        jda.shutdown();
 
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
         for(MintProject project : manager.getProjects().values())
@@ -106,7 +108,7 @@ public class EMI extends JavaPlugin {
         commandManager.registerCommand(new ReportReplyCommand());
         commandManager.registerCommand(new GetRepliesCommand());
         commandManager.registerCommand(new SupportCommand());
-        commandManager.registerCommand(new DiscordsyncCommand());
+        commandManager.registerCommand(new DiscordSyncCommands());
         commandManager.registerCommand(new CharterCommand());
         commandManager.registerCommand(new MintProjectCommands());
         commandManager.registerCommand(new MintMaterialCommands());
@@ -114,6 +116,7 @@ public class EMI extends JavaPlugin {
         commandManager.registerCommand(new MintValidationCommands());
         commandManager.registerCommand(new MintViewCommands());
         commandManager.registerCommand(new MotdCommand());
+        commandManager.registerCommand(new AltAccountCommands());
     }
 
     private void initBot()
@@ -127,6 +130,7 @@ public class EMI extends JavaPlugin {
         builder.addCommand(new CloseReportCommand());
         builder.addCommand(new ApplyCommand());
         builder.addCommand(new WhitelistAppCommand());
+        builder.addCommand(new RequestWhitelistCommand());
         builder.setOwnerId(this.getConfig().getString("bot-owner-id"));
 
         CommandClient client = builder.build();
@@ -143,6 +147,13 @@ public class EMI extends JavaPlugin {
                     .enableIntents(GatewayIntent.DIRECT_MESSAGES)
                     .build();
             jda.awaitReady();
+            Guild guild = EMI.getJda().getGuildById(plugin.getConfig().getLong("guild-id"));
+
+            // send an API request for all Everneth guild members on startup, which will then be stored in the cache
+            guild.loadMembers();
+
+            // cache the help channel history so message history persists through a reset
+            guild.getTextChannelById(plugin.getConfig().getLong("help-channel-id")).getHistoryFromBeginning(100).complete();
         }
         catch(Exception e)
         {
