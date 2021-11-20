@@ -33,7 +33,7 @@ public class UnsyncCommand extends Command {
 
         // remove the user from the DB so their accounts are not read as already whitelisted
         DB.executeUpdateAsync("DELETE FROM players WHERE discord_id = ?",
-                event.getMember().getId());
+                event.getMember().getIdLong());
 
         event.reply("Your discord has been unsynced and your accounts have been removed from the whitelist. " +
                 "Please use `!whitelist <username>` to temporarily add another account to the whitelist so you may re-sync.");

@@ -117,6 +117,7 @@ public class EMI extends JavaPlugin {
         commandManager.registerCommand(new MintViewCommands());
         commandManager.registerCommand(new MotdCommand());
         commandManager.registerCommand(new AltAccountCommands());
+        commandManager.registerCommand(new InfoCommand());
     }
 
     private void initBot()
@@ -197,7 +198,10 @@ public class EMI extends JavaPlugin {
         for(DbRow projectRow : projects)
         {
             DbRow playerRow = PlayerUtils.getPlayerRow(projectRow.getInt("leader"));
-            EMIPlayer playerLead = new EMIPlayer(playerRow.getString("player_uuid"), playerRow.getString("player_name"), playerRow.getInt("player_id"));
+            EMIPlayer playerLead = new EMIPlayer(playerRow.getString("player_uuid"),
+                    playerRow.getString("player_name"),
+                    playerRow.getString("alt_name"),
+                    playerRow.getInt("player_id"));
             LocalDateTime endDateTime = projectRow.get("end_date");
             String endDate = null;
 
@@ -225,7 +229,10 @@ public class EMI extends JavaPlugin {
 
                 DbRow player = PlayerUtils.getPlayerRow(worker.getInt("player_id"));
                 if (player != null) {
-                    EMIPlayer emiPlayer = new EMIPlayer(player.getString("player_uuid"), player.getString("player_name"), player.getInt("player_id"));
+                    EMIPlayer emiPlayer = new EMIPlayer(player.getString("player_uuid"),
+                            player.getString("player_name"),
+                            player.getString("alt_name"),
+                            player.getInt("player_id"));
 
                     project.getWorkers().add(emiPlayer);
                 }
@@ -285,14 +292,20 @@ public class EMI extends JavaPlugin {
                 DbRow loggedByRow = PlayerUtils.getPlayerRow(taskLogRow.getInt("logged_by"));
                 EMIPlayer loggedBy = null;
                 if (loggedByRow != null) {
-                    loggedBy = new EMIPlayer(loggedByRow.getString("player_uuid"), loggedByRow.getString("player_name"), loggedByRow.getInt("player_id"));
+                    loggedBy = new EMIPlayer(loggedByRow.getString("player_uuid"),
+                            loggedByRow.getString("player_name"),
+                            loggedByRow.getString("alt_name"),
+                            loggedByRow.getInt("player_id"));
                 }
                 EMIPlayer validatedBy;
 
                 try
                 {
                     DbRow validatedByRow = PlayerUtils.getPlayerRow(taskLogRow.getInt("validated_by"));
-                    validatedBy = new EMIPlayer(validatedByRow.getString("player_uuid"), validatedByRow.getString("player_name"), validatedByRow.getInt("player_id"));
+                    validatedBy = new EMIPlayer(validatedByRow.getString("player_uuid"),
+                            validatedByRow.getString("player_name"),
+                            validatedByRow.getString("alt_name"),
+                            validatedByRow.getInt("player_id"));
                 }
                 catch (NullPointerException e)
                 {
@@ -329,14 +342,20 @@ public class EMI extends JavaPlugin {
                 DbRow loggedByRow = PlayerUtils.getPlayerRow(materialLogRow.getInt("logged_by"));
                 EMIPlayer loggedBy = null;
                 if (loggedByRow != null) {
-                    loggedBy = new EMIPlayer(loggedByRow.getString("player_uuid"), loggedByRow.getString("player_name"), loggedByRow.getInt("player_id"));
+                    loggedBy = new EMIPlayer(loggedByRow.getString("player_uuid"),
+                            loggedByRow.getString("player_name"),
+                            loggedByRow.getString("alt_name"),
+                            loggedByRow.getInt("player_id"));
                 }
                 EMIPlayer validatedBy;
 
                 try
                 {
                     DbRow validatedByRow = PlayerUtils.getPlayerRow(materialLogRow.getInt("validated_by"));
-                    validatedBy = new EMIPlayer(validatedByRow.getString("player_uuid"), validatedByRow.getString("player_name"), validatedByRow.getInt("player_id"));
+                    validatedBy = new EMIPlayer(validatedByRow.getString("player_uuid"),
+                            validatedByRow.getString("player_name"),
+                            validatedByRow.getString("alt_name"),
+                            validatedByRow.getInt("player_id"));
                 }
                 catch (NullPointerException e)
                 {

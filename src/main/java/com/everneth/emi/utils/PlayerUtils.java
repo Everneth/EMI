@@ -121,11 +121,13 @@ public class PlayerUtils {
             EMIPlayer issuerPlayer = new EMIPlayer(
                     issuer.getString("player_uuid"),
                     issuer.getString("player_name"),
+                    issuer.getString("alt_name"),
                     issuer.getInt("player_id")
             );
             EMIPlayer recipientPlayer = new EMIPlayer(
                     recipient.getString("player_uuid"),
                     recipient.getString("player_name"),
+                    recipient.getString("alt_name"),
                     recipient.getInt("player_id")
             );
             return new CharterPoint(
@@ -182,12 +184,18 @@ public class PlayerUtils {
     public static EMIPlayer getEMIPlayer(String name)
     {
         DbRow playerRow = PlayerUtils.getPlayerRow(name);
-        return new EMIPlayer(playerRow.getString("player_uuid"), playerRow.getString("player_name"), playerRow.getInt("player_id"));
+        return new EMIPlayer(playerRow.getString("player_uuid"),
+                playerRow.getString("player_name"),
+                playerRow.getString("alt_name"),
+                playerRow.getInt("player_id"));
     }
     public static EMIPlayer getEMIPlayer(UUID uuid)
     {
         DbRow playerRow = PlayerUtils.getPlayerRow(uuid);
-        return new EMIPlayer(playerRow.getString("player_uuid"), playerRow.getString("player_name"), playerRow.getInt("player_id"));
+        return new EMIPlayer(playerRow.getString("player_uuid"),
+                playerRow.getString("player_name"),
+                playerRow.getString("alt_name"),
+                playerRow.getInt("player_id"));
     }
 
     public static UUID getPlayerUUID(String name) {
