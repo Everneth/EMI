@@ -1,7 +1,7 @@
 name: EMI
-version: 1.5.0
+version: 1.5.1
 main: com.everneth.emi.EMI
-author: tptmike, sterling
+author: tptmike, sterling, riki
 api-version: 1.17
 commands:
   emi:

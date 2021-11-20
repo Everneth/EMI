@@ -6,6 +6,7 @@ import com.everneth.emi.EMI;
 import com.everneth.emi.utils.PlayerUtils;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import net.dv8tion.jda.api.entities.Role;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitScheduler;
 
@@ -31,9 +32,11 @@ public class UnsyncCommand extends Command {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "whitelist remove " + altUsername));
         }
 
+        Role syncedRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("sync-role-id"));
+        event.getMember().getRoles().remove(syncedRole);
         // remove the user from the DB so their accounts are not read as already whitelisted
         DB.executeUpdateAsync("DELETE FROM players WHERE discord_id = ?",
-                event.getMember().getId());
+                event.getMember().getIdLong());
 
         event.reply("Your discord has been unsynced and your accounts have been removed from the whitelist. " +
                 "Please use `!whitelist <username>` to temporarily add another account to the whitelist so you may re-sync.");

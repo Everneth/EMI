@@ -81,11 +81,13 @@ public class CharterCommand extends BaseCommand {
             EMIPlayer recipient = new EMIPlayer(
                     recipientRecord.getString("player_uuid"),
                     recipientRecord.getString("player_name"),
+                    recipientRecord.getString("alt_name"),
                     recipientRecord.getInt("player_id")
             );
             EMIPlayer issuerPlayer = new EMIPlayer(
                     issuer.getUniqueId().toString(),
-                    issuer.getName()
+                    issuer.getName(),
+                    null
             );
             CharterPoint point = new CharterPoint(issuerPlayer, recipient, reason, amount);
             pointRecordId = point.issuePoint();
@@ -113,6 +115,7 @@ public class CharterCommand extends BaseCommand {
             EMIPlayer recipient = new EMIPlayer(
                     recipientRecord.getString("player_uuid"),
                     recipientRecord.getString("player_name"),
+                    recipientRecord.getString("alt_name"),
                     recipientRecord.getInt("player_id")
             );
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + player + Utils.color(" &c" + reason));

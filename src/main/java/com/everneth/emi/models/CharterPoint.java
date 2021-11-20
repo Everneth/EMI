@@ -111,7 +111,8 @@ public class CharterPoint {
             }
         }
 
-        EMIPlayer player = new EMIPlayer(pointsList.get(0).getString("recipient_uuid"), pointsList.get(0).getString("issued_to"));
+        EMIPlayer player = new EMIPlayer(pointsList.get(0).getString("recipient_uuid"),
+                pointsList.get(0).getString("issued_to"));
         Calendar cal = Calendar.getInstance();
         switch(points)
         {

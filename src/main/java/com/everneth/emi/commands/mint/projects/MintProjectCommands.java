@@ -100,7 +100,10 @@ public class MintProjectCommands extends BaseCommand
         }
 
         // Valid information is then put into the project
-        EMIPlayer playerLead = new EMIPlayer(dbPlayerLead.getString("player_uuid"), dbPlayerLead.getString("player_name"), dbPlayerLead.getInt("player_id"));
+        EMIPlayer playerLead = new EMIPlayer(dbPlayerLead.getString("player_uuid"),
+                dbPlayerLead.getString("player_name"),
+                dbPlayerLead.getString("alt_name"),
+                dbPlayerLead.getInt("player_id"));
         project = new MintProject(playerLead, projectName, Utils.getCurrentDate(), null, 0, 0, Utils.buildMessage(description, 0, false));
         manager.addProject(project);
         player.sendMessage(Utils.color(mintProjectTag + "&aSuccessfully created the project!"));
