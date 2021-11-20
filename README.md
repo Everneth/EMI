@@ -65,7 +65,7 @@ Everneth Ministry Interface - This is a all-inclusive tool to open up commands a
 ### Staff Utilities
 | Command | Permission Node | Description |
 | ------------- |:-------------:| ----- |
-| /info <user>      | none | Get a brief printout of user information including main account, alt account, and discord contact details
+| /info \<user\>      | none | Get a brief printout of user information including main account, alt account, and discord contact details
 
 
 ## Integrations
