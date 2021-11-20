@@ -7,6 +7,7 @@ import com.everneth.emi.commands.bot.*;
 import com.everneth.emi.commands.bot.par.WhitelistAppCommand;
 import com.everneth.emi.commands.mint.projects.*;
 import com.everneth.emi.commands.par.CharterCommand;
+import com.everneth.emi.commands.par.InfoCommand;
 import com.everneth.emi.events.JoinEvent;
 import com.everneth.emi.events.LeaveEvent;
 import com.everneth.emi.events.bot.GuildLeaveListener;
@@ -27,7 +28,6 @@ import net.dv8tion.jda.api.JDABuilder;
 
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.bukkit.configuration.file.FileConfiguration;
