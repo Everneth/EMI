@@ -15,8 +15,8 @@ public class RoleChangeListener extends ListenerAdapter {
     public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event)
     {
         Role pendingRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("pending-role-id"));
-        Role citizenRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("member-role-id"));
-        if(event.getRoles().contains(pendingRole))
+        Role applicantRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("applicant-role-id"));
+        if(event.getRoles().contains(pendingRole)) {
             event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("voting-channel-id"))
                     .sendMessage("Heads up @everyone! " + event.getMember().getAsMention() + " has just met requirements.").queue(
                     (msg) -> {
@@ -29,12 +29,8 @@ public class RoleChangeListener extends ListenerAdapter {
                         msg.addReaction(REJECT_REACTION).queue();
                     }
             );
-        else if(PlayerUtils.isMember(event.getUser().getIdLong()))
-        {
-            if(event.getGuild().getMemberById(event.getUser().getIdLong()).getRoles().isEmpty()) {
-                event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("whitelist-channel-id"))
-                        .sendMessage("Welcome back " + event.getUser().getAsMention() + "!").queue();
-            }
+            // remove the applicant role from a member once the pending role is given
+            event.getGuild().removeRoleFromMember(event.getMember(), applicantRole);
         }
     }
 }
