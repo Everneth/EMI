@@ -99,7 +99,7 @@ public class DiscordSyncCommands extends BaseCommand {
                 privateChannel.sendMessage("Your discord account has been unsynced with your minecraft account. If you did not request an unsync " +
                             "please contact staff immediately.").queue());
 
-        Role syncRole = guild.getRoleById(EMI.getPlugin().getConfig().getLong("sync-role-id"));
+        Role syncRole = guild.getRoleById(EMI.getPlugin().getConfig().getLong("synced-role-id"));
         guild.removeRoleFromMember(member, syncRole).queue();
 
         DB.executeUpdateAsync("UPDATE players SET discord_id = 0 WHERE ? IN (player_uuid,alt_uuid)", player.getUniqueId().toString());

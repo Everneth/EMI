@@ -41,7 +41,7 @@ public class InfoCommand extends BaseCommand {
         String altName = playerRow.getString("alt_name");
         if (altName != null) {
             report += Utils.color("&aAlternate Account&f: " + altName + "\n");
-            LocalDateTime dateAdded = ((Timestamp) playerRow.get("date_alt_added")).toLocalDateTime();
+            LocalDateTime dateAdded = playerRow.get("date_alt_added");
             report += Utils.color("&aAlt Whitelisted&f: " + dateAdded.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "\n\n");
         }
         else {
