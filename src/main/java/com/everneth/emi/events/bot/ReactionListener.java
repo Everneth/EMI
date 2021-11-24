@@ -80,7 +80,8 @@ public class ReactionListener extends ListenerAdapter {
             event.getGuild().addRoleToMember(applicant, syncedRole).queue();
 
             votingService.removeVote(event.getMessageIdLong());
-        } else if (eventReaction.getReactionEmote().getEmoji().equals(REJECT_REACTION)) {
+        }
+        else if (eventReaction.getReactionEmote().getEmoji().equals(REJECT_REACTION)) {
             message.editMessage("The vote is now over. Applicant " + applicant.getAsMention() + " denied.").queue();
             event.getGuild().removeRoleFromMember(applicant, pendingRole).queue();
 
