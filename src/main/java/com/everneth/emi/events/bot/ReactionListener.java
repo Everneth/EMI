@@ -40,44 +40,51 @@ public class ReactionListener extends ListenerAdapter {
         Role staffRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("staff-role-id"));
         List<Member> staffMembers = event.getGuild().getMembersWithRoles(staffRole);
 
+        // Events hold no count data, we'll have to iterate through all reactions and check for majority
         Message message = event.retrieveMessage().complete();
+        MessageReaction eventReaction = null;
+        for (MessageReaction reaction : message.getReactions()) {
+            int numReactions = reaction.getCount();
 
-        MessageReaction reaction = event.getReaction();
-
-        int numReactions = reaction.getCount();
-        if (((numReactions - 1) * 100) / staffMembers.size() >= 51) {
-            // this reaction has created a majority, determine if the applicant is approved or denied
-            DbRow application = PlayerUtils.getAppRecord(votingService.getVoteByMessageId(message.getIdLong()).getApplicantDiscordId());
-            Member applicant = event.getGuild().getMemberById(application.getLong("applicant_discord_id"));
-
-            if (reaction.getReactionEmote().getEmoji().equals(APPROVE_REACTION)) {
-                String ign = application.getString("mc_ign");
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        EMI.getPlugin().getServer().dispatchCommand(Bukkit.getConsoleSender(), "whitelist add " + ign);
-                    }
-                }.runTask(EMI.getPlugin());
-
-                event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("whitelist-channel-id"))
-                        .sendMessage(applicant.getAsMention() + " has been whitelisted! Congrats!").queue();
-
-                WhitelistAppService.getService().approveWhitelistAppRecord(applicant.getIdLong(), event.getMessageIdLong());
-                votingService.getVoteByMessageId(event.getMessageIdLong()).updateVote();
-                message.editMessage("The vote is now over. Applicant " + applicant.getAsMention() + " accepted.").queue();
-
-                event.getGuild().removeRoleFromMember(applicant, pendingRole).queue();
-                event.getGuild().addRoleToMember(applicant, citizenRole).queue();
-                event.getGuild().addRoleToMember(applicant, syncedRole).queue();
-
-                votingService.removeVote(event.getMessageIdLong());
+            if (((numReactions - 1) * 100) / staffMembers.size() >= 51) {
+                eventReaction = reaction;
             }
-            else if (reaction.getReactionEmote().getEmoji().equals(REJECT_REACTION)) {
-                message.editMessage("The vote is now over. Applicant " + applicant.getAsMention() + " denied.").queue();
-                event.getGuild().removeRoleFromMember(applicant, pendingRole).queue();
+        }
 
-                votingService.removeVote(event.getMessageIdLong());
-            }
+        // no majority vote was found, return
+        if (eventReaction == null) return;
+
+        int numReactions = eventReaction.getCount();
+        // this reaction has created a majority, determine if the applicant is approved or denied
+        DbRow application = PlayerUtils.getAppRecord(votingService.getVoteByMessageId(message.getIdLong()).getApplicantDiscordId());
+        Member applicant = event.getGuild().getMemberById(application.getLong("applicant_discord_id"));
+
+        if (eventReaction.getReactionEmote().getEmoji().equals(APPROVE_REACTION)) {
+            String ign = application.getString("mc_ign");
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    EMI.getPlugin().getServer().dispatchCommand(Bukkit.getConsoleSender(), "whitelist add " + ign);
+                }
+            }.runTask(EMI.getPlugin());
+
+            event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("whitelist-channel-id"))
+                    .sendMessage(applicant.getAsMention() + " has been whitelisted! Congrats!").queue();
+
+            WhitelistAppService.getService().approveWhitelistAppRecord(applicant.getIdLong(), event.getMessageIdLong());
+            votingService.getVoteByMessageId(event.getMessageIdLong()).updateVote();
+            message.editMessage("The vote is now over. Applicant " + applicant.getAsMention() + " accepted.").queue();
+
+            event.getGuild().removeRoleFromMember(applicant, pendingRole).queue();
+            event.getGuild().addRoleToMember(applicant, citizenRole).queue();
+            event.getGuild().addRoleToMember(applicant, syncedRole).queue();
+
+            votingService.removeVote(event.getMessageIdLong());
+        } else if (eventReaction.getReactionEmote().getEmoji().equals(REJECT_REACTION)) {
+            message.editMessage("The vote is now over. Applicant " + applicant.getAsMention() + " denied.").queue();
+            event.getGuild().removeRoleFromMember(applicant, pendingRole).queue();
+
+            votingService.removeVote(event.getMessageIdLong());
         }
     }
 }
