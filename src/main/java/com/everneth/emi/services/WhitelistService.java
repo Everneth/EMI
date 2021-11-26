@@ -24,7 +24,7 @@ public class WhitelistService {
         return service;
     }
 
-    public void AddToWhitelistTemporarily(String name) {
+    public void addToWhitelistTemporarily(String name) {
         EMI.getPlugin().getServer().getScheduler().callSyncMethod(EMI.getPlugin(), () ->
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "whitelist add " + name));
         whitelistedPlayers.add(name);
