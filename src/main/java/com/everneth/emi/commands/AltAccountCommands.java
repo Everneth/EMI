@@ -89,12 +89,12 @@ public class AltAccountCommands extends BaseCommand {
         // Use our calendar to calculate if 3 days have passed and if user is staff, don't allow if both are not true
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, -3);
-        if (playerRow.get("date_alt_added") != null
-                && !cal.after(playerRow.get("date_alt_added"))
-                && !player.hasPermission("emi.par.alt.remove"))
+        if (!player.hasPermission("emi.par.alt.remove"))
         {
-            player.sendMessage(Utils.color("&cYou must wait at least &f3 days &cafter adding an alternate account before removing it."));
-            return;
+            if (playerRow.get("date_alt_added") != null && cal.before(playerRow.get("date_alt_added"))) {
+                player.sendMessage(Utils.color("&cYou must wait at least &f3 days &cafter adding an alternate account before removing it."));
+                return;
+            }
         }
 
         if (altUsername == null) {
