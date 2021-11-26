@@ -7,7 +7,6 @@ import com.everneth.emi.utils.PlayerUtils;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.entities.Role;
-import org.bukkit.entity.Player;
 
 import java.util.List;
 
@@ -50,7 +49,7 @@ public class RequestWhitelistCommand extends Command {
             return;
         }
 
-        WhitelistService.getService().AddToWhitelistTemporarily(username);
+        WhitelistService.getService().addToWhitelistTemporarily(username);
         event.reply("Added you to the whitelist for 5 minutes. Please login to `play.everneth.com` and use `/discord sync <Name#0000>`");
     }
 }
