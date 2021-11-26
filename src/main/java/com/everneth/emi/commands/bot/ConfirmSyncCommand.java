@@ -34,7 +34,7 @@ public class ConfirmSyncCommand extends Command {
         DiscordSyncManager dsm = DiscordSyncManager.getDSM();
         User toFind = dsm.findSyncRequest(event.getAuthor());
         long guildId = EMI.getPlugin().getConfig().getLong("guild-id");
-        long syncRoleId = EMI.getPlugin().getConfig().getLong("sync-role-id");
+        long syncRoleId = EMI.getPlugin().getConfig().getLong("synced-role-id");
         long pendingRoleId = EMI.getPlugin().getConfig().getLong("pending-role-id");
         long memberRoleId = EMI.getPlugin().getConfig().getLong("member-role-id");
 
