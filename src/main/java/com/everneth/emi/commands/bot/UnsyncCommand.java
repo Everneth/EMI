@@ -32,8 +32,9 @@ public class UnsyncCommand extends Command {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "whitelist remove " + altUsername));
         }
 
+        long guildId = EMI.getPlugin().getConfig().getLong("guild-id");
         Role syncedRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("synced-role-id"));
-        event.getMember().getRoles().remove(syncedRole);
+        EMI.getJda().getGuildById(guildId).removeRoleFromMember(event.getMember(), syncedRole);
         // remove the user from the DB so their accounts are not read as already whitelisted
         DB.executeUpdateAsync("DELETE FROM players WHERE discord_id = ?",
                 event.getMember().getIdLong());
