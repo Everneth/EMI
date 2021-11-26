@@ -141,11 +141,10 @@ public class WhitelistAppService {
         DB.executeUpdateAsync("UPDATE applications SET is_approved = 1, app_active = 0 WHERE applicant_discord_id = ?",
                 id);
         try {
-            DB.executeInsert("INSERT INTO players (player_name, player_uuid, member_id, discord_id) " +
+            DB.executeInsert("INSERT INTO players (player_name, player_uuid, discord_id) " +
                             "VALUES (?, ?, ?, ?)",
                     playerToAdd.getString("mc_ign"),
                     playerToAdd.getString("mc_uuid"),
-                    null,
                     id);
         }
         catch (SQLException e)
