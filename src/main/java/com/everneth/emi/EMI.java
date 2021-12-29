@@ -146,8 +146,6 @@ public class EMI extends JavaPlugin {
 
         builder.setActivity(Activity.watching(getConfig().getString("bot-game")));
         builder.addSlashCommands(new HelpClearCommand(),
-                new ConfirmSyncCommand(),
-                new DenySyncCommand(),
                 new CloseReportCommand(),
                 new ApplyCommand(),
                 new WhitelistAppCommand(),
@@ -155,11 +153,16 @@ public class EMI extends JavaPlugin {
                 new UnsyncCommand());
         builder.setOwnerId(this.getConfig().getString("bot-owner-id"));
 
+        // register our global commands separately
+        CommandClientBuilder globalBuilder = new CommandClientBuilder();
+        globalBuilder.addSlashCommands(new ConfirmSyncCommand(), new DenySyncCommand());
+
+        CommandClient globalClient = globalBuilder.build();
         CommandClient client = builder.build();
 
         try {
             jda = JDABuilder.createDefault(config.getString("bot-token"))
-                    .addEventListeners(client,
+                    .addEventListeners(client, globalClient,
                             new MessageReceivedListener(),
                             new ReactionListener(),
                             new RoleChangeListener(),
