@@ -12,6 +12,9 @@ public class ApplyCommand extends SlashCommand {
     {
         this.name = "apply";
         this.help = "Fill out an application to request whitelisting.";
+
+        this.defaultEnabled = false;
+        this.disabledRoles = new String[]{EMI.getPlugin().getConfig().getString("member-role-id")};
     }
     @Override
     public void execute(SlashCommandEvent event)
