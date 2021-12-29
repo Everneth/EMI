@@ -70,6 +70,7 @@ public class WhitelistAppCommand extends SlashCommand {
             this.name = "all";
             this.help = "Gets the applications for all current applicants.";
 
+            this.defaultEnabled = false;
             this.enabledRoles = new String[]{EMI.getPlugin().getConfig().getString("staff-role-id")};
         }
         @Override

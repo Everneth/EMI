@@ -27,8 +27,6 @@ public class ConfirmSyncCommand extends SlashCommand {
     {
         this.name = "confirmsync";
         this.help = "Confirm an account synchronization from a minecraft account";
-
-        this.guildOnly = false;
     }
     @Override
     protected void execute(SlashCommandEvent event)

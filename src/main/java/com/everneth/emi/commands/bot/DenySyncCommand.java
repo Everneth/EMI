@@ -21,8 +21,6 @@ public class DenySyncCommand extends SlashCommand {
     {
         this.name = "denysync";
         this.help = "Deny a synchronization request to your discord account.";
-
-        this.guildOnly = false;
     }
     @Override
     public void execute(SlashCommandEvent event)
