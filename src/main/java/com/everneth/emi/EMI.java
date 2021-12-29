@@ -139,12 +139,12 @@ public class EMI extends JavaPlugin {
     {
         CommandClientBuilder builder = new CommandClientBuilder();
         // force the builder to create guild commands to avoid long global registration times
-        builder.forceGuildOnly(this.getConfig().getLong("guild-id"));
+        builder.forceGuildOnly(getConfig().getLong("guild-id"));
 
         // the need for a prefix has been deprecated with slash commands
         //builder.setPrefix(this.getConfig().getString("bot-prefix"));
 
-        builder.setActivity(Activity.listening(this.getConfig().getString("bot-game")));
+        builder.setActivity(Activity.watching(getConfig().getString("bot-game")));
         builder.addSlashCommands(new HelpClearCommand(),
                 new ConfirmSyncCommand(),
                 new DenySyncCommand(),
@@ -174,7 +174,7 @@ public class EMI extends JavaPlugin {
             guild.loadMembers();
 
             // cache the help channel history so message history persists through a reset
-            guild.getTextChannelById(plugin.getConfig().getLong("help-channel-id")).getHistoryFromBeginning(100).complete();
+            guild.getTextChannelById(plugin.getConfig().getLong("help-channel-id")).getHistoryFromBeginning(100);
         }
         catch(Exception e)
         {
