@@ -144,7 +144,6 @@ public class EMI extends JavaPlugin {
         // the need for a prefix has been deprecated with slash commands
         //builder.setPrefix(this.getConfig().getString("bot-prefix"));
 
-        builder.setActivity(Activity.watching(getConfig().getString("bot-game")));
         builder.addSlashCommands(new HelpClearCommand(),
                 new CloseReportCommand(),
                 new ApplyCommand(),
@@ -155,10 +154,13 @@ public class EMI extends JavaPlugin {
 
         // register our global commands separately
         CommandClientBuilder globalBuilder = new CommandClientBuilder();
+        globalBuilder.setActivity(Activity.watching(getConfig().getString("bot-game")));
+        
         globalBuilder.addSlashCommands(new ConfirmSyncCommand(), new DenySyncCommand());
+        globalBuilder.setOwnerId(this.getConfig().getString("bot-owner-id"));
 
-        CommandClient globalClient = globalBuilder.build();
         CommandClient client = builder.build();
+        CommandClient globalClient = globalBuilder.build();
 
         try {
             jda = JDABuilder.createDefault(config.getString("bot-token"))
