@@ -6,23 +6,25 @@ import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.utils.FileUtils;
 
 import com.everneth.emi.utils.PlayerUtils;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.command.SlashCommand;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-public class CloseReportCommand extends Command {
+public class CloseReportCommand extends SlashCommand {
+
     public CloseReportCommand() {
         this.name = "close-report";
+        this.help = "Close an open report from a user";
     }
 
     @Override
-    protected void execute(CommandEvent event) {
+    protected void execute(SlashCommandEvent event) {
 
         long mintRoleId = EMI.getPlugin().getConfig().getLong("mint-role-id");
         long staffRoleId = EMI.getPlugin().getConfig().getLong("staff-role-id");
@@ -64,7 +66,7 @@ public class CloseReportCommand extends Command {
             } else {
                 // You can;t even use this at all, we're not checking any further
                 // TODO: Mute member if attempts are made to use command to spam replies
-                event.reply("Sorry dear, you must be a member of staff to use this command. :heart: ");
+                event.reply("Sorry dear, you must be a member of staff to use this command. :heart: ").setEphemeral(true).queue();
             }
         }
         else if(event.getChannel().getName().contains("_mint"))
@@ -97,7 +99,7 @@ public class CloseReportCommand extends Command {
             } else {
                 // You can;t even use this at all, we're not checking any further
                 // TODO: Mute member if attempts are made to use command to spam replies
-                event.reply("Sorry dear, you must be a member of MINT or Staff to use this command. :heart: ");
+                event.reply("Sorry dear, you must be a member of MINT or Staff to use this command. :heart: ").setEphemeral(true).queue();
             }
         }
 

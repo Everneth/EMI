@@ -4,13 +4,13 @@ import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.managers.DiscordSyncManager;
 import com.everneth.emi.EMI;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 
+import com.jagrosh.jdautilities.command.SlashCommand;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -20,56 +20,59 @@ import java.util.concurrent.CompletableFuture;
  *     Purpose: The JDA bot !!comfirmsync command that adds the users discord ID to EMIs player table
  */
 
-public class ConfirmSyncCommand extends Command {
+public class ConfirmSyncCommand extends SlashCommand {
     private CompletableFuture<DbRow> playerObjectFuture;
     private CompletableFuture<Integer> futurePlayerId;
     public ConfirmSyncCommand()
     {
         this.name = "confirmsync";
+        this.help = "Confirm an account synchronization from a minecraft account";
+
         this.guildOnly = false;
     }
     @Override
-    protected void execute(CommandEvent event)
+    protected void execute(SlashCommandEvent event)
     {
         DiscordSyncManager dsm = DiscordSyncManager.getDSM();
-        User toFind = dsm.findSyncRequest(event.getAuthor());
+        User toFind = dsm.findSyncRequest(event.getUser());
         long guildId = EMI.getPlugin().getConfig().getLong("guild-id");
         long syncRoleId = EMI.getPlugin().getConfig().getLong("synced-role-id");
         long pendingRoleId = EMI.getPlugin().getConfig().getLong("pending-role-id");
         long memberRoleId = EMI.getPlugin().getConfig().getLong("member-role-id");
 
-        if(event.isFromType(ChannelType.PRIVATE))
+        if(event.getChannelType() == ChannelType.PRIVATE)
         {
             if(toFind == null)
             {
-                event.replyInDm("No sync request exists for your account or it hs already been synced.");
+                event.reply("No sync request exists for your account or it hs already been synced.").queue();
             }
             else {
                 if (syncExists(toFind)) {
-                    event.replyInDm("You have already synced this account. If this is in error, please contact staff.");
-                } else {
+                    event.reply("You have already synced this account. If this is in error, please contact staff.").queue();
+                }
+                else {
                     int playerId = syncAccount(toFind);
                     if (playerId == 0) {
-                        event.replyInDm("Could not sync account, no player record found.");
+                        event.reply("Could not sync account, no player record found.").queue();
                     } else {
                         dsm.removeSyncRequest(this.getPlayerRow(playerId).getString("player_uuid"));
                         EMI.getJda().getGuildById(guildId).addRoleToMember(
-                                EMI.getJda().getGuildById(guildId).getMemberById(event.getAuthor().getIdLong()),
+                                EMI.getJda().getGuildById(guildId).getMemberById(event.getUser().getIdLong()),
                                 EMI.getJda().getGuildById(guildId).getRoleById(syncRoleId)
                         ).queue();
                         Role memberRole = EMI.getJda().getGuildById(guildId).getRoleById(memberRoleId);
                         if (EMI.getPlugin().getConfig().getBoolean("use-pending-role")) {
                             Role pendingRole = EMI.getJda().getGuildById(guildId).getRoleById(pendingRoleId);
-                            Member member = EMI.getJda().getGuildById(guildId).getMember(event.getSelfUser());
+                            Member member = event.getMember();
                             if (member.getRoles().contains(pendingRole)) {
                                 member.getRoles().remove(pendingRole);
                                 member.getRoles().add(memberRole);
-                                event.replyInDm("Your account has been synced and your roles updated!");
+                                event.reply("Your account has been synced and your roles updated!").queue();
                             } else {
-                                event.replyInDm("Your account has been synced!");
+                                event.reply("Your account has been synced!").queue();
                             }
                         } else {
-                            event.replyInDm("Your account has been synced!");
+                            event.reply("Your account has been synced!").queue();
                         }
                     }
                 }

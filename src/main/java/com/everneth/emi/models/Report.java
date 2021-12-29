@@ -108,7 +108,7 @@ public class Report {
                                 reportToAdd.setDiscordUserId(discordMember.getUser().getIdLong());
                                 rm.addReport(player.getUniqueId(), reportToAdd);
                                 rm.addReportRecord(reportToAdd, playerRow.getInt("player_id"));
-                                channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessage(ebs.build()).queue();
+                                channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessageEmbeds(ebs.build()).queue();
                             });
                 }
                 else
@@ -121,7 +121,7 @@ public class Report {
                                 Report reportToAdd = new Report(channel.getIdLong());
                                 rm.addReport(player.getUniqueId(), reportToAdd);
                                 rm.addReportRecord(reportToAdd, playerRow.getInt("player_id"));
-                                channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessage(ebs.build()).queue();
+                                channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessageEmbeds(ebs.build()).queue();
                             });
                 }
                 break;
@@ -155,7 +155,7 @@ public class Report {
                                 reportToAdd.setDiscordUserId(discordMember.getUser().getIdLong());
                                 rm.addReport(player.getUniqueId(), reportToAdd);
                                 rm.addReportRecord(reportToAdd, playerRow.getInt("player_id"));
-                                channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessage(ebm.build()).queue();
+                                channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessageEmbeds(ebm.build()).queue();
                             });
                 }
                 else
@@ -169,7 +169,7 @@ public class Report {
                                 Report reportToAdd = new Report(channel.getIdLong());
                                 rm.addReport(player.getUniqueId(), reportToAdd);
                                 rm.addReportRecord(reportToAdd, playerRow.getInt("player_id"));
-                                channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessage(ebm.build()).queue();
+                                channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessageEmbeds(ebm.build()).queue();
                             });
                 }
                 break;

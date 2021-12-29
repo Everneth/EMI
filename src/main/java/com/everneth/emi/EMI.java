@@ -20,15 +20,17 @@ import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.models.*;
 import com.everneth.emi.models.mint.*;
 import com.everneth.emi.utils.PlayerUtils;
+
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
-
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -39,6 +41,7 @@ import java.io.File;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *     Class: EMI
@@ -83,6 +86,9 @@ public class EMI extends JavaPlugin {
     public void onDisable() {
         getLogger().info("Ministry Interface stopped.");
         DB.close();
+
+        // remove all the registered slash commands from the guild
+        unregisterCommands();
         jda.shutdown();
 
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
@@ -120,33 +126,46 @@ public class EMI extends JavaPlugin {
         commandManager.registerCommand(new InfoCommand());
     }
 
+    private void unregisterCommands()
+    {
+        Guild guild = EMI.getJda().getGuildById(plugin.getConfig().getLong("guild-id"));
+
+        List<Command> commands = guild.retrieveCommands().complete();
+        for (Command command : commands)
+            command.delete().complete();
+    }
+
     private void initBot()
     {
         CommandClientBuilder builder = new CommandClientBuilder();
-        builder.setPrefix(this.getConfig().getString("bot-prefix"));
+        // force the builder to create guild commands to avoid long global registration times
+        builder.forceGuildOnly(this.getConfig().getLong("guild-id"));
+
+        // the need for a prefix has been deprecated with slash commands
+        //builder.setPrefix(this.getConfig().getString("bot-prefix"));
+
         builder.setActivity(Activity.listening(this.getConfig().getString("bot-game")));
-        builder.addCommand(new HelpClearCommand());
-        builder.addCommand(new ConfirmSyncCommand());
-        builder.addCommand(new DenySyncCommand());
-        builder.addCommand(new CloseReportCommand());
-        builder.addCommand(new ApplyCommand());
-        builder.addCommand(new WhitelistAppCommand());
-        builder.addCommand(new RequestWhitelistCommand());
-        builder.addCommand(new UnsyncCommand());
+        builder.addSlashCommands(new HelpClearCommand(),
+                new ConfirmSyncCommand(),
+                new DenySyncCommand(),
+                new CloseReportCommand(),
+                new ApplyCommand(),
+                new WhitelistAppCommand(),
+                new RequestWhitelistCommand(),
+                new UnsyncCommand());
         builder.setOwnerId(this.getConfig().getString("bot-owner-id"));
 
         CommandClient client = builder.build();
 
         try {
             jda = JDABuilder.createDefault(config.getString("bot-token"))
-                    .addEventListeners(client)
-                    .addEventListeners(new MessageReceivedListener())
-                    .addEventListeners(new ReactionListener())
-                    .addEventListeners(new RoleChangeListener())
-                    .addEventListeners(new GuildLeaveListener())
+                    .addEventListeners(client,
+                            new MessageReceivedListener(),
+                            new ReactionListener(),
+                            new RoleChangeListener(),
+                            new GuildLeaveListener())
                     .setMemberCachePolicy(MemberCachePolicy.ALL)
-                    .enableIntents(GatewayIntent.GUILD_MEMBERS)
-                    .enableIntents(GatewayIntent.DIRECT_MESSAGES)
+                    .enableIntents(GatewayIntent.GUILD_MEMBERS,GatewayIntent.DIRECT_MESSAGES,GatewayIntent.GUILD_MESSAGES)
                     .build();
             jda.awaitReady();
             Guild guild = EMI.getJda().getGuildById(plugin.getConfig().getLong("guild-id"));

@@ -2,12 +2,12 @@ package com.everneth.emi.commands.bot;
 
 import com.everneth.emi.EMI;
 import com.everneth.emi.utils.FileUtils;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.command.SlashCommand;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,14 +21,18 @@ import java.util.List;
  *     Purpose: The JDA bot !!help-clear command that removes all but the specified message by id
  */
 
-public class HelpClearCommand extends Command {
+public class HelpClearCommand extends SlashCommand {
 
     public HelpClearCommand()
     {
         this.name = "help-clear";
+        this.help = "Clears the help channel, but must be used inside of that channel.";
+
+        // we should integrate some way to read in these on a per-command basis
+        //this.enabledRoles = new String[]{"178104117238038528"};
     }
     @Override
-    protected void execute(CommandEvent event)
+    protected void execute(SlashCommandEvent event)
     {
         // We need to make sure the command sender has the correct authorized roles.
         // Assume no one has roles
@@ -57,7 +61,7 @@ public class HelpClearCommand extends Command {
                 if(messageList.size() == 2) {
                     // Hold up! Theres only the root message and the command! Delete the command, instruct the user
                     event.getChannel().deleteMessageById(event.getChannel().getLatestMessageIdLong()).queue();
-                    event.replyInDm("There is nothing to clear in #help, hun! Careful with this command!");
+                    event.reply("There is nothing to clear in #help, hun! Careful with this command!").setEphemeral(true).queue();
                 }
                 else {
                     // Take our messages and build a string, we'll dump that string into a message file
@@ -74,20 +78,20 @@ public class HelpClearCommand extends Command {
                             event.getChannel().deleteMessageById(msg.getIdLong()).queue();
                         }
                     }
-                    event.replyInDm("Channel cleared, dear. <3 ");
+                    event.reply("Channel cleared, dear. <3").setEphemeral(true).queue();
                 }
             }
             else
             {
                 // You have permissions, but this is the wrong channel you goon
-                event.reply("Sorry dear, you *can* use this command but **not** in this channel. :heart: ");
+                event.reply("Sorry dear, you *can* use this command but **not** in this channel. :heart: ").setEphemeral(true).queue();
             }
         }
         else
         {
             // You can;t even use this at all, we're not checking any further
             // TODO: Mute member if attempts are made to use command to spam replies
-            event.reply("Sorry dear, you do not have the required role to use this command. :heart: ");
+            event.reply("Sorry dear, you do not have the required role to use this command. :heart: ").setEphemeral(true).queue();
         }
     }
     private File transcribe(List<Message> messageList)
