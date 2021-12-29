@@ -155,7 +155,7 @@ public class EMI extends JavaPlugin {
         // register our global commands separately
         CommandClientBuilder globalBuilder = new CommandClientBuilder();
         globalBuilder.setActivity(Activity.watching(getConfig().getString("bot-game")));
-        
+
         globalBuilder.addSlashCommands(new ConfirmSyncCommand(), new DenySyncCommand());
         globalBuilder.setOwnerId(this.getConfig().getString("bot-owner-id"));
 
