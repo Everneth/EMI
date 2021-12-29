@@ -12,8 +12,6 @@ public class ApplyCommand extends SlashCommand {
     {
         this.name = "apply";
         this.help = "Fill out an application to request whitelisting.";
-
-        this.guildOnly = false;
     }
     @Override
     public void execute(SlashCommandEvent event)

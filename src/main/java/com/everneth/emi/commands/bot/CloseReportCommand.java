@@ -21,6 +21,9 @@ public class CloseReportCommand extends SlashCommand {
     public CloseReportCommand() {
         this.name = "close-report";
         this.help = "Close an open report from a user";
+
+        this.defaultEnabled = false;
+        this.enabledRoles = new String[]{EMI.getPlugin().getConfig().getString("staff-role-id")};
     }
 
     @Override

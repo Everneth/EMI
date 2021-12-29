@@ -1,5 +1,6 @@
 package com.everneth.emi.commands.bot.par;
 
+import com.everneth.emi.EMI;
 import com.everneth.emi.models.WhitelistApp;
 import com.everneth.emi.services.WhitelistAppService;
 import com.jagrosh.jdautilities.command.SlashCommand;
@@ -68,7 +69,8 @@ public class WhitelistAppCommand extends SlashCommand {
         {
             this.name = "all";
             this.help = "Gets the applications for all current applicants.";
-            this.guildOnly = true;
+
+            this.enabledRoles = new String[]{EMI.getPlugin().getConfig().getString("staff-role-id")};
         }
         @Override
         protected void execute(SlashCommandEvent event)
@@ -91,10 +93,12 @@ public class WhitelistAppCommand extends SlashCommand {
         {
             this.name = "get";
             this.help = "Get an application for an applicant";
-            this.guildOnly = true;
 
             this.options = new ArrayList<>();
             this.options.add(new OptionData(OptionType.STRING, "id", "The user's unique identifier").setRequired(true));
+
+            this.defaultEnabled = false;
+            this.enabledRoles = new String[]{EMI.getPlugin().getConfig().getString("staff-role-id")};
         }
         @Override
         protected void execute(SlashCommandEvent event)
