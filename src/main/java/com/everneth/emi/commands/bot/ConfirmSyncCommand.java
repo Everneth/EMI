@@ -42,14 +42,14 @@ public class ConfirmSyncCommand extends SlashCommand {
             event.reply("No sync request exists for your account or it has already been synced.").setEphemeral(true).queue();
             return;
         }
+        else if (PlayerUtils.syncExists(toFind)) {
+            event.reply("You have already synced this account. If this is in error, please contact staff.").setEphemeral(true).queue();
+            return;
+        }
 
         int playerId = dsm.syncAccount(toFind);
         if (playerId == 0) {
             event.reply("Could not sync account, no player record found.").setEphemeral(true).queue();
-            return;
-        }
-        else if (PlayerUtils.syncExists(toFind)) {
-            event.reply("You have already synced this account. If this is in error, please contact staff.").setEphemeral(true).queue();
             return;
         }
 
