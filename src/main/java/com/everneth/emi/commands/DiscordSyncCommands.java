@@ -74,7 +74,7 @@ public class DiscordSyncCommands extends BaseCommand {
                     user.openPrivateChannel().queue(privateChannel ->
                             privateChannel.sendMessage(player.getName() + " is attempting to link their minecraft account with our Discord guild. " +
                                     "If this is you, please use `/confirmsync` to complete the account synchronization. " +
-                                    "If this is not done by you, please use `/denysync` forward this message to staff immediately. Thank you!").queue());
+                                    "If this is not done by you, please use `/denysync` and forward this message to staff immediately. Thank you!").queue());
                 }
                 catch (Exception e)
                 {
