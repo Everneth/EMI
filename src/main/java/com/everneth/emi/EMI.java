@@ -90,11 +90,11 @@ public class EMI extends JavaPlugin {
 
         // remove all the registered slash commands from the guild
         unregisterCommands();
-
+        jda.shutdown();
+        
         // In the event someone requested temporary whitelisting less than 5 minutes before a server shutdown,
         // we want to remove them so that they're not permanently on the whitelist
         WhitelistService.getService().removeAllFromWhitelist();
-        jda.shutdown();
 
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
         for(MintProject project : manager.getProjects().values())

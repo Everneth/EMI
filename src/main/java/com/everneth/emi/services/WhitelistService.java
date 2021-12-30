@@ -52,7 +52,7 @@ public class WhitelistService {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "whitelist remove " + username));
             DB.executeUpdateAsync("DELETE FROM players WHERE player_name = ?", username);
         }
-        
+
         whitelistedPlayers = new ArrayList<>();
     }
 
