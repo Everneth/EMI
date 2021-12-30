@@ -19,6 +19,7 @@ import com.everneth.emi.managers.MotdManager;
 import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.models.*;
 import com.everneth.emi.models.mint.*;
+import com.everneth.emi.services.WhitelistService;
 import com.everneth.emi.utils.PlayerUtils;
 
 import com.jagrosh.jdautilities.command.CommandClient;
@@ -89,6 +90,10 @@ public class EMI extends JavaPlugin {
 
         // remove all the registered slash commands from the guild
         unregisterCommands();
+
+        // In the event someone requested temporary whitelisting less than 5 minutes before a server shutdown,
+        // we want to remove them so that they're not permanently on the whitelist
+        WhitelistService.getService().removeAllFromWhitelist();
         jda.shutdown();
 
         MintProjectManager manager = MintProjectManager.getMintProjectManager();

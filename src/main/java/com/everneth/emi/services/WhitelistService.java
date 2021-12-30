@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 public class WhitelistService {
     private static WhitelistService service;
-    ArrayList<String> whitelistedPlayers = new ArrayList<>();
+    private ArrayList<String> whitelistedPlayers = new ArrayList<>();
 
     public static WhitelistService getService() {
         if (service == null) {
@@ -43,6 +43,17 @@ public class WhitelistService {
                 }
             }
         }, 20L * 60 * 5);
+    }
+
+    public void removeAllFromWhitelist() {
+        BukkitScheduler scheduler = EMI.getPlugin().getServer().getScheduler();
+        for (String username : whitelistedPlayers) {
+            scheduler.callSyncMethod(EMI.getPlugin(), () ->
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "whitelist remove " + username));
+            DB.executeUpdateAsync("DELETE FROM players WHERE player_name = ?", username);
+        }
+        
+        whitelistedPlayers = new ArrayList<>();
     }
 
     public boolean isWhitelisted(String name) {
