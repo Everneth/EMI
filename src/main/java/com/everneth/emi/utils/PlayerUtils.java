@@ -166,7 +166,11 @@ public class PlayerUtils {
 
     public static boolean syncExists(User user) {
         DbRow playerRow = getPlayerRow(user.getIdLong());
-        return playerRow != null;
+        Long discordId = 0L;
+        if (playerRow != null)
+            discordId = playerRow.getLong("discord_id");
+
+        return discordId != null && discordId != 0;
     }
 
     public static boolean isMember(long discordId)
