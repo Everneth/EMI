@@ -30,7 +30,7 @@ public class RequestWhitelistCommand extends SlashCommand {
     protected void execute(SlashCommandEvent event) {
         DbRow playerRow = PlayerUtils.getPlayerRow(event.getMember().getIdLong());
         if (playerRow != null) {
-            event.reply("You are already synced, you do not need to apply for temporary whitelisting.").queue();
+            event.reply("You are already synced, you do not need to apply for temporary whitelisting.").setEphemeral(true).queue();
             return;
         }
         String username = event.getOption("name").getAsString();
