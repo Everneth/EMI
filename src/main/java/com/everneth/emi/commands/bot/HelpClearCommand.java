@@ -44,7 +44,6 @@ public class HelpClearCommand extends SlashCommand {
         List<Message> messageList = event.getTextChannel().getIterableHistory().complete();
         if (messageList.size() == 1) {
             // Hold up! Theres only the root message and the command! Delete the command, instruct the user
-            event.getChannel().deleteMessageById(event.getChannel().getLatestMessageIdLong()).queue();
             event.reply("There is nothing to clear in #help, hun! Careful with this command!").setEphemeral(true).queue();
             return;
         }
