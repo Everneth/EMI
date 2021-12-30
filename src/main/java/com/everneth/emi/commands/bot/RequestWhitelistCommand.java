@@ -28,25 +28,6 @@ public class RequestWhitelistCommand extends SlashCommand {
 
     @Override
     protected void execute(SlashCommandEvent event) {
-        // We need to make sure the command sender has the correct authorized roles.
-        // Assume no one has roles
-        boolean hasRequiredRoles = false;
-        // Get the roles from the member
-        List<Role> roleList = event.getMember().getRoles();
-        // Lets check them
-        for(Role role : roleList)
-        {
-            if(role.getName().equals("Citizen"))
-            {
-                // Found a required role, no need to find the other, break from the loop
-                hasRequiredRoles = true;
-                break;
-            }
-        }
-        if (!hasRequiredRoles) {
-            event.reply("You do not have the Citizen role!").setEphemeral(true).queue();
-            return;
-        }
         DbRow playerRow = PlayerUtils.getPlayerRow(event.getMember().getIdLong());
         if (playerRow != null) {
             event.reply("You are already synced, you do not need to apply for temporary whitelisting.").queue();
