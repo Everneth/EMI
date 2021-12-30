@@ -70,14 +70,20 @@ public class DiscordSyncCommands extends BaseCommand {
             User user = member.getUser();
             if (user.getName().equalsIgnoreCase(name) && user.getDiscriminator().equals(discriminator)) {
                 dsm.addSyncRequest(player, user);
-                user.openPrivateChannel().queue(privateChannel ->
-                        privateChannel.sendMessage(player.getName() + " is attempting to link their minecraft account with our Discord guild. " +
-                                "If this is you, please use `/confirmsync` to complete the account synchronization. " +
-                                "If this is not done by you, please use `/denysync` forward this message to staff immediately. Thank you!").queue());
-
-                player.sendMessage("Please check your Discord DMs to verify your account. " +
-                        "If you did not receive a message, check that your privacy settings " +
-                        "allow messages from Everneth Discord members and try again.");
+                try {
+                    user.openPrivateChannel().queue(privateChannel ->
+                            privateChannel.sendMessage(player.getName() + " is attempting to link their minecraft account with our Discord guild. " +
+                                    "If this is you, please use `/confirmsync` to complete the account synchronization. " +
+                                    "If this is not done by you, please use `/denysync` forward this message to staff immediately. Thank you!").queue());
+                }
+                catch (Exception e)
+                {
+                    EMI.getPlugin().getLogger().warning(e.getMessage());
+                    dsm.removeSyncRequest(player);
+                    player.sendMessage(Utils.color("&cFailed to create a sync request because I cannot message you on Discord. " +
+                            "Please enable messages from Everneth Discord members and try again."));
+                }
+                player.sendMessage(Utils.color("&aMessage sent. Please check your discord DMs to confirm your synchronization!"));
                 return;
             }
         }
