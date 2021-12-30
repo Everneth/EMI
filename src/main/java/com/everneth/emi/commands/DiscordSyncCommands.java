@@ -81,7 +81,6 @@ public class DiscordSyncCommands extends BaseCommand {
                         }, new ErrorHandler()
                                 .handle(ErrorResponse.CANNOT_SEND_TO_USER, (error) -> {
                                     player.sendMessage(Utils.color("&cRequest failed. Please enable direct messages from server members"));
-                                    return;
                                 }));
                 return;
             }
