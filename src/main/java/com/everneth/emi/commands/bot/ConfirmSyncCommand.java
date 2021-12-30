@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -56,7 +57,8 @@ public class ConfirmSyncCommand extends SlashCommand {
         long guildId = EMI.getPlugin().getConfig().getLong("guild-id");
         long syncRoleId = EMI.getPlugin().getConfig().getLong("synced-role-id");
 
-        dsm.removeSyncRequest(PlayerUtils.getPlayerRow(playerId).getString("player_uuid"));
+        UUID key = dsm.findSyncRequestUUID(event.getUser());
+        dsm.removeSyncRequest(key.toString());
         EMI.getJda().getGuildById(guildId).addRoleToMember(
                 EMI.getJda().getGuildById(guildId).getMemberById(event.getUser().getIdLong()),
                 EMI.getJda().getGuildById(guildId).getRoleById(syncRoleId)
