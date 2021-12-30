@@ -126,6 +126,7 @@ public class EMI extends JavaPlugin {
         commandManager.registerCommand(new InfoCommand());
     }
 
+    // While the bot is offline we want to unregister all commands inside the guild
     private void unregisterCommands()
     {
         Guild guild = EMI.getJda().getGuildById(plugin.getConfig().getLong("guild-id"));
