@@ -78,12 +78,12 @@ public class DiscordSyncCommands extends BaseCommand {
                         .queue(message -> {
                             dsm.addSyncRequest(player, user);
                             player.sendMessage(Utils.color("&aMessage sent. Please check your discord DMs to confirm your synchronization!"));
-                            return;
                         }, new ErrorHandler()
                                 .handle(ErrorResponse.CANNOT_SEND_TO_USER, (error) -> {
                                     player.sendMessage(Utils.color("&cRequest failed. Please enable direct messages from server members"));
                                     return;
                                 }));
+                return;
             }
         }
         player.sendMessage(Utils.color("&cUser not found! Please check your details and try again. If this is your third attempt, please contact Staff."));
