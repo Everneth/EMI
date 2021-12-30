@@ -143,7 +143,7 @@ public class WhitelistAppService {
                 id);
         try {
             DB.executeInsert("INSERT INTO players (player_name, player_uuid, discord_id) " +
-                            "VALUES (?, ?, ?, ?)",
+                            "VALUES (?, ?, ?)",
                     playerToAdd.getString("mc_ign"),
                     playerToAdd.getString("mc_uuid"),
                     id);
