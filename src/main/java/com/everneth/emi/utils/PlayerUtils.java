@@ -5,6 +5,7 @@ import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.models.CharterPoint;
 import com.everneth.emi.models.EMIPlayer;
+import net.dv8tion.jda.api.entities.User;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -161,6 +162,11 @@ public class PlayerUtils {
             discordId = playerRow.getLong("discord_id");
 
         return discordId != null && discordId != 0;
+    }
+
+    public static boolean syncExists(User user) {
+        DbRow playerRow = getPlayerRow(user.getIdLong());
+        return playerRow != null;
     }
 
     public static boolean isMember(long discordId)
