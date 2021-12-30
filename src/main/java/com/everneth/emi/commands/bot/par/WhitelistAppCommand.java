@@ -22,6 +22,8 @@ public class WhitelistAppCommand extends SlashCommand {
         this.help = "All commands pertaining to user applications";
 
         this.defaultEnabled = false;
+        this.enabledRoles = new String[]{EMI.getPlugin().getConfig().getString("staff-role-id")};
+        
         this.children = new SlashCommand[]{new GetAllApps(), new GetApp()};
     }
 
