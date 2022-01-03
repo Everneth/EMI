@@ -16,7 +16,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.bukkit.entity.Player;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -67,12 +66,14 @@ public class WhitelistAppService {
 
     public void messageStaffWithEmbed(EmbedBuilder eb2)
     {
-        EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getTextChannelById(EMI.getPlugin().getConfig().getLong("voting-channel-id")).sendMessage(eb2.build()).queue();
+        EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getTextChannelById(EMI.getPlugin().getConfig().getLong("voting-channel-id"))
+                .sendMessageEmbeds(eb2.build()).queue();
     }
 
     public void messageStaff(String msg)
     {
-        EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getTextChannelById(EMI.getPlugin().getConfig().getLong("voting-channel-id")).sendMessage(msg).queue();
+        EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getTextChannelById(EMI.getPlugin().getConfig().getLong("voting-channel-id"))
+                .sendMessage(msg).queue();
     }
 
     public WhitelistApp findByDiscordId(long id)
@@ -142,7 +143,7 @@ public class WhitelistAppService {
                 id);
         try {
             DB.executeInsert("INSERT INTO players (player_name, player_uuid, discord_id) " +
-                            "VALUES (?, ?, ?, ?)",
+                            "VALUES (?, ?, ?)",
                     playerToAdd.getString("mc_ign"),
                     playerToAdd.getString("mc_uuid"),
                     id);

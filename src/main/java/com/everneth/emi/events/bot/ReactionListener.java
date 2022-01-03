@@ -9,9 +9,9 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -23,7 +23,7 @@ public class ReactionListener extends ListenerAdapter {
     private final String REJECT_REACTION = "\u26D4";
 
     @Override
-    public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
+    public void onMessageReactionAdd(MessageReactionAddEvent event) {
         VotingService votingService = VotingService.getService();
         // Ignore reactions to non-voting messages, reactions from bots, and reactions outside the voting channel
         if (!votingService.isVotingMessage(event.getMessageIdLong()) ||

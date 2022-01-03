@@ -13,6 +13,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -69,15 +71,17 @@ public class DiscordSyncCommands extends BaseCommand {
             // If we find a user matching the name and discriminator, proceed with sync request
             User user = member.getUser();
             if (user.getName().equalsIgnoreCase(name) && user.getDiscriminator().equals(discriminator)) {
-                dsm.addSyncRequest(player, user);
-                user.openPrivateChannel().queue(privateChannel ->
-                        privateChannel.sendMessage(player.getName() + " is attempting to link their minecraft account with our Discord guild. " +
-                                "If this is you, please use !confirmsync to complete the account synchronization. " +
-                                "If this is not done by you, please use !denysync forward this message to staff immediately. Thank you!").queue());
-
-                player.sendMessage("Please check your Discord DMs to verify your account. " +
-                        "If you did not receive a message, check that your privacy settings " +
-                        "allow messages from Everneth Discord members and try again.");
+                user.openPrivateChannel()
+                        .flatMap(privateChannel -> privateChannel.sendMessage(player.getName() + " is attempting to link their minecraft account with our Discord guild. " +
+                                "If this is you, please use `/confirmsync` to complete the account synchronization. " +
+                                "If this is not done by you, please use `/denysync` and forward this message to staff immediately. Thank you!"))
+                        .queue(message -> {
+                            dsm.addSyncRequest(player, user);
+                            player.sendMessage(Utils.color("&aMessage sent. Please check your discord DMs to confirm your synchronization!"));
+                        }, new ErrorHandler()
+                                .handle(ErrorResponse.CANNOT_SEND_TO_USER, (error) -> {
+                                    player.sendMessage(Utils.color("&cRequest failed. Please enable direct messages from server members"));
+                                }));
                 return;
             }
         }
@@ -95,14 +99,19 @@ public class DiscordSyncCommands extends BaseCommand {
         }
         Guild guild = EMI.getJda().getGuildById(plugin.getConfig().getLong("guild-id"));
         Member member = guild.getMemberById(discordId);
-        member.getUser().openPrivateChannel().queue(privateChannel ->
-                privateChannel.sendMessage("Your discord account has been unsynced with your minecraft account. If you did not request an unsync " +
-                            "please contact staff immediately.").queue());
+
+        member.getUser().openPrivateChannel()
+                .flatMap(privateChannel -> privateChannel.sendMessage("Your discord account has been unsynced with your minecraft account. " +
+                        "If you did not request an unsync please contact staff immediately."))
+                .queue(null, new ErrorHandler()
+                        .handle(ErrorResponse.CANNOT_SEND_TO_USER, (error) ->
+                            player.sendMessage(Utils.color("&cI tried to message you on discord and could not. " +
+                                    "Please enable direct messages from Everneth server members for future purposes."))));
 
         Role syncRole = guild.getRoleById(EMI.getPlugin().getConfig().getLong("synced-role-id"));
         guild.removeRoleFromMember(member, syncRole).queue();
 
-        DB.executeUpdateAsync("UPDATE players SET discord_id = 0 WHERE ? IN (player_uuid,alt_uuid)", player.getUniqueId().toString());
+        DB.executeUpdateAsync("UPDATE players SET discord_id = NULL WHERE ? IN (player_uuid,alt_uuid)", player.getUniqueId().toString());
         player.sendMessage(Utils.color("Your discord account has been successfully unsynced. Please use &a/discord sync &fto set up with a new account."));
     }
 }

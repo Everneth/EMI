@@ -2,9 +2,10 @@ package com.everneth.emi.commands.bot;
 
 import com.everneth.emi.managers.DiscordSyncManager;
 import com.everneth.emi.EMI;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.command.SlashCommand;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
 import java.util.UUID;
 
@@ -14,38 +15,41 @@ import java.util.UUID;
  *     Purpose: The JDA bot !!denysync command that removes the active sync request from the service
  */
 
-public class DenySyncCommand extends Command {
+public class DenySyncCommand extends SlashCommand {
     private DiscordSyncManager dsm = DiscordSyncManager.getDSM();
 
     public DenySyncCommand()
     {
         this.name = "denysync";
+        this.help = "Deny a synchronization request to your discord account.";
+
         this.guildOnly = false;
     }
     @Override
-    public void execute(CommandEvent event)
+    public void execute(SlashCommandEvent event)
     {
-        UUID key = dsm.findSyncRequestUUID(event.getAuthor());
+        UUID key = dsm.findSyncRequestUUID(event.getUser());
 
         if(key == null && !hasSyncRole(event))
         {
-            event.replyInDm("No request found. It either expired or the server was restarted.");
+            event.reply("No request found. It either expired or the server was restarted.").setEphemeral(true).queue();
         }
         else if (key == null && hasSyncRole(event))
         {
-            event.replyInDm("Your account is already synced and running this command did nothing.");
+            event.reply("Your account is already synced and running this command did nothing.").setEphemeral(true).queue();
         }
         else if (key != null)
         {
             dsm.removeSyncRequest(key.toString());
-            event.replyInDm("Sync request denied successfully.");
+            event.reply("Sync request denied successfully.").queue();
         }
     }
-    private boolean hasSyncRole(CommandEvent event)
+
+    private boolean hasSyncRole(SlashCommandEvent event)
     {
         long guildId = EMI.getPlugin().getConfig().getLong("guild-id");
-        long syncRoleId = EMI.getPlugin().getConfig().getLong("sync-role-id");
+        long syncRoleId = EMI.getPlugin().getConfig().getLong("synced-role-id");
         Role syncRole = EMI.getJda().getGuildById(guildId).getRoleById(syncRoleId);
-        return EMI.getJda().getGuildById(guildId).getMember(event.getSelfUser()).getRoles().contains(syncRole);
+        return EMI.getJda().getGuildById(guildId).getMemberById(event.getUser().getIdLong()).getRoles().contains(syncRole);
     }
 }

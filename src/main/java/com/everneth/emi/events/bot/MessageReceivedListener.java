@@ -28,7 +28,6 @@ import org.apache.http.util.EntityUtils;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -159,7 +158,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                                 eb.addField("What is the secret word?", appInProgress.getSecretWord(), false);
                                 eb.setFooter("THIS IS A PREVIEW APPLICATION AND MUST BE CONFIRMED BEFORE SENDING!");
 
-                                event.getPrivateChannel().sendMessage(eb.build()).queue();
+                                event.getPrivateChannel().sendMessageEmbeds(eb.build()).queue();
                                 event.getPrivateChannel().sendMessage("Is this information correct? Please reply **yes** or **no**.").queue();
                                 break;
                             case 11:

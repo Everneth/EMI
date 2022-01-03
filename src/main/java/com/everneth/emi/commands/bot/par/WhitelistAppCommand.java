@@ -1,28 +1,35 @@
 package com.everneth.emi.commands.bot.par;
 
+import com.everneth.emi.EMI;
 import com.everneth.emi.models.WhitelistApp;
 import com.everneth.emi.services.WhitelistAppService;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.command.SlashCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class WhitelistAppCommand extends Command {
+public class WhitelistAppCommand extends SlashCommand {
     public WhitelistAppCommand()
     {
         this.name = "application";
-        this.children = new Command[2];
-        children[0] = new GetAllApps();
-        children[1] = new GetApp();
+        this.help = "All commands pertaining to user applications";
+
+        this.defaultEnabled = false;
+        this.children = new SlashCommand[]{new GetAllApps(), new GetApp()};
     }
+
     @Override
-    public void execute(CommandEvent event) {}
+    public void execute(SlashCommandEvent event) {}
 
 
-    private String convertToMessage(List<WhitelistApp> apps, CommandEvent event)
+    private String convertToMessage(List<WhitelistApp> apps, SlashCommandEvent event)
     {
         StringBuilder sb = new StringBuilder();
         sb.append("```asciidoc\n= Current Application Results =\n");
@@ -37,7 +44,7 @@ public class WhitelistAppCommand extends Command {
         return sb.toString();
     }
 
-    private MessageEmbed convertToEmbed(WhitelistApp app, CommandEvent event)
+    private MessageEmbed convertToEmbed(WhitelistApp app, SlashCommandEvent event)
     {
         User user = event.getGuild().getMemberById(app.getDiscordId()).getUser();
         EmbedBuilder eb2 = new EmbedBuilder();
@@ -57,53 +64,59 @@ public class WhitelistAppCommand extends Command {
         return eb2.build();
     }
 
-    private class GetAllApps extends Command
+    private class GetAllApps extends SlashCommand
     {
         private GetAllApps()
         {
             this.name = "all";
-            this.guildOnly = true;
+            this.help = "Gets the applications for all current applicants.";
+
+            this.defaultEnabled = false;
+            this.enabledRoles = new String[]{EMI.getPlugin().getConfig().getString("staff-role-id")};
         }
         @Override
-        protected void execute(CommandEvent event)
+        protected void execute(SlashCommandEvent event)
         {
             List<WhitelistApp> apps = WhitelistAppService.getService().getAllCurrentApplicants();
             if(apps.isEmpty())
             {
-                event.reply("```asciidoc\n [NO RESULTS]```");
+                event.reply("```asciidoc\n [NO RESULTS]```").queue();
             }
             else
             {
-                event.reply(convertToMessage(apps, event));
+                event.reply(convertToMessage(apps, event)).queue();
             }
         }
     }
 
-    private class GetApp extends Command
+    private class GetApp extends SlashCommand
     {
         private GetApp()
         {
             this.name = "get";
-            this.guildOnly = true;
-            this.arguments = "<name>";
+            this.help = "Get an application for an applicant";
+
+            this.options = new ArrayList<>();
+            this.options.add(new OptionData(OptionType.STRING, "id", "The user's unique identifier").setRequired(true));
+
+            this.defaultEnabled = false;
+            this.enabledRoles = new String[]{EMI.getPlugin().getConfig().getString("staff-role-id")};
         }
         @Override
-        protected void execute(CommandEvent event)
+        protected void execute(SlashCommandEvent event)
         {
-            long id = Long.parseLong(event.getArgs());
+            long id = Long.parseLong(event.getOption("id").getAsString());
             WhitelistApp app;
             if(id == 0L)
-                app = WhitelistAppService.getService().getSingleApplicant(event.getArgs());
+                app = WhitelistAppService.getService().getSingleApplicant(event.getMember().getIdLong());
             else
                 app = WhitelistAppService.getService().getSingleApplicant(id);
 
-            if(app == null)
-            {
-                event.reply("```asciidoc\n [NO RESULTS]```");
+            if(app == null) {
+                event.reply("```asciidoc\n [NO RESULTS]```").queue();
             }
-            else
-            {
-                event.reply(convertToEmbed(app, event));
+            else {
+                event.replyEmbeds(convertToEmbed(app, event)).queue();
             }
         }
 
