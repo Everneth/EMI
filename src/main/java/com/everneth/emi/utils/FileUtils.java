@@ -22,6 +22,7 @@ public class FileUtils {
         reader.close();
         return sb.toString();
     }
+
     public static File writeFileFromString(String path, String content) throws IOException
     {
         File file = new File(path);

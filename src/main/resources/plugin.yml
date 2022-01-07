@@ -1,8 +1,8 @@
 name: EMI
-version: 1.6.0
+version: 1.6.1
 main: com.everneth.emi.EMI
 author: tptmike, sterling, jmwren
-api-version: 1.17
+api-version: 1.18
 commands:
   emi:
     description: Ministry Interface version

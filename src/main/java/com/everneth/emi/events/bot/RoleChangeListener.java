@@ -3,34 +3,60 @@ package com.everneth.emi.events.bot;
 import com.everneth.emi.EMI;
 import com.everneth.emi.models.WhitelistVote;
 import com.everneth.emi.services.VotingService;
-import com.everneth.emi.utils.PlayerUtils;
+import com.everneth.emi.services.WhitelistAppService;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Emoji;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
+import net.dv8tion.jda.api.interactions.components.Button;
+
+import java.awt.*;
 
 public class RoleChangeListener extends ListenerAdapter {
     private final String APPROVE_REACTION = "\u2705";
     private final String REJECT_REACTION = "\u26D4";
+
     @Override
-    public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event)
-    {
+    public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
         Role pendingRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("pending-role-id"));
         Role applicantRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("applicant-role-id"));
-        if(event.getRoles().contains(pendingRole)) {
-            event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("voting-channel-id"))
-                    .sendMessage("Heads up @everyone! " + event.getMember().getAsMention() + " has just met requirements.").queue(
-                    (msg) -> {
-                        VotingService.getService().addVote(msg.getIdLong(), new WhitelistVote(
-                                event.getUser().getIdLong(),
-                                msg.getIdLong()
-                        ));
 
-                        msg.addReaction(APPROVE_REACTION).queue();
-                        msg.addReaction(REJECT_REACTION).queue();
-                    }
-            );
-            // remove the applicant role from a member once the pending role is given
-            event.getGuild().removeRoleFromMember(event.getMember(), applicantRole);
+        if (event.getRoles().contains(pendingRole)) {
+            // the user does not have an application, let's remove the pending role from them
+            if (!WhitelistAppService.getService().appExists(event.getMember().getIdLong())) {
+                EMI.getGuild().removeRoleFromMember(event.getMember(), pendingRole).queue();
+                return;
+            }
+
+            event.getGuild().getTextChannelById(EMI.getPlugin().getConfig().getLong("voting-channel-id"))
+                    .sendMessage("Heads up @everyone! " + event.getMember().getAsMention() + " has just met requirements.")
+                    .setEmbeds(createVoteEmbed(event.getMember()))
+                    .setActionRow(Button.success("confirm", Emoji.fromUnicode(APPROVE_REACTION)),
+                            Button.danger("deny", Emoji.fromUnicode(REJECT_REACTION)))
+                    .queue((msg) ->
+                            {
+                                VotingService.getService().startVote(msg.getIdLong(), new WhitelistVote(
+                                        event.getUser().getIdLong(),
+                                        msg.getIdLong()
+                                ));
+                            }
+                    );
+            event.getGuild().removeRoleFromMember(event.getMember(), applicantRole).queue();
         }
+    }
+
+    private MessageEmbed createVoteEmbed(Member member) {
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setTitle("Whitelist Vote for " + member.getEffectiveName());
+        builder.setThumbnail(member.getEffectiveAvatarUrl());
+        builder.setColor(Color.ORANGE);
+        builder.setDescription("This is how everyone has voted so far:");
+        builder.addField("Voted Yay", "*Nobody*", false);
+        builder.addField("Voted Nay", "*Nobody*", false);
+
+        return builder.build();
     }
 }

@@ -4,12 +4,32 @@ import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 
 import com.everneth.emi.EMI;
+import com.everneth.emi.models.WhitelistApp;
 import com.everneth.emi.models.WhitelistVote;
+import com.everneth.emi.utils.FileUtils;
+import com.everneth.emi.utils.PlayerUtils;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.sun.jdi.ClassType;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.requests.ErrorResponse;
+import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.io.*;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class VotingService {
 
@@ -27,14 +47,47 @@ public class VotingService {
         }
         return service;
     }
-    public void addVote(long id, WhitelistVote vote)
+    public void startVote(long id, WhitelistVote vote)
     {
         voteMap.put(id, vote);
     }
-    public void removeVote(long id)
+
+    public void endVote(long id, boolean approved, ButtonClickEvent event)
     {
+        WhitelistVote vote = voteMap.get(id);
+        // Get all the roles that may need to be modified based on the vote outcome
+        Role pendingRole = EMI.getGuild().getRoleById(EMI.getConfigLong("pending-role-id"));
+        Role citizenRole = EMI.getGuild().getRoleById(EMI.getConfigLong("member-role-id"));
+        Role syncedRole = EMI.getGuild().getRoleById(EMI.getConfigLong("synced-role-id"));
+
+        Guild guild = EMI.getGuild();
+        DbRow application = PlayerUtils.getAppRecord(vote.getApplicantDiscordId());
+        Member applicant = guild.getMemberById(application.getLong("applicant_discord_id"));
+
+        if (approved) {
+            guild.addRoleToMember(applicant, citizenRole).queue();
+            guild.addRoleToMember(applicant, syncedRole).queue();
+
+            WhitelistAppService.getService().approveWhitelistAppRecord(applicant.getIdLong(), vote.getMessageId());
+            List<Button> disabledButtons = new ArrayList<>();
+            event.getMessage().getButtons().forEach(button -> disabledButtons.add(button.asDisabled()));
+            event.getMessage().editMessage("The vote is now over. Applicant " + applicant.getAsMention() + " accepted.")
+                    .setActionRow(disabledButtons).queue();
+            guild.getTextChannelById(EMI.getPlugin().getConfig().getLong("whitelist-channel-id"))
+                    .sendMessage(applicant.getAsMention() + " has been whitelisted! Congrats!").queue();
+
+            vote.setInactive();
+        }
+        else {
+            event.getMessage().editMessage("The vote is now over. Applicant " + applicant.getAsMention() + " denied.").queue();
+        }
+
+        guild.removeRoleFromMember(applicant, pendingRole).queue();
         voteMap.remove(id);
+        WhitelistAppService.getService().removeApp(applicant.getIdLong());
     }
+
+    public void removeVote(long id) { voteMap.remove(id); }
 
     public DbRow getAppByDiscordId(long id)
     {
@@ -50,6 +103,7 @@ public class VotingService {
         }
         return app;
     }
+
     public boolean isVotingMessage(long messageId)
     {
         return this.voteMap.containsKey(messageId);
@@ -65,9 +119,7 @@ public class VotingService {
         return this.voteMap.get(userid).getMessageId();
     }
 
-    public HashMap<Long, WhitelistVote> load()
-    {
-        HashMap<Long, WhitelistVote> data = new HashMap<>();
+    public void load() {
         List<DbRow> results = new ArrayList<>();
         try
         {
@@ -77,19 +129,110 @@ public class VotingService {
         {
             EMI.getPlugin().getLogger().warning(e.getMessage());
         }
-        if(!results.isEmpty())
-        {
-            for(DbRow result : results)
-            {
+        if(!results.isEmpty()) {
+            for (DbRow result : results) {
+                long messageId = result.getLong("message_id");
                 this.voteMap.put(
-                        result.getLong("message_id"),
+                        messageId,
                         new WhitelistVote(
                                 result.getLong("applicant_id"),
-                                result.getLong("message_id"),
+                                messageId,
                                 false)
-                        );
+                );
+
+                EMI.getGuild().getTextChannelById(EMI.getConfigLong("voting-channel-id"))
+                        .retrieveMessageById(messageId).queue(message -> {
+                            WhitelistVote vote = voteMap.get(messageId);
+                            if (message.getEmbeds().size() > 0) {
+                                for (MessageEmbed.Field field : message.getEmbeds().get(0).getFields()) {
+                                    loadVoters(vote, field);
+                                }
+                            }
+                        }, new ErrorHandler()
+                                .handle(ErrorResponse.UNKNOWN_MESSAGE, error -> {
+                                    voteMap.get(messageId).setInactive();
+                                    voteMap.remove(messageId);
+                                    EMI.getPlugin().getLogger().warning("Vote message not found. {id: " + messageId + "}");
+                                }));
             }
         }
-        return data;
+    }
+
+    private void loadVoters(WhitelistVote vote, MessageEmbed.Field field) {
+        String content = field.getValue();
+
+        // use the pattern for mentioned users to find all who have voted
+        Pattern pattern = Pattern.compile("<@!?(\\d+)>");
+        Matcher matcher = pattern.matcher(content);
+        while(matcher.find()) {
+            long memberId = Long.parseLong(matcher.group(1));
+            Member member = EMI.getGuild().getMemberById(memberId);
+
+            if (field.getName().contains("Yay")) {
+                vote.addPositiveVoter(member);
+            }
+            else if (field.getName().contains("Nay")) {
+                vote.addNegativeVoter(member);
+            }
+        }
+    }
+
+    public void onPositiveVoter(ButtonClickEvent event) {
+        WhitelistVote vote = getVoteByMessageId(event.getMessageIdLong());
+        vote.addPositiveVoter(event.getMember());
+        onVote(event, vote);
+    }
+
+    public void onNegativeVoter(ButtonClickEvent event) {
+        WhitelistVote vote = getVoteByMessageId(event.getMessageIdLong());
+        vote.addNegativeVoter(event.getMember());
+        onVote(event, vote);
+    }
+
+    private void onVote(ButtonClickEvent event, WhitelistVote vote) {
+        updateVoteEmbed(event);
+
+        DbRow application = PlayerUtils.getAppRecord(getVoteByMessageId(event.getMessage().getIdLong()).getApplicantDiscordId());
+        Member applicant = event.getGuild().getMemberById(application.getLong("applicant_discord_id"));
+
+        if (hasMajority(vote.getPositiveVoters(), 51)) {
+            String ign = application.getString("mc_ign");
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    EMI.getPlugin().getServer().dispatchCommand(Bukkit.getConsoleSender(), "whitelist add " + ign);
+                }
+            }.runTask(EMI.getPlugin());
+
+            endVote(event.getMessageIdLong(), true, event);
+        }
+        else if (hasMajority(vote.getNegativeVoters(), 50)) {
+            endVote(event.getMessageIdLong(), false, event);
+        }
+    }
+
+    private boolean hasMajority(HashSet<Member> voters, int percentRequired) {
+        Role staffRole = EMI.getGuild().getRoleById(EMI.getConfigLong("staff-role-id"));
+        int staffCount = EMI.getGuild().getMembersWithRoles(staffRole).size();
+
+        return (voters.size() * 100) / staffCount >= percentRequired;
+    }
+
+    private void updateVoteEmbed(ButtonClickEvent event) {
+        EmbedBuilder builder = new EmbedBuilder(event.getMessage().getEmbeds().get(0));
+        builder.clearFields();
+
+        WhitelistVote vote = voteMap.get(event.getMessage().getIdLong());
+        String positiveVoters = vote.getPositiveVoters().stream()
+                        .map(Member::getAsMention)
+                        .collect(Collectors.joining(" "));
+        String negativeVoters = vote.getNegativeVoters().stream()
+                .map(Member::getAsMention)
+                .collect(Collectors.joining(" "));
+
+        builder.addField("Voted Yay", positiveVoters, false);
+        builder.addField("Voted Nay", negativeVoters, false);
+
+        event.editMessageEmbeds(builder.build()).queue();
     }
 }

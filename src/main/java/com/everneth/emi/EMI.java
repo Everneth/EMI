@@ -10,15 +10,13 @@ import com.everneth.emi.commands.par.CharterCommand;
 import com.everneth.emi.commands.par.InfoCommand;
 import com.everneth.emi.events.JoinEvent;
 import com.everneth.emi.events.LeaveEvent;
-import com.everneth.emi.events.bot.GuildLeaveListener;
-import com.everneth.emi.events.bot.MessageReceivedListener;
-import com.everneth.emi.events.bot.ReactionListener;
-import com.everneth.emi.events.bot.RoleChangeListener;
+import com.everneth.emi.events.bot.*;
 import com.everneth.emi.managers.MintProjectManager;
 import com.everneth.emi.managers.MotdManager;
 import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.models.*;
 import com.everneth.emi.models.mint.*;
+import com.everneth.emi.services.VotingService;
 import com.everneth.emi.services.WhitelistService;
 import com.everneth.emi.utils.PlayerUtils;
 
@@ -30,6 +28,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.managers.GuildManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -88,8 +87,8 @@ public class EMI extends JavaPlugin {
         getLogger().info("Ministry Interface stopped.");
         DB.close();
 
-        // remove all the registered slash commands from the guild
-        unregisterCommands();
+        // remove all the registered slash commands from the guild and shutdown
+        unregisterCommands(true);
         jda.shutdown();
 
         // In the event someone requested temporary whitelisting less than 5 minutes before a server shutdown,
@@ -132,13 +131,20 @@ public class EMI extends JavaPlugin {
     }
 
     // While the bot is offline we want to unregister all commands inside the guild
-    private void unregisterCommands()
+    private void unregisterCommands(boolean keepGlobal)
     {
         Guild guild = EMI.getJda().getGuildById(plugin.getConfig().getLong("guild-id"));
 
         List<Command> commands = guild.retrieveCommands().complete();
         for (Command command : commands)
             command.delete().complete();
+
+        if (!keepGlobal) {
+            List<Command> globalCommands = EMI.getJda().retrieveCommands().complete();
+            for (Command command : globalCommands) {
+                command.delete().complete();
+            }
+        }
     }
 
     private void initBot()
@@ -172,7 +178,7 @@ public class EMI extends JavaPlugin {
             jda = JDABuilder.createDefault(config.getString("bot-token"))
                     .addEventListeners(client, globalClient,
                             new MessageReceivedListener(),
-                            new ReactionListener(),
+                            new ButtonListener(),
                             new RoleChangeListener(),
                             new GuildLeaveListener())
                     .setMemberCachePolicy(MemberCachePolicy.ALL)
@@ -181,8 +187,11 @@ public class EMI extends JavaPlugin {
             jda.awaitReady();
             Guild guild = EMI.getJda().getGuildById(plugin.getConfig().getLong("guild-id"));
 
-            // send an API request for all Everneth guild members on startup, which will then be stored in the cache
+            //send an API request for all Everneth guild members on startup, which will then be stored in the cache
             guild.loadMembers();
+
+            // call the service to force it to load the votes
+            VotingService.getService();
 
             // cache the help channel history so message history persists through a reset
             guild.getTextChannelById(plugin.getConfig().getLong("help-channel-id")).getHistoryFromBeginning(100);
@@ -449,4 +458,8 @@ public class EMI extends JavaPlugin {
     {
         return jda;
     }
+
+    public static Guild getGuild() { return jda.getGuildById(plugin.config.getLong("guild-id")); }
+
+    public static Long getConfigLong(String path) { return plugin.config.getLong(path); }
 }
