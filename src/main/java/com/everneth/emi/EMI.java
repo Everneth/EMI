@@ -88,7 +88,7 @@ public class EMI extends JavaPlugin {
         DB.close();
 
         // remove all the registered slash commands from the guild and shutdown
-        unregisterCommands(false);
+        unregisterCommands(true);
         jda.shutdown();
 
         // In the event someone requested temporary whitelisting less than 5 minutes before a server shutdown,
