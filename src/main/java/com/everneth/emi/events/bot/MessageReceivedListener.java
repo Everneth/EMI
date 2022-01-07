@@ -90,6 +90,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                 WhitelistApp appInProgress = WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong());
                 if(appInProgress != null) {
                         if (appInProgress.getStep() == 10 && event.getMessage().getContentRaw().toLowerCase().equals("yes")) {
+                            appInProgress.setStep(11);
                             appInProgress.setHoldForNextStep(false);
                         } else if (appInProgress.getStep() == 10 && event.getMessage().getContentRaw().toLowerCase().equals("no")) {
                             appInProgress.setStep(1);
