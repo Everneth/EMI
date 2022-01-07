@@ -89,12 +89,12 @@ public class MessageReceivedListener extends ListenerAdapter {
             if (!event.getAuthor().isBot() && !event.getMessage().getContentRaw().isEmpty()) {
                 WhitelistApp appInProgress = WhitelistAppService.getService().findByDiscordId(event.getAuthor().getIdLong());
                 if(appInProgress != null) {
-                        if (appInProgress.getStep() == 11 && event.getMessage().getContentRaw().toLowerCase().equals("yes")) {
+                        if (appInProgress.getStep() == 10 && event.getMessage().getContentRaw().toLowerCase().equals("yes")) {
                             appInProgress.setHoldForNextStep(false);
-                        } else if (appInProgress.getStep() == 11 && event.getMessage().getContentRaw().toLowerCase().equals("no")) {
+                        } else if (appInProgress.getStep() == 10 && event.getMessage().getContentRaw().toLowerCase().equals("no")) {
                             appInProgress.setStep(1);
                             appInProgress.setHoldForNextStep(false);
-                        } else if (appInProgress.getStep() == 11 && (!event.getMessage().getContentRaw().toLowerCase().equals("no") || !event.getMessage().getContentRaw().toLowerCase().equals("yes"))) {
+                        } else if (appInProgress.getStep() == 10 && (!event.getMessage().getContentRaw().toLowerCase().equals("no") || !event.getMessage().getContentRaw().toLowerCase().equals("yes"))) {
                             event.getPrivateChannel().sendMessage("**INVALID INPUT** Please review once more and answer with yes or no!").queue();
                         } else {
                             WhitelistAppService.getService().addData(appInProgress.getDiscordId(), appInProgress.getStep(), event.getMessage().getContentRaw());
@@ -185,8 +185,6 @@ public class MessageReceivedListener extends ListenerAdapter {
                                     WhitelistAppService.getService().addApplicationRecord(appInProgress);
 
 
-                                String msg = appInProgress.getInGameName() + "'s whitelist application could not be transmitted to the site. An embed of the application has been posted.";
-                                WhitelistAppService.getService().messageStaff(msg);
                                 WhitelistAppService.getService().changeRoleToApplicant(appInProgress.getDiscordId());
                                 event.getPrivateChannel().sendMessage("Your application has been submitted! Your role is now Applicant").queue();
                                 WhitelistAppService.getService().removeApp(appInProgress.getDiscordId());
