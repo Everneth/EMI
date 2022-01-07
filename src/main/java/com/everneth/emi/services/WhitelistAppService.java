@@ -74,10 +74,6 @@ public class WhitelistAppService {
         app.setInProgress(true);
         app.setHoldForNextStep(false);
         appMap.put(id, app);
-
-        EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getMemberById(id).getUser().openPrivateChannel().queue(privateChannel ->
-                privateChannel.sendMessage("What is your Minecraft IGN? **NOTE:** If you enter an invalid IGN, you will be asked again.").queue()
-        );
     }
 
     public void removeApp(long id)
