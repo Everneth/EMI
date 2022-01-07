@@ -35,8 +35,36 @@ public class WhitelistAppService {
         if(service == null)
         {
             service = new WhitelistAppService();
+            service.load();
         }
         return service;
+    }
+
+    // this is a direct copy of getAllCurrentApplicants until refactoring can be done on that method
+    private void load() {
+        List<DbRow> results = new ArrayList<>();
+        try {
+            results = DB.getResultsAsync("SELECT * FROM applications WHERE app_active = ?", 1).get();
+        }
+        catch(Exception e)
+        {
+            EMI.getPlugin().getLogger().warning("Error retrieving current applications. Error msg: " + e.getMessage());
+        }
+        for(DbRow result : results) {
+            appMap.put(result.getLong("applicant_discord_id"),
+                    new WhitelistApp(result.getString("mc_ign"),
+                            result.getString("location"),
+                            result.getInt("age"),
+                            result.getString("friend"),
+                            result.getString("looking_for"),
+                            result.getString("has_been_banned"),
+                            result.getString("love_hate"),
+                            result.getString("intro"),
+                            result.getString("secret_word"),
+                            result.getLong("applicant_discord_id"),
+                            UUID.fromString(result.getString("mc_uuid"))
+                    ));
+        }
     }
 
     public void addApp(long id, WhitelistApp app)
@@ -256,10 +284,11 @@ public class WhitelistAppService {
 
     public boolean appExists(UUID minecraftUuid) {
         WhitelistApp app = getSingleApplicant(minecraftUuid);
-        if(app == null)
-            return false;
-        else
-            return true;
+        return app != null;
+    }
+
+    public boolean appExists(Long discordId) {
+        return appMap.containsKey(discordId);
     }
 
     public void addData(long id, int step, String data)
