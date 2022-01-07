@@ -139,7 +139,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                                 break;
                             case 9:
                                 appInProgress.setHoldForNextStep(true);
-                                event.getPrivateChannel().sendMessage("What is the secret word?").queue();
+                                event.getPrivateChannel().sendMessage("What is the secret word? (**Hint**: <https://everneth.com/rules>").queue();
                                 break;
                             case 10:
                                 appInProgress.setHoldForNextStep(true);
