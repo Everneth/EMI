@@ -119,11 +119,14 @@ public class CharterCommand extends BaseCommand {
                     recipientRecord.getInt("player_id")
             );
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + player + Utils.color(" &c" + reason));
+            sender.sendMessage(Utils.color("Banned &c" + player));
             String altName = recipientRecord.getString("alt_name");
             if (altName != null) {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + player + Utils.color(" &c" + reason));
+                sender.sendMessage(Utils.color("Banned &c" + altName));
             }
-            sender.sendMessage(Utils.color("&9[Charter] &3" + recipient.getName() + " and any whitelisted alts have been permanently banned."));
+            sender.sendMessage(Utils.color("&9[Charter] &3" + recipient.getName() + " and any whitelisted alts have been permanently banned." +
+                    "Please login to the test server and manually any of these accounts."));
         }
     }
     @CommandPermission("emi.par.charter.history")
