@@ -48,6 +48,8 @@ public class HelpClearCommand extends SlashCommand {
             return;
         }
 
+        event.reply("Clearing the channel, dear. <3").setEphemeral(true).queue();
+
         // Take our messages and build a string, we'll dump that string into a message file
         // and embed the file into a message
         File embedFile = transcribe(messageList);
@@ -71,8 +73,6 @@ public class HelpClearCommand extends SlashCommand {
                 EMI.getPlugin().getLogger().severe(e.getMessage());
             }
         }
-
-        event.reply("Channel cleared, dear. <3").setEphemeral(true).queue();
     }
 
     private File transcribe(List<Message> messageList)
