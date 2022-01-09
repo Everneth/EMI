@@ -2,11 +2,9 @@ package com.everneth.emi.commands.bot.par;
 
 import com.everneth.emi.EMI;
 import com.everneth.emi.models.WhitelistApp;
-import com.everneth.emi.services.VotingService;
 import com.everneth.emi.services.WhitelistAppService;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
