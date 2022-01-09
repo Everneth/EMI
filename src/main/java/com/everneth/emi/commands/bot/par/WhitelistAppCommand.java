@@ -133,6 +133,8 @@ public class WhitelistAppCommand extends SlashCommand {
         @Override
         protected void execute(SlashCommandEvent event) {
             WhitelistAppService.getService().load();
+
+            event.reply("All active whitelist applications have been reloaded.").setEphemeral(true).queue();
         }
     }
 }
