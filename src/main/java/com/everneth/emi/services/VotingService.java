@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -72,7 +73,7 @@ public class VotingService {
             List<Button> disabledButtons = new ArrayList<>();
             event.getMessage().getButtons().forEach(button -> disabledButtons.add(button.asDisabled()));
             event.getMessage().editMessage("The vote is now over. Applicant " + applicant.getAsMention() + " accepted.")
-                    .setActionRow(disabledButtons).queue();
+                    .setActionRow(disabledButtons).queueAfter(2, TimeUnit.SECONDS);
             guild.getTextChannelById(EMI.getPlugin().getConfig().getLong("whitelist-channel-id"))
                     .sendMessage(applicant.getAsMention() + " has been whitelisted! Congrats!").queue();
 
@@ -233,6 +234,8 @@ public class VotingService {
         builder.addField("Voted Yay", positiveVoters, false);
         builder.addField("Voted Nay", negativeVoters, false);
 
+        // We wait for the message embed update to complete before proceeding so the cached message is updated
+        // This prevents the issue of the last person to vote not being included in the message embed
         event.editMessageEmbeds(builder.build()).queue();
     }
 }
