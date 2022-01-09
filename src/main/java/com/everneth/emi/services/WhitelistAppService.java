@@ -41,7 +41,7 @@ public class WhitelistAppService {
     }
 
     // this is a direct copy of getAllCurrentApplicants until refactoring can be done on that method
-    private void load() {
+    public void load() {
         List<DbRow> results = new ArrayList<>();
         try {
             results = DB.getResultsAsync("SELECT * FROM applications WHERE app_active = ?", 1).get();

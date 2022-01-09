@@ -5,7 +5,6 @@ import com.everneth.emi.models.WhitelistApp;
 import com.everneth.emi.services.WhitelistAppService;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -119,6 +118,22 @@ public class WhitelistAppCommand extends SlashCommand {
             }
         }
 
+    }
+
+    private class ReloadApps extends SlashCommand
+    {
+        private ReloadApps() {
+            this.name = "reload";
+            this.help = "Reload all active applications into memory from the table.";
+
+            this.defaultEnabled = false;
+            this.enabledRoles = new String[]{EMI.getPlugin().getConfig().getString("staff-role-id")};
+        }
+
+        @Override
+        protected void execute(SlashCommandEvent event) {
+            WhitelistAppService.getService().load();
+        }
     }
 }
 
