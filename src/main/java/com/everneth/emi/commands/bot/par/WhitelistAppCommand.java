@@ -20,7 +20,7 @@ public class WhitelistAppCommand extends SlashCommand {
         this.name = "application";
         this.help = "All commands pertaining to user applications";
 
-        this.children = new SlashCommand[]{new GetAllApps(), new GetApp()};
+        this.children = new SlashCommand[]{new GetAllApps(), new GetApp(), new ReloadApps()};
     }
 
     @Override

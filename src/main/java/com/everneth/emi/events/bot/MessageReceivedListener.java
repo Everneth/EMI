@@ -188,7 +188,6 @@ public class MessageReceivedListener extends ListenerAdapter {
 
                                 WhitelistAppService.getService().changeRoleToApplicant(appInProgress.getDiscordId());
                                 event.getPrivateChannel().sendMessage("Your application has been submitted! Your role is now Applicant").queue();
-                                WhitelistAppService.getService().removeApp(appInProgress.getDiscordId());
                                 break;
                         }
                         }
