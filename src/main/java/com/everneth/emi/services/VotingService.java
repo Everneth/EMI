@@ -15,8 +15,11 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.Component;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -70,20 +73,37 @@ public class VotingService {
             guild.addRoleToMember(applicant, syncedRole).queue();
 
             WhitelistAppService.getService().approveWhitelistAppRecord(applicant.getIdLong(), vote.getMessageId());
-            List<Button> disabledButtons = new ArrayList<>();
-            event.getMessage().getButtons().forEach(button -> disabledButtons.add(button.asDisabled()));
-            event.getMessage().editMessage("The vote is now over. Applicant " + applicant.getAsMention() + " accepted.")
-                    .setActionRow(disabledButtons).queueAfter(2, TimeUnit.SECONDS);
+
             guild.getTextChannelById(EMI.getPlugin().getConfig().getLong("whitelist-channel-id"))
                     .sendMessage(applicant.getAsMention() + " has been whitelisted! Congrats!").queue();
-
-            vote.setInactive();
         }
         else {
-            event.getMessage().editMessage("The vote is now over. Applicant " + applicant.getAsMention() + " denied.").queue();
+            applicant.getUser().openPrivateChannel().queue(privateChannel ->
+                    privateChannel.sendMessage("Hey, " + applicant.getEffectiveName() +
+                                    "!\n\nI'm here to notify you that your application has been unfortunately denied. You can ask a staff member " +
+                                    "for specifics but the most common reasons for denial include:\n" +
+                                    "**1)** An incorrect secret word (Did you read the rules?).\n" +
+                                    "**2)** General lack of effort put into the application. You don't have to write an essay, we just want to know " +
+                                    "a little bit about you!\n" +
+                                    "**3)** Behavior deemed inappropriate while interacting with our community members.\n\n" +
+                                    "You are welcome to submit another application a week from now, if you so choose. Feel free to stick around " +
+                                    "and chat until then!")
+                            .queue(null, new ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER,
+                                    error ->
+                                        EMI.getGuild().getTextChannelById(EMI.getConfigLong("voting-channel-id"))
+                                                .sendMessage("Could not message applicant. Please notify them that they have been denied.")
+                                    )));
         }
 
+        // I have yet to figure out a better way of going about disabling buttons, the answer is somewhere within ActionRows which
+        // I generally do not understand proper usage of
+        List<Button> disabledButtons = new ArrayList<>();
+        event.getMessage().getButtons().forEach(button -> disabledButtons.add(button.asDisabled()));
+        event.getMessage().editMessage("The vote is now over. Applicant " + applicant.getAsMention() + (approved ? " accepted." : " denied."))
+                .setActionRow(disabledButtons).queueAfter(2, TimeUnit.SECONDS);
+
         guild.removeRoleFromMember(applicant, pendingRole).queue();
+        vote.setInactive();
         voteMap.remove(id);
         WhitelistAppService.getService().removeApp(applicant.getIdLong());
     }
@@ -180,12 +200,20 @@ public class VotingService {
 
     public void onPositiveVoter(ButtonClickEvent event) {
         WhitelistVote vote = getVoteByMessageId(event.getMessageIdLong());
+        if (vote == null) {
+            disableMessage(event);
+            return;
+        }
         vote.addPositiveVoter(event.getMember());
         onVote(event, vote);
     }
 
     public void onNegativeVoter(ButtonClickEvent event) {
         WhitelistVote vote = getVoteByMessageId(event.getMessageIdLong());
+        if (vote == null) {
+            disableMessage(event);
+            return;
+        }
         vote.addNegativeVoter(event.getMember());
         onVote(event, vote);
     }
@@ -225,8 +253,8 @@ public class VotingService {
 
         WhitelistVote vote = voteMap.get(event.getMessage().getIdLong());
         String positiveVoters = vote.getPositiveVoters().stream()
-                        .map(Member::getAsMention)
-                        .collect(Collectors.joining(" "));
+                .map(Member::getAsMention)
+                .collect(Collectors.joining(" "));
         String negativeVoters = vote.getNegativeVoters().stream()
                 .map(Member::getAsMention)
                 .collect(Collectors.joining(" "));
@@ -237,5 +265,12 @@ public class VotingService {
         // We wait for the message embed update to complete before proceeding so the cached message is updated
         // This prevents the issue of the last person to vote not being included in the message embed
         event.editMessageEmbeds(builder.build()).queue();
+    }
+
+    private void disableMessage(ButtonClickEvent event) {
+        List<Button> disabledButtons = new ArrayList<>();
+        event.getMessage().getButtons().forEach(button -> disabledButtons.add(button.asDisabled()));
+        event.editMessage("Something has gone wrong. Vote ended.")
+                .setActionRow(disabledButtons).queue();
     }
 }
