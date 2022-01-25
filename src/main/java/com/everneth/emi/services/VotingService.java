@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -70,18 +71,17 @@ public class VotingService {
             guild.addRoleToMember(applicant, syncedRole).queue();
 
             WhitelistAppService.getService().approveWhitelistAppRecord(applicant.getIdLong(), vote.getMessageId());
-            List<Button> disabledButtons = new ArrayList<>();
-            event.getMessage().getButtons().forEach(button -> disabledButtons.add(button.asDisabled()));
-            event.getMessage().editMessage("The vote is now over. Applicant " + applicant.getAsMention() + " accepted.")
-                    .setActionRow(disabledButtons).queueAfter(2, TimeUnit.SECONDS);
+
             guild.getTextChannelById(EMI.getPlugin().getConfig().getLong("whitelist-channel-id"))
                     .sendMessage(applicant.getAsMention() + " has been whitelisted! Congrats!").queue();
 
             vote.setInactive();
         }
-        else {
-            event.getMessage().editMessage("The vote is now over. Applicant " + applicant.getAsMention() + " denied.").queue();
-        }
+
+        List<Button> disabledButtons = new ArrayList<>();
+        event.getMessage().getButtons().forEach(button -> disabledButtons.add(button.asDisabled()));
+        event.getMessage().editMessage("The vote is now over. Applicant " + applicant.getAsMention() + (approved ? " accepted." : " denied."))
+                .setActionRow(disabledButtons).queueAfter(2, TimeUnit.SECONDS);
 
         guild.removeRoleFromMember(applicant, pendingRole).queue();
         voteMap.remove(id);
@@ -225,8 +225,8 @@ public class VotingService {
 
         WhitelistVote vote = voteMap.get(event.getMessage().getIdLong());
         String positiveVoters = vote.getPositiveVoters().stream()
-                        .map(Member::getAsMention)
-                        .collect(Collectors.joining(" "));
+                .map(Member::getAsMention)
+                .collect(Collectors.joining(" "));
         String negativeVoters = vote.getNegativeVoters().stream()
                 .map(Member::getAsMention)
                 .collect(Collectors.joining(" "));
