@@ -15,7 +15,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.Component;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.apache.commons.lang.StringUtils;
@@ -74,8 +76,6 @@ public class VotingService {
 
             guild.getTextChannelById(EMI.getPlugin().getConfig().getLong("whitelist-channel-id"))
                     .sendMessage(applicant.getAsMention() + " has been whitelisted! Congrats!").queue();
-
-            vote.setInactive();
         }
 
         List<Button> disabledButtons = new ArrayList<>();
@@ -84,6 +84,7 @@ public class VotingService {
                 .setActionRow(disabledButtons).queueAfter(2, TimeUnit.SECONDS);
 
         guild.removeRoleFromMember(applicant, pendingRole).queue();
+        vote.setInactive();
         voteMap.remove(id);
         WhitelistAppService.getService().removeApp(applicant.getIdLong());
     }
@@ -180,12 +181,20 @@ public class VotingService {
 
     public void onPositiveVoter(ButtonClickEvent event) {
         WhitelistVote vote = getVoteByMessageId(event.getMessageIdLong());
+        if (vote == null) {
+            disableMessage(event);
+            return;
+        }
         vote.addPositiveVoter(event.getMember());
         onVote(event, vote);
     }
 
     public void onNegativeVoter(ButtonClickEvent event) {
         WhitelistVote vote = getVoteByMessageId(event.getMessageIdLong());
+        if (vote == null) {
+            disableMessage(event);
+            return;
+        }
         vote.addNegativeVoter(event.getMember());
         onVote(event, vote);
     }
@@ -237,5 +246,12 @@ public class VotingService {
         // We wait for the message embed update to complete before proceeding so the cached message is updated
         // This prevents the issue of the last person to vote not being included in the message embed
         event.editMessageEmbeds(builder.build()).queue();
+    }
+
+    private void disableMessage(ButtonClickEvent event) {
+        List<Button> disabledButtons = new ArrayList<>();
+        event.getMessage().getButtons().forEach(button -> disabledButtons.add(button.asDisabled()));
+        event.editMessage("Something has gone wrong. Vote ended.")
+                .setActionRow(disabledButtons).queue();
     }
 }
