@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.managers.GuildManager;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -289,48 +290,52 @@ public class WhitelistAppService {
 
     public void addData(long id, int step, String data)
     {
-        appMap.get(id).setHoldForNextStep(true);
+        WhitelistApp app = appMap.get(id);
+        app.setHoldForNextStep(true);
         switch(step)
         {
             case 1:
                 UUID playerUuid = PlayerUtils.getPlayerUUID(data);
                 if (playerUuid != null) {
-                    appMap.get(id).setMinecraftUuid(playerUuid);
-                    appMap.get(id).setInGameName(data);
+                    app.setMinecraftUuid(playerUuid);
+                    app.setInGameName(data);
                 }
                 break;
             case 2:
-                appMap.get(id).setLocation(data);
+                app.setLocation(data);
                 break;
             case 3:
-                appMap.get(id).setAge(Integer.valueOf(data));
+                if (StringUtils.isNumeric(data)) {
+                    app.setAge(Integer.valueOf(data));
+                }
                 break;
             case 4:
-                appMap.get(id).setFriend(data);
+                app.setFriend(data);
                 break;
             case 5:
-                appMap.get(id).setBannedElsewhere(data);
+                app.setBannedElsewhere(data);
                 break;
             case 6:
-                appMap.get(id).setLookingFor(data);
+                app.setLookingFor(data);
                 break;
             case 7:
-                appMap.get(id).setLoveHate(data);
+                app.setLoveHate(data);
                 break;
             case 8:
-                appMap.get(id).setIntro(data);
+                app.setIntro(data);
                 break;
             case 9:
-                appMap.get(id).setSecretWord(data);
-                break;
-            case 10:
-                //appMap.get(id).setStep(0); // restart app
+                app.setSecretWord(data);
                 break;
         }
-        appMap.get(id).setStep(appMap.get(id).getStep() + 1);
-        if(appMap.get(id).getStep() >= 13)
+
+        if (app.getMinecraftUuid() != null && app.getAge() != 0) {
+            app.setStep(app.getStep() + 1);
+        }
+        
+        if(app.getStep() >= 13)
         {
-            appMap.get(id).setInProgress(false);
+            app.setInProgress(false);
         }
     }
 }
