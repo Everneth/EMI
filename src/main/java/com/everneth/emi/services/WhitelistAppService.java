@@ -329,13 +329,18 @@ public class WhitelistAppService {
                 break;
         }
 
-        if (app.getMinecraftUuid() != null && app.getAge() != 0) {
-            app.setStep(app.getStep() + 1);
+        if (app.getStep() == 1 && app.getMinecraftUuid() == null) {
+            app.setStep(1);
         }
-        
-        if(app.getStep() >= 13)
+        else if (app.getStep() == 3 && app.getAge() == 0) {
+            app.setStep(3);
+        }
+        else if (app.getStep() >= 13)
         {
             app.setInProgress(false);
+        }
+        else {
+            app.setStep(app.getStep() + 1);
         }
     }
 }
