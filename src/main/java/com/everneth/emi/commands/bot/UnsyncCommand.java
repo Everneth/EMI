@@ -43,7 +43,7 @@ public class UnsyncCommand extends SlashCommand {
 
         long guildId = EMI.getPlugin().getConfig().getLong("guild-id");
         Role syncedRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("synced-role-id"));
-        EMI.getJda().getGuildById(guildId).removeRoleFromMember(event.getMember(), syncedRole);
+        EMI.getJda().getGuildById(guildId).removeRoleFromMember(event.getMember(), syncedRole).queue();
         // remove the user from the DB so their accounts are not read as already whitelisted
         DB.executeUpdateAsync("DELETE FROM players WHERE discord_id = ?",
                 event.getMember().getIdLong());
