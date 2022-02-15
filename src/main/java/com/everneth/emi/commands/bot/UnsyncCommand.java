@@ -49,6 +49,6 @@ public class UnsyncCommand extends SlashCommand {
                 event.getMember().getIdLong());
 
         event.reply("Your discord has been unsynced and your accounts have been removed from the whitelist. " +
-                "Please use `/whitelist <username>` to temporarily add another account to the whitelist so you may re-sync.");
+                "Please use `/whitelist <username>` to temporarily add another account to the whitelist so you may re-sync.").queue();
     }
 }
