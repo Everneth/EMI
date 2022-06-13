@@ -126,7 +126,7 @@ public class CharterCommand extends BaseCommand {
                 sender.sendMessage(Utils.color("Banned &c" + altName));
             }
             sender.sendMessage(Utils.color("&9[Charter] &3" + recipient.getName() + " and any whitelisted alts have been permanently banned." +
-                    "Please login to the test server and manually any of these accounts."));
+                    "Please login to the test server and manually ban any of these accounts."));
         }
     }
     @CommandPermission("emi.par.charter.history")
