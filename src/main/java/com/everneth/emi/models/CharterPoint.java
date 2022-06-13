@@ -2,8 +2,12 @@ package com.everneth.emi.models;
 
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
+import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
 import com.everneth.emi.utils.PlayerUtils;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -111,80 +115,56 @@ public class CharterPoint {
             }
         }
 
-        EMIPlayer player = new EMIPlayer(pointsList.get(0).getString("recipient_uuid"),
-                pointsList.get(0).getString("issued_to"));
+        EMIPlayer player = PlayerUtils.getEMIPlayer(this.recipient.getName());
         Calendar cal = Calendar.getInstance();
         switch(points)
         {
-            case(1):
-                //TODO: notification to discord/private message from "system" user
-                sender.sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 1 point."));
-                break;
             case(2):
-                if(Bukkit.getBanList(BanList.Type.NAME).isBanned(player.getName()))
-                {
-                    Bukkit.getBanList(BanList.Type.NAME).pardon(player.getName());
-                }
+                // 12 hour ban
                 cal.add(Calendar.HOUR_OF_DAY, 12);
-                Bukkit.getBanList(BanList.Type.NAME).addBan(
-                        player.getName(),
-                        Utils.color("&c" + pointsList.get(pointsList.size()-1).getString("reason") + "&c"),
-                        cal.getTime(),
-                        null);
-                sender.sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 2 points " +
-                        "and has been banned for 12 hours."));
                 break;
             case(3):
                 // 24 hour ban
-                if(Bukkit.getBanList(BanList.Type.NAME).isBanned(player.getName()))
-                {
-                    Bukkit.getBanList(BanList.Type.NAME).pardon(player.getName());
-                }
                 cal.add(Calendar.DAY_OF_MONTH, 1);
-                Bukkit.getBanList(BanList.Type.NAME).addBan(
-                        player.getName(),
-                        Utils.color("&c" + pointsList.get(pointsList.size()-1).getString("reason") + "&c"),
-                        cal.getTime(),
-                        null);
-                sender.sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 3 points " +
-                        "and has been banned for 24 hours."));
                 break;
             case(4):
                 // 72 hour ban
-                if(Bukkit.getBanList(BanList.Type.NAME).isBanned(player.getName()))
-                {
-                    Bukkit.getBanList(BanList.Type.NAME).pardon(player.getName());
-                }
                 cal.add(Calendar.DAY_OF_MONTH, 3);
-                Bukkit.getBanList(BanList.Type.NAME).addBan(
-                        player.getName(),
-                        Utils.color("&c" + pointsList.get(pointsList.size()-1).getString("reason") + "&c"),
-                        cal.getTime(),
-                        null);
-                sender.sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 4 points " +
-                        "and has been banned for 72 hours."));
-                break;
-            case(5):
-                // Permanent ban
-                if(Bukkit.getBanList(BanList.Type.NAME).isBanned(player.getName()))
-                {
-                    Bukkit.getBanList(BanList.Type.NAME).pardon(player.getName());
-                }
-                Bukkit.getBanList(BanList.Type.NAME).addBan(
-                        player.getName(),
-                        Utils.color("&c" + pointsList.get(pointsList.size()-1).getString("reason") + "&c"),
-                        null,
-                        null);
-                sender.sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated 5 points! " +
-                        "If this was not in error, please proceed with /charter ban <player> <reason>."));
-                flagPlayer(player);
                 break;
             default:
-                // Permanent ban
-                sender.sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated more than 5 points! " +
-                        "If this was not in error, please proceed with /charter ban <player> <reason>."));
+                // 5+ points, a permanent ban, flag the user in case of potential future pardons
                 flagPlayer(player);
                 break;
+        }
+        
+        sender.sendMessage(Utils.color("&9[Charter] &3" + this.getRecipient().getName() + " accumulated " + points + " point(s) " +
+                "and has been messaged/banned accordingly."));
+
+        if (points >= 2) {
+            // Both accounts need to be banned with expiry set to the same time
+            String names[] = { player.getName(), player.getAltName() };
+            for (String name : names) {
+                if (name == null) continue;
+
+                Bukkit.getBanList(BanList.Type.NAME).addBan(
+                        name,
+                        Utils.color("%c" + this.reason),
+                        points >= 5 ? null : cal.getTime(),
+                        null);
+            }
+        }
+
+        // This will eventually be replaced with a much nicer method in the EMIPlayer model
+        User user = EMI.getJda().getUserById(this.recipient.getId());
+        if (user != null) {
+            String message = buildBanMessage(points, user.getName(), cal);
+            user.openPrivateChannel()
+                    .flatMap(privateChannel -> privateChannel.sendMessage(message))
+                    .queue(null,
+                            new ErrorHandler()
+                                    .handle(ErrorResponse.CANNOT_SEND_TO_USER, (error) -> {
+                                        sender.sendMessage(Utils.color("&cCould not message user on Discord. Please notify them of the circumstances ASAP."));
+                                    }));
         }
     }
 
@@ -278,5 +258,22 @@ public class CharterPoint {
             return true;
         else
             return false;
+    }
+
+    private String buildBanMessage(int totalPoints, String discordName, Calendar expiry) {
+        String message = "Hey " + discordName + ". I'm here to notify you that you have been issued " +
+                this.amount + " point(s) by " + this.issuer.getName() + " with the following reason:\n> *" + this.reason + "*\n";
+
+        if (totalPoints >= 2) {
+            message += "You have accumulated " + totalPoints + " points in the last 60 days, and have been banned accordingly. " +
+                    "As per the charter, this ban ";
+            message += totalPoints >= 5 ? "will not expire." : "will expire at the following time: <t:" + expiry.getTimeInMillis() / 1000 + ">";
+        }
+        else {
+            message += "As this is your only point in the last 60 days, you may consider this a warning.";
+        }
+
+        message += "\n\n**If you believe this to be an error or wish to appeal, feel free to contact an admin.**";
+        return message;
     }
 }
