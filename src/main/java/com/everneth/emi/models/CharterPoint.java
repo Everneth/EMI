@@ -119,6 +119,9 @@ public class CharterPoint {
         Calendar cal = Calendar.getInstance();
         switch(points)
         {
+            case(1):
+                // We don't want players with 1 point to get flagged
+                break;
             case(2):
                 // 12 hour ban
                 cal.add(Calendar.HOUR_OF_DAY, 12);
