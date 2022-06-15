@@ -46,24 +46,24 @@ public class Configuration {
     private static EMI plugin;
     private String configPath;
     private File configFile;
-    private static BukkitCommandManager commandManager;
-    private FileConfiguration config = plugin.getConfig();
     private static JDA jda;
 
+    private static BukkitCommandManager commandManager;
+    private FileConfiguration config = EMI.getPlugin().getConfig();
 
-    public Configuration(EMI plugin) {
-        this.plugin = plugin;
-        String configPath = plugin.getDataFolder() + System.getProperty("file.separator") + "config.yml";
+    public Configuration() {
+        String configPath = EMI.getPlugin().getDataFolder() + System.getProperty("file.separator") + "config.yml";
         File configFile = new File(configPath);
+
     }
 
     public void startup()
     {
-        plugin.getLogger().info("Ministry Interface started.");
+        EMI.getPlugin().getLogger().info("Ministry Interface started.");
         if(!configFile.exists())
         {
-            plugin.saveDefaultConfig();
-            this.config = plugin.getConfig();
+            EMI.getPlugin().saveDefaultConfig();
+            this.config = EMI.getPlugin().getConfig();
         }
         Utils.chatTag = config.getString("chat-tag");
 
@@ -81,12 +81,12 @@ public class Configuration {
     }
     public void shutdown()
     {
-        plugin.getLogger().info("Ministry Interface stopped.");
+        EMI.getPlugin().getLogger().info("Ministry Interface stopped.");
         DB.close();
 
         // remove all the registered slash commands from the guild and shutdown
         unregisterCommands(true);
-        jda.shutdown();
+        EMI.getJda().shutdown();
 
         // In the event someone requested temporary whitelisting less than 5 minutes before a server shutdown,
         // we want to remove them so that they're not permanently on the whitelist
@@ -130,8 +130,8 @@ public class Configuration {
 
     private void registerListeners()
     {
-        plugin.getServer().getPluginManager().registerEvents(new JoinEvent(plugin), plugin);
-        plugin.getServer().getPluginManager().registerEvents(new LeaveEvent(plugin), plugin);
+        EMI.getPlugin().getServer().getPluginManager().registerEvents(new JoinEvent(plugin), plugin);
+        EMI.getPlugin().getServer().getPluginManager().registerEvents(new LeaveEvent(plugin), plugin);
     }
 
     private void initMint()
@@ -156,7 +156,7 @@ public class Configuration {
         }
         catch(SQLException e)
         {
-            plugin.getLogger().info("Failed to gather info for devop projects: " + e.toString());
+            EMI.getPlugin().getLogger().info("Failed to gather info for devop projects: " + e.toString());
             return;
         }
 
@@ -356,7 +356,7 @@ public class Configuration {
     {
         CommandClientBuilder builder = new CommandClientBuilder();
         // force the builder to create guild commands to avoid long global registration times
-        builder.forceGuildOnly(plugin.getConfig().getLong("guild-id"));
+        builder.forceGuildOnly(EMI.getPlugin().getConfig().getLong("guild-id"));
 
         // the need for a prefix has been deprecated with slash commands
         //builder.setPrefix(this.getConfig().getString("bot-prefix"));
@@ -367,14 +367,14 @@ public class Configuration {
                 new WhitelistAppCommand(),
                 new RequestWhitelistCommand(),
                 new UnsyncCommand());
-        builder.setOwnerId(plugin.getConfig().getString("bot-owner-id"));
+        builder.setOwnerId(EMI.getPlugin().getConfig().getString("bot-owner-id"));
 
         // register our global commands separately
         CommandClientBuilder globalBuilder = new CommandClientBuilder();
-        globalBuilder.setActivity(Activity.watching(plugin.getConfig().getString("bot-game")));
+        globalBuilder.setActivity(Activity.watching(EMI.getPlugin().getConfig().getString("bot-game")));
 
         globalBuilder.addSlashCommands(new ConfirmSyncCommand(), new DenySyncCommand());
-        globalBuilder.setOwnerId(plugin.getConfig().getString("bot-owner-id"));
+        globalBuilder.setOwnerId(EMI.getPlugin().getConfig().getString("bot-owner-id"));
 
         CommandClient client = builder.build();
         CommandClient globalClient = globalBuilder.build();
@@ -389,8 +389,8 @@ public class Configuration {
                     .setMemberCachePolicy(MemberCachePolicy.ALL)
                     .enableIntents(GatewayIntent.GUILD_MEMBERS,GatewayIntent.DIRECT_MESSAGES,GatewayIntent.GUILD_MESSAGES)
                     .build();
-            jda.awaitReady();
-            Guild guild = Configuration.getJda().getGuildById(plugin.getConfig().getLong("guild-id"));
+            EMI.getJda().awaitReady();
+            Guild guild = EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id"));
 
             //send an API request for all Everneth guild members on startup, which will then be stored in the cache
             guild.loadMembers();
@@ -399,7 +399,7 @@ public class Configuration {
             VotingService.getService();
 
             // cache the help channel history so message history persists through a reset
-            guild.getTextChannelById(plugin.getConfig().getLong("help-channel-id")).getHistoryFromBeginning(100);
+            guild.getTextChannelById(EMI.getPlugin().getConfig().getLong("help-channel-id")).getHistoryFromBeginning(100);
         }
         catch(Exception e)
         {
@@ -432,28 +432,18 @@ public class Configuration {
 
     private void unregisterCommands(boolean keepGlobal)
     {
-        Guild guild = Configuration.getJda().getGuildById(plugin.getConfig().getLong("guild-id"));
+        Guild guild = EMI.getJda().getGuildById(plugin.getConfig().getLong("guild-id"));
 
         List<Command> commands = guild.retrieveCommands().complete();
         for (Command command : commands)
             command.delete().complete();
 
         if (!keepGlobal) {
-            List<Command> globalCommands = Configuration.getJda().retrieveCommands().complete();
+            List<Command> globalCommands = EMI.getJda().retrieveCommands().complete();
             for (Command command : globalCommands) {
                 command.delete().complete();
             }
         }
     }
-
-    public static EMI getPlugin()
-    {
-        return plugin;
-    }
-    public static JDA getJda()
-    {
-        return jda;
-    }
-    public static Guild getGuild() { return Configuration.getJda().getGuildById(plugin.getConfig().getLong("guild-id")); }
-    public static Long getConfigLong(String path) { return plugin.getConfig().getLong(path); }
+    public static JDA getJda() { return jda; }
 }
