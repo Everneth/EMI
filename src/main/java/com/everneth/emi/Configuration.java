@@ -106,7 +106,17 @@ public class Configuration {
             }
         }
     }
-    public void reload() {}
+    public void reload()
+    {
+        try
+        {
+            config.load(configFile);
+        }
+        catch (Exception e)
+        {
+            EMI.getPlugin().getLogger().severe(e.getMessage());
+        }
+    }
 
     private void registerCommands()
     {
