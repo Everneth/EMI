@@ -7,10 +7,9 @@ import co.aikar.commands.annotation.Description;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
-import com.everneth.emi.utils.PlayerUtils;
+import com.everneth.emi.models.EMIPlayer;
 import org.bukkit.command.CommandSender;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -26,7 +25,7 @@ public class InfoCommand extends BaseCommand {
     @Description("Request some useful information about a user")
     @CommandPermission("emi.par.info")
     public void onInfo(CommandSender sender, String username) {
-        DbRow playerRow = PlayerUtils.getPlayerRow(username);
+        DbRow playerRow = EMIPlayer.getPlayerRow(username);
 
         if (playerRow == null) {
             sender.sendMessage(Utils.color("&cCould not find a user with the name " + username + "."));

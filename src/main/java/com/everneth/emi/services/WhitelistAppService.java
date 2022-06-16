@@ -4,21 +4,14 @@ import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 
+import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.WhitelistApp;
-import com.everneth.emi.utils.PlayerUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.managers.GuildManager;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-import org.bukkit.entity.Player;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -163,7 +156,7 @@ public class WhitelistAppService {
 
     public void approveWhitelistAppRecord(long id, long msgid)
     {
-        DbRow playerToAdd = PlayerUtils.getAppRecord(id);
+        DbRow playerToAdd = EMIPlayer.getAppRecord(id);
         DB.executeUpdateAsync("UPDATE applications SET is_approved = 1, app_active = 0 WHERE applicant_discord_id = ?",
                 id);
         try {
@@ -298,7 +291,7 @@ public class WhitelistAppService {
             case 1:
                 // the username containing any spaces will cause an exception, the easiest solution is to simply replace any spaces
                 data = data.trim().replace(" ", "_");
-                UUID playerUuid = PlayerUtils.getPlayerUUID(data);
+                UUID playerUuid = EMIPlayer.getPlayerUUID(data);
                 if (playerUuid != null) {
                     app.setMinecraftUuid(playerUuid);
                     app.setInGameName(data);

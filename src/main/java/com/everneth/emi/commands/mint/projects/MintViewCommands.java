@@ -10,7 +10,6 @@ import com.everneth.emi.models.mint.MintLogMaterial;
 import com.everneth.emi.models.mint.MintLogTask;
 import com.everneth.emi.models.mint.MintMaterial;
 import com.everneth.emi.models.mint.MintProject;
-import com.everneth.emi.utils.PlayerUtils;
 import org.bukkit.entity.Player;
 
 /**
@@ -46,7 +45,7 @@ public class MintViewCommands extends BaseCommand
             return;
         }
 
-        DbRow dbWorker = PlayerUtils.getPlayerRow(worker);
+        DbRow dbWorker = EMIPlayer.getPlayerRow(worker);
 
         if(dbWorker == null || dbWorker.isEmpty())
         {
@@ -103,7 +102,7 @@ public class MintViewCommands extends BaseCommand
             return;
         }
 
-        DbRow dbWorker = PlayerUtils.getPlayerRow(worker);
+        DbRow dbWorker = EMIPlayer.getPlayerRow(worker);
 
         if(dbWorker == null || dbWorker.isEmpty())
         {

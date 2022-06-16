@@ -3,16 +3,14 @@ package com.everneth.emi.commands.bot;
 
 import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
+import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.services.WhitelistService;
-import com.everneth.emi.utils.PlayerUtils;
 import com.jagrosh.jdautilities.command.SlashCommand;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class RequestWhitelistCommand extends SlashCommand {
     public RequestWhitelistCommand() {
@@ -28,7 +26,7 @@ public class RequestWhitelistCommand extends SlashCommand {
 
     @Override
     protected void execute(SlashCommandEvent event) {
-        DbRow playerRow = PlayerUtils.getPlayerRow(event.getMember().getIdLong());
+        DbRow playerRow = EMIPlayer.getPlayerRow(event.getMember().getIdLong());
         if (playerRow != null) {
             event.reply("You are already synced, you do not need to apply for temporary whitelisting.").setEphemeral(true).queue();
             return;
@@ -38,7 +36,7 @@ public class RequestWhitelistCommand extends SlashCommand {
             event.reply("You did not provide a name for me to whitelist").setEphemeral(true).queue();
             return;
         }
-        if (PlayerUtils.getPlayerRow(username) != null || WhitelistService.getService().isWhitelisted(username)) {
+        if (EMIPlayer.getPlayerRow(username) != null || WhitelistService.getService().isWhitelisted(username)) {
             event.reply("That user is already on the whitelist. If this is an error please contact Staff.").setEphemeral(true).queue();
             return;
         }

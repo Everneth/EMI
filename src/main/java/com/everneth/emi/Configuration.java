@@ -23,7 +23,6 @@ import com.everneth.emi.models.Motd;
 import com.everneth.emi.models.mint.*;
 import com.everneth.emi.services.VotingService;
 import com.everneth.emi.services.WhitelistService;
-import com.everneth.emi.utils.PlayerUtils;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -172,7 +171,7 @@ public class Configuration {
 
         for(DbRow projectRow : projects)
         {
-            DbRow playerRow = PlayerUtils.getPlayerRow(projectRow.getInt("leader"));
+            DbRow playerRow = EMIPlayer.getPlayerRow(projectRow.getInt("leader"));
             EMIPlayer playerLead = new EMIPlayer(playerRow.getString("player_uuid"),
                     playerRow.getString("player_name"),
                     playerRow.getString("alt_name"),
@@ -202,7 +201,7 @@ public class Configuration {
                     continue;
                 }
 
-                DbRow player = PlayerUtils.getPlayerRow(worker.getInt("player_id"));
+                DbRow player = EMIPlayer.getPlayerRow(worker.getInt("player_id"));
                 if (player != null) {
                     EMIPlayer emiPlayer = new EMIPlayer(player.getString("player_uuid"),
                             player.getString("player_name"),
@@ -264,7 +263,7 @@ public class Configuration {
                     continue;
                 }
 
-                DbRow loggedByRow = PlayerUtils.getPlayerRow(taskLogRow.getInt("logged_by"));
+                DbRow loggedByRow = EMIPlayer.getPlayerRow(taskLogRow.getInt("logged_by"));
                 EMIPlayer loggedBy = null;
                 if (loggedByRow != null) {
                     loggedBy = new EMIPlayer(loggedByRow.getString("player_uuid"),
@@ -276,7 +275,7 @@ public class Configuration {
 
                 try
                 {
-                    DbRow validatedByRow = PlayerUtils.getPlayerRow(taskLogRow.getInt("validated_by"));
+                    DbRow validatedByRow = EMIPlayer.getPlayerRow(taskLogRow.getInt("validated_by"));
                     validatedBy = new EMIPlayer(validatedByRow.getString("player_uuid"),
                             validatedByRow.getString("player_name"),
                             validatedByRow.getString("alt_name"),
@@ -314,7 +313,7 @@ public class Configuration {
                     continue;
                 }
 
-                DbRow loggedByRow = PlayerUtils.getPlayerRow(materialLogRow.getInt("logged_by"));
+                DbRow loggedByRow = EMIPlayer.getPlayerRow(materialLogRow.getInt("logged_by"));
                 EMIPlayer loggedBy = null;
                 if (loggedByRow != null) {
                     loggedBy = new EMIPlayer(loggedByRow.getString("player_uuid"),
@@ -326,7 +325,7 @@ public class Configuration {
 
                 try
                 {
-                    DbRow validatedByRow = PlayerUtils.getPlayerRow(materialLogRow.getInt("validated_by"));
+                    DbRow validatedByRow = EMIPlayer.getPlayerRow(materialLogRow.getInt("validated_by"));
                     validatedBy = new EMIPlayer(validatedByRow.getString("player_uuid"),
                             validatedByRow.getString("player_name"),
                             validatedByRow.getString("alt_name"),

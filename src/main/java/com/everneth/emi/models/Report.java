@@ -3,7 +3,6 @@ package com.everneth.emi.models;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.managers.ReportManager;
-import com.everneth.emi.utils.PlayerUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -76,7 +75,7 @@ public class Report {
         Role botRole = guildManager.getGuild().getRolesByName(EMI.getJda().getSelfUser().getName(), true).get(0);
         ReportManager rm = ReportManager.getReportManager();
 
-        DbRow playerRow = PlayerUtils.getPlayerRow(player.getUniqueId());
+        DbRow playerRow = EMIPlayer.getPlayerRow(player.getUniqueId());
 
         switch(reportType) {
             case "_staff":
@@ -93,7 +92,7 @@ public class Report {
                 ebs.addField("Description", message, false);
                 ebs.setFooter("Staff help requested!", null);
 
-                if(PlayerUtils.syncExists(player.getUniqueId())) {
+                if(EMIPlayer.syncExists(player.getUniqueId())) {
                     long userPermissions = Permission.ALL_TEXT_PERMISSIONS
                             + Permission.VIEW_CHANNEL.getRawValue()
                             - Permission.MESSAGE_MANAGE.getRawValue();
@@ -139,7 +138,7 @@ public class Report {
                 ebm.addField("Description", message, false);
                 ebm.setFooter("MINT help requested!", null);
 
-                if(PlayerUtils.syncExists(player.getUniqueId())) {
+                if(EMIPlayer.syncExists(player.getUniqueId())) {
                     long userPermissions = Permission.ALL_TEXT_PERMISSIONS
                             + Permission.VIEW_CHANNEL.getRawValue()
                             - Permission.MESSAGE_MANAGE.getRawValue();

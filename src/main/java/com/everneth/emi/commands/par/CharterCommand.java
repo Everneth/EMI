@@ -8,7 +8,6 @@ import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
 import com.everneth.emi.models.CharterPoint;
 import com.everneth.emi.models.EMIPlayer;
-import com.everneth.emi.utils.PlayerUtils;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import org.bukkit.BanList;
@@ -21,7 +20,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -69,7 +67,7 @@ public class CharterCommand extends BaseCommand {
     public void onIssueCommand(CommandSender sender, String player, int amount, String reason)
     {
         Player issuer = (Player) sender;
-        DbRow recipientRecord = PlayerUtils.getPlayerRow(player);
+        DbRow recipientRecord = EMIPlayer.getPlayerRow(player);
         long pointRecordId = 0;
 
         if(recipientRecord == null)
@@ -101,7 +99,7 @@ public class CharterCommand extends BaseCommand {
     public void onBanCommand(CommandSender sender, String player, @Optional String reason)
     {
         Player issuer = (Player) sender;
-        DbRow recipientRecord = PlayerUtils.getPlayerRow(player);
+        DbRow recipientRecord = EMIPlayer.getPlayerRow(player);
         if(reason == null)
         {
             reason = "You have exceeded 5 charter points and are permanently banned. Please contact staff on discord if you wish to appeal.";
@@ -136,7 +134,7 @@ public class CharterCommand extends BaseCommand {
     public void onHistoryCommand(CommandSender sender, String name, @Default("false") boolean includeExpired)
     {
         //before doing anything does this player exist?
-        DbRow player = PlayerUtils.getPlayerRow(name);
+        DbRow player = EMIPlayer.getPlayerRow(name);
         if(player == null || player.isEmpty())
         {
             sender.sendMessage(Utils.color("&9[Charter]&3 This player does not exist in our system."));
@@ -144,7 +142,7 @@ public class CharterCommand extends BaseCommand {
         else
         {
         List<DbRow> points;
-        points = PlayerUtils.getAllPoints(name);
+        points = EMIPlayer.getAllPoints(name);
 
         if(points.isEmpty())
         {
@@ -298,7 +296,7 @@ public class CharterCommand extends BaseCommand {
         }
         else
         {
-            DbRow playerRow = PlayerUtils.getPlayerRow(name);
+            DbRow playerRow = EMIPlayer.getPlayerRow(name);
             String playerName = playerRow.getString("player_name");
             String altName = playerRow.getString("alt_name");
             Bukkit.getBanList(BanList.Type.NAME).pardon(playerName);

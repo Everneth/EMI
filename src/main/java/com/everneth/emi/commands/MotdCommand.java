@@ -4,10 +4,7 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import com.everneth.emi.Utils;
 import com.everneth.emi.managers.MotdManager;
-import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.Motd;
-import com.everneth.emi.utils.PlayerUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 

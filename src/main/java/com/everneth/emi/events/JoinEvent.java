@@ -7,9 +7,9 @@ import com.everneth.emi.managers.MotdManager;
 import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.Utils;
 import com.everneth.emi.EMI;
+import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.Motd;
 
-import com.everneth.emi.utils.PlayerUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -51,7 +51,7 @@ public class JoinEvent implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event)
     {
         Player player = event.getPlayer();
-        DbRow playerRow = PlayerUtils.getPlayerRow(player.getUniqueId());
+        DbRow playerRow = EMIPlayer.getPlayerRow(player.getUniqueId());
 
         // Did we find anything?
         if (playerRow == null) {

@@ -4,7 +4,6 @@ import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
-import com.everneth.emi.utils.PlayerUtils;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.requests.ErrorResponse;
@@ -74,7 +73,7 @@ public class CharterPoint {
 
     public long issuePoint()
     {
-        DbRow issuer = PlayerUtils.getPlayerRow(UUID.fromString(this.getIssuer().getUniqueId()));
+        DbRow issuer = EMIPlayer.getPlayerRow(UUID.fromString(this.getIssuer().getUniqueId()));
         Date now = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -102,7 +101,7 @@ public class CharterPoint {
 
     public void enforceCharter(CommandSender sender)
     {
-        List<DbRow> pointsList = PlayerUtils.getAllPoints(this.recipient.getName());
+        List<DbRow> pointsList = EMIPlayer.getAllPoints(this.recipient.getName());
         int points = 0;
         LocalDateTime now = LocalDateTime.now();
 
@@ -115,7 +114,7 @@ public class CharterPoint {
             }
         }
 
-        EMIPlayer player = PlayerUtils.getEMIPlayer(this.recipient.getName());
+        EMIPlayer player = EMIPlayer.getEMIPlayer(this.recipient.getName());
         Calendar cal = Calendar.getInstance();
         switch(points)
         {
@@ -173,13 +172,13 @@ public class CharterPoint {
 
     public static CharterPoint getCharterPoint(int id)
     {
-        return PlayerUtils.getOnePoint(id);
+        return EMIPlayer.getOnePoint(id);
     }
 
     public static long pardonPlayer(String name, Player sender, boolean removeFlag)
     {
         int retVal = 0;
-        DbRow playerRecord = PlayerUtils.getPlayerRow(name);
+        DbRow playerRecord = EMIPlayer.getPlayerRow(name);
         LocalDateTime now = LocalDateTime.now();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 

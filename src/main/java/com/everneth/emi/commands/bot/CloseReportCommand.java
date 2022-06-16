@@ -5,7 +5,6 @@ import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.utils.FileUtils;
 
-import com.everneth.emi.utils.PlayerUtils;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -42,7 +41,7 @@ public class CloseReportCommand extends SlashCommand {
         if(event.getChannel().getName().contains("_staff"))
         {
             UUID uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
-            EMIPlayer player = PlayerUtils.getEMIPlayer(uuid);
+            EMIPlayer player = EMIPlayer.getEMIPlayer(uuid);
             // Lets check them
             for (Role role : roleList) {
                 if (role.getIdLong() == staffRoleId) {
@@ -75,7 +74,7 @@ public class CloseReportCommand extends SlashCommand {
         else if(event.getChannel().getName().contains("_mint"))
         {
             UUID uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
-            EMIPlayer player = PlayerUtils.getEMIPlayer(uuid);
+            EMIPlayer player = EMIPlayer.getEMIPlayer(uuid);
             // Lets check them
             for (Role role : roleList) {
                 if (role.getIdLong() == staffRoleId || role.getIdLong() == mintRoleId) {
