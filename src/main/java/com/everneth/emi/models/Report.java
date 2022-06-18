@@ -75,7 +75,7 @@ public class Report {
         Role botRole = guildManager.getGuild().getRolesByName(EMI.getJda().getSelfUser().getName(), true).get(0);
         ReportManager rm = ReportManager.getReportManager();
 
-        DbRow playerRow = EMIPlayer.getPlayerRow(player.getUniqueId());
+        EMIPlayer playerRow = EMIPlayer.getEmiPlayer(player.getUniqueId());
 
         switch(reportType) {
             case "_staff":
@@ -96,7 +96,7 @@ public class Report {
                     long userPermissions = Permission.ALL_TEXT_PERMISSIONS
                             + Permission.VIEW_CHANNEL.getRawValue()
                             - Permission.MESSAGE_MANAGE.getRawValue();
-                    discordMember = guildManager.getGuild().getMemberById(playerRow.getLong("discord_id"));
+                    discordMember = guildManager.getGuild().getMemberById(playerRow.getDiscordId());
                     ChannelAction<TextChannel> channelAction = guildManager.getGuild().createTextChannel(player.getName().toLowerCase() + reportType);
                     channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
                             .addPermissionOverride(staffRole, Permission.ALL_CHANNEL_PERMISSIONS, 0)
@@ -106,7 +106,7 @@ public class Report {
                                 Report reportToAdd = new Report(channel.getIdLong());
                                 reportToAdd.setDiscordUserId(discordMember.getUser().getIdLong());
                                 rm.addReport(player.getUniqueId(), reportToAdd);
-                                rm.addReportRecord(reportToAdd, playerRow.getInt("player_id"));
+                                rm.addReportRecord(reportToAdd, playerRow.getId());
                                 channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessageEmbeds(ebs.build()).queue();
                             });
                 }
@@ -119,7 +119,7 @@ public class Report {
                             channel -> {
                                 Report reportToAdd = new Report(channel.getIdLong());
                                 rm.addReport(player.getUniqueId(), reportToAdd);
-                                rm.addReportRecord(reportToAdd, playerRow.getInt("player_id"));
+                                rm.addReportRecord(reportToAdd, playerRow.getId());
                                 channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessageEmbeds(ebs.build()).queue();
                             });
                 }
@@ -142,7 +142,7 @@ public class Report {
                     long userPermissions = Permission.ALL_TEXT_PERMISSIONS
                             + Permission.VIEW_CHANNEL.getRawValue()
                             - Permission.MESSAGE_MANAGE.getRawValue();
-                    discordMember = guildManager.getGuild().getMemberById(playerRow.getLong("discord_id"));
+                    discordMember = guildManager.getGuild().getMemberById(playerRow.getDiscordId());
                     ChannelAction<TextChannel> channelAction = guildManager.getGuild().createTextChannel(player.getName().toLowerCase() + reportType);
                     channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
                             .addPermissionOverride(staffRole, Permission.ALL_CHANNEL_PERMISSIONS, 0)
@@ -153,7 +153,7 @@ public class Report {
                                 Report reportToAdd = new Report(channel.getIdLong());
                                 reportToAdd.setDiscordUserId(discordMember.getUser().getIdLong());
                                 rm.addReport(player.getUniqueId(), reportToAdd);
-                                rm.addReportRecord(reportToAdd, playerRow.getInt("player_id"));
+                                rm.addReportRecord(reportToAdd, playerRow.getId());
                                 channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessageEmbeds(ebm.build()).queue();
                             });
                 }
@@ -167,7 +167,7 @@ public class Report {
                             channel -> {
                                 Report reportToAdd = new Report(channel.getIdLong());
                                 rm.addReport(player.getUniqueId(), reportToAdd);
-                                rm.addReportRecord(reportToAdd, playerRow.getInt("player_id"));
+                                rm.addReportRecord(reportToAdd, playerRow.getId());
                                 channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessageEmbeds(ebm.build()).queue();
                             });
                 }
