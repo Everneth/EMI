@@ -61,7 +61,7 @@ public class VotingService {
 
             WhitelistAppService.getService().approveWhitelistAppRecord(applicant.getIdLong(), vote.getMessageId());
 
-            guild.getTextChannelById(EMI.getPlugin().getConfig().getLong("whitelist-channel-id"))
+            guild.getTextChannelById(EMI.getPlugin().getConfig().getLong("announcement-channel-id"))
                     .sendMessage(applicant.getAsMention() + " has been whitelisted! Congrats!").queue();
         }
         else {
