@@ -57,7 +57,7 @@ public class EMIPlayer {
         this.name = name;
         this.altName = altName;
         this.id = id;
-        this.discordId = id;
+        this.discordId = discordId;
     }
 
     public EMIPlayer(String uuid, String name, String altName, int id, long discordId, LocalDateTime dateAltAdded, String altUuid) {
@@ -65,7 +65,7 @@ public class EMIPlayer {
         this.name = name;
         this.altName = altName;
         this.id = id;
-        this.discordId = id;
+        this.discordId = discordId;
         this.dateAltAdded = dateAltAdded;
         this.altUuid = altUuid;
     }
