@@ -6,33 +6,19 @@ import com.everneth.emi.EMI;
 import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.Utils;
 
-import com.everneth.emi.models.PostResponse;
-import com.everneth.emi.models.Report;
+import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.WhitelistApp;
 import com.everneth.emi.services.WhitelistAppService;
-import com.everneth.emi.utils.PlayerUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.apache.http.Consts;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class MessageReceivedListener extends ListenerAdapter {
@@ -48,7 +34,7 @@ public class MessageReceivedListener extends ListenerAdapter {
             UUID player_uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
 
             if(player_uuid != null) {
-                if(!PlayerUtils.syncExists(player_uuid)) {
+                if(!EMIPlayer.syncExists(player_uuid)) {
                     OfflinePlayer offlinePlayer = EMI.getPlugin().getServer().getOfflinePlayer(player_uuid);
 
 

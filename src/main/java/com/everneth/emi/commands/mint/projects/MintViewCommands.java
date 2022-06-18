@@ -10,7 +10,6 @@ import com.everneth.emi.models.mint.MintLogMaterial;
 import com.everneth.emi.models.mint.MintLogTask;
 import com.everneth.emi.models.mint.MintMaterial;
 import com.everneth.emi.models.mint.MintProject;
-import com.everneth.emi.utils.PlayerUtils;
 import org.bukkit.entity.Player;
 
 /**
@@ -46,16 +45,15 @@ public class MintViewCommands extends BaseCommand
             return;
         }
 
-        DbRow dbWorker = PlayerUtils.getPlayerRow(worker);
+        EMIPlayer playerWorker = EMIPlayer.getEmiPlayer(worker);
 
-        if(dbWorker == null || dbWorker.isEmpty())
+        if(worker.isEmpty())
         {
             player.sendMessage(Utils.color(mintProjectTag + "&cUnrecognized player, did you spell the name correctly?"));
             return;
         }
 
         // Searches for and displays tasks that meet the right project and worker
-        EMIPlayer playerWorker = new EMIPlayer(dbWorker.getString("player_uuid"), dbWorker.getString("player_name"), dbWorker.getInt("player_id"));
 
         player.sendMessage(Utils.color(mintProjectTag + "&aTask logs submitted by &6" + playerWorker.getName() + " &afor project &6" + project.getName() + "&a:"));
 
@@ -103,17 +101,15 @@ public class MintViewCommands extends BaseCommand
             return;
         }
 
-        DbRow dbWorker = PlayerUtils.getPlayerRow(worker);
+        EMIPlayer playerWorker = EMIPlayer.getEmiPlayer(worker);
 
-        if(dbWorker == null || dbWorker.isEmpty())
+        if(playerWorker.isEmpty())
         {
             player.sendMessage(Utils.color(mintProjectTag + "&cUnrecognized player, did you spell the name correctly?"));
             return;
         }
 
         // Searches for and displays materials that meet the right project and worker
-        EMIPlayer playerWorker = new EMIPlayer(dbWorker.getString("player_uuid"), dbWorker.getString("player_name"), dbWorker.getInt("player_id"));
-
         player.sendMessage(Utils.color(mintProjectTag + "&aMaterial logs submitted by &6" + playerWorker.getName() + " &afor project &6" + project.getName() + "&a:"));
 
         for(MintLogMaterial material : project.getMaterialLog().values())

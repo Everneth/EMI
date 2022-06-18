@@ -12,7 +12,6 @@ import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.mint.MintMaterial;
 import com.everneth.emi.models.mint.MintProject;
 import com.everneth.emi.models.mint.MintTask;
-import com.everneth.emi.utils.PlayerUtils;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -91,19 +90,15 @@ public class MintProjectCommands extends BaseCommand
             return;
         }
 
-        DbRow dbPlayerLead = PlayerUtils.getPlayerRow(lead);
+        EMIPlayer playerLead = EMIPlayer.getEmiPlayer(lead);
 
-        if(dbPlayerLead == null || dbPlayerLead.isEmpty())
+        if(playerLead.isEmpty())
         {
             player.sendMessage(Utils.color(mintProjectTag + "&cUnrecognized player, did you spell the name correctly?"));
             return;
         }
 
         // Valid information is then put into the project
-        EMIPlayer playerLead = new EMIPlayer(dbPlayerLead.getString("player_uuid"),
-                dbPlayerLead.getString("player_name"),
-                dbPlayerLead.getString("alt_name"),
-                dbPlayerLead.getInt("player_id"));
         project = new MintProject(playerLead, projectName, Utils.getCurrentDate(), null, 0, 0, Utils.buildMessage(description, 0, false));
         manager.addProject(project);
         player.sendMessage(Utils.color(mintProjectTag + "&aSuccessfully created the project!"));
@@ -263,7 +258,7 @@ public class MintProjectCommands extends BaseCommand
         }
 
         // Valid information is then put into the project
-        EMIPlayer emiPlayer = PlayerUtils.getEMIPlayer(player.getName());
+        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(player.getName());
 
         project.addWorker(emiPlayer);
         player.sendMessage(Utils.color(mintProjectTag + "&aSuccessfully joined the project!"));

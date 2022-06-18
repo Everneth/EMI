@@ -3,12 +3,11 @@ package com.everneth.emi.managers;
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
+import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.Report;
-import com.everneth.emi.utils.PlayerUtils;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -58,54 +57,11 @@ public final class ReportManager {
         Long discordId = rm.findReportById(uuid).getDiscordUserId();
         return !discordId.equals(0L);
     }
-
-    public int messagesMissed(UUID uuid)
-    {
-        Report report = rm.findReportById(uuid);
-        DbRow playerRecord = PlayerUtils.getPlayerRow(uuid);
-        DbRow reportRecord = getReportRecord(uuid);
-        EMI.getJda().getTextChannelById(report.getChannelId()).sendMessage("***" + playerRecord.getString("player_name") + "** has joined the game.*").queue();
-        try {
-            CompletableFuture<List<DbRow>> result = DB.getResultsAsync("SELECT * FROM report_messages WHERE report_id = ? AND msg_read = 0", reportRecord.getInt("report_id"));
-            return result.get().size();
-
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-            return 0;
-        }
-    }
-    public List<DbRow> getMissedMessages(UUID uuid)
-    {
-        Report report = rm.findReportById(uuid);
-        DbRow playerRecord = PlayerUtils.getPlayerRow(uuid);
-        DbRow reportRecord = getReportRecord(uuid);
-        try
-        {
-            CompletableFuture<List<DbRow>> results = DB.getResultsAsync("SELECT author, message FROM report_messages WHERE report_id = ? AND msg_read = 0",
-                    reportRecord.getInt("report_id"));
-            markReportMessagesRead(reportRecord);
-            return results.get();
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-            return null;
-        }
-    }
-
-    private void markReportMessagesRead(DbRow reportRecord)
-    {
-        DB.executeUpdateAsync("UPDATE report_messages SET msg_read = 1 WHERE report_id = ? AND msg_read = 0",
-                reportRecord.getInt("report_id"));
-    }
-
     public DbRow getReportRecord(UUID uuid)
     {
-        DbRow playerRow = PlayerUtils.getPlayerRow(uuid);
+        EMIPlayer playerRow = EMIPlayer.getEmiPlayer(uuid);
         try {
-            CompletableFuture<DbRow> result =  DB.getFirstRowAsync("SELECT * FROM reports WHERE initiator_id = ?", playerRow.getInt("player_id"));
+            CompletableFuture<DbRow> result =  DB.getFirstRowAsync("SELECT * FROM reports WHERE initiator_id = ?", playerRow.getId());
             return result.get();
         }
         catch (Exception e)
@@ -150,14 +106,13 @@ public final class ReportManager {
     {
         Date now = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        DbRow playerRow = PlayerUtils.getPlayerRow(uuid);
+        EMIPlayer playerRow = EMIPlayer.getEmiPlayer(uuid);
         DbRow reportRecord = getReportRecord(uuid);
         DB.executeUpdateAsync(
                 "UPDATE reports SET active = 0, date_closed = ? WHERE initiator_id = ?",
                 format.format(now),
-                playerRow.getInt("player_id")
+                playerRow.getId()
         );
-        markReportMessagesRead(reportRecord);
         rm.removeReport(uuid);
     }
 

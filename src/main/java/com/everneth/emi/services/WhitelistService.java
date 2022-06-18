@@ -3,15 +3,11 @@ package com.everneth.emi.services;
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
-import com.everneth.emi.utils.PlayerUtils;
+import com.everneth.emi.models.EMIPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class WhitelistService {
     private static WhitelistService service;
@@ -33,9 +29,9 @@ public class WhitelistService {
         scheduler.scheduleSyncDelayedTask(EMI.getPlugin(), new Runnable() {
             @Override
             public void run() {
-                DbRow playerRow = PlayerUtils.getPlayerRow(name);
+                EMIPlayer player = EMIPlayer.getEmiPlayer(name);
                 // If row or discord_id is null, the player did not sync and needs to be removed from the whitelist
-                if (playerRow == null || playerRow.getLong("discord_id") == null) {
+                if (player.isEmpty() || player.getDiscordId() == 0) {
                     EMI.getPlugin().getServer().getScheduler().callSyncMethod(EMI.getPlugin(), () ->
                             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "whitelist remove " + name));
                     whitelistedPlayers.remove(name);

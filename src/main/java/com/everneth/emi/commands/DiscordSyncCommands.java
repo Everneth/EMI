@@ -7,7 +7,7 @@ import co.aikar.idb.DbRow;
 import com.everneth.emi.Utils;
 import com.everneth.emi.managers.DiscordSyncManager;
 import com.everneth.emi.EMI;
-import com.everneth.emi.utils.PlayerUtils;
+import com.everneth.emi.models.EMIPlayer;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -15,14 +15,10 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.requests.ErrorResponse;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Class: DiscordSyncCommands
@@ -41,7 +37,7 @@ public class DiscordSyncCommands extends BaseCommand {
     @Syntax("<Name#0000>")
     public void onDiscordsync(Player player, String discordDetails) {
         // If the account is already synced, notify the user and return
-        if (PlayerUtils.syncExists(player.getUniqueId())) {
+        if (EMIPlayer.syncExists(player.getUniqueId())) {
             player.sendMessage(Utils.color("&cYou have already synced this account. If this is in error, please contact staff."));
             return;
         }
@@ -91,9 +87,9 @@ public class DiscordSyncCommands extends BaseCommand {
     @Subcommand("unsync")
     @Description("If you have lost access to your discord account, you may unsync and re-sync with a different account.")
     public void onDiscordUnsync(Player player) {
-        DbRow playerRow = PlayerUtils.getPlayerRow(player.getUniqueId());
-        Long discordId = playerRow.getLong("discord_id");
-        if (discordId == null || discordId == 0) {
+        EMIPlayer playerRow = EMIPlayer.getEmiPlayer(player.getUniqueId());
+        long discordId = playerRow.getDiscordId();
+        if (discordId == 0) {
             player.sendMessage("You do not have a discord account synced with your minecraft account.");
             return;
         }

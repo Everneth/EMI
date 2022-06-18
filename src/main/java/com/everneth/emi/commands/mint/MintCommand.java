@@ -4,13 +4,11 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import com.everneth.emi.Utils;
 import com.everneth.emi.managers.ReportManager;
+import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.Report;
-import com.everneth.emi.utils.PlayerUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-
-import java.sql.SQLException;
 
 /**
  *     Class: MintCommand
@@ -42,7 +40,7 @@ public class MintCommand extends BaseCommand
         else {
             Report.buildPrivateChannel(player, message, "_mint");
             // Make the bot post the embed to the channel and notify the player
-            if(PlayerUtils.syncExists(player.getUniqueId()))
+            if(EMIPlayer.syncExists(player.getUniqueId()))
                 player.sendMessage(Utils.color("<&6The Wench&f> I have created a direct channel with the &dMinistry of the Interior&f. &a&lProceed to Discord to continue the chat. &d<3"));
             else
                 player.sendMessage(Utils.color("<&6The Wench&f> I have created a direct channel with the &dMinistry of the Interior&f. Please use &6/rr <message>&f to message MINT directly! A member " +

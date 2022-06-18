@@ -4,30 +4,17 @@ import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 
 import com.everneth.emi.EMI;
-import com.everneth.emi.models.WhitelistApp;
+import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.WhitelistVote;
-import com.everneth.emi.utils.FileUtils;
-import com.everneth.emi.utils.PlayerUtils;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.sun.jdi.ClassType;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.Component;
 import net.dv8tion.jda.api.requests.ErrorResponse;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.*;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -65,7 +52,7 @@ public class VotingService {
         Role syncedRole = EMI.getGuild().getRoleById(EMI.getConfigLong("synced-role-id"));
 
         Guild guild = EMI.getGuild();
-        DbRow application = PlayerUtils.getAppRecord(vote.getApplicantDiscordId());
+        DbRow application = EMIPlayer.getAppRecord(vote.getApplicantDiscordId());
         Member applicant = guild.getMemberById(application.getLong("applicant_discord_id"));
 
         if (approved) {
@@ -221,7 +208,7 @@ public class VotingService {
     private void onVote(ButtonClickEvent event, WhitelistVote vote) {
         updateVoteEmbed(event);
 
-        DbRow application = PlayerUtils.getAppRecord(getVoteByMessageId(event.getMessage().getIdLong()).getApplicantDiscordId());
+        DbRow application = EMIPlayer.getAppRecord(getVoteByMessageId(event.getMessage().getIdLong()).getApplicantDiscordId());
         Member applicant = event.getGuild().getMemberById(application.getLong("applicant_discord_id"));
 
         if (hasMajority(vote.getPositiveVoters(), 51)) {

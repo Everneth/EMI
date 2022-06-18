@@ -1,15 +1,11 @@
 package com.everneth.emi.commands.bot;
 
-import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.managers.DiscordSyncManager;
 import com.everneth.emi.EMI;
 
-import com.everneth.emi.utils.PlayerUtils;
+import com.everneth.emi.models.EMIPlayer;
 import com.jagrosh.jdautilities.command.SlashCommand;
-import net.dv8tion.jda.api.entities.ChannelType;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
@@ -43,7 +39,7 @@ public class ConfirmSyncCommand extends SlashCommand {
             event.reply("No sync request exists for your account or it has already been synced.").setEphemeral(true).queue();
             return;
         }
-        else if (PlayerUtils.syncExists(toFind)) {
+        else if (EMIPlayer.syncExists(toFind)) {
             event.reply("You have already synced this account. If this is in error, please contact staff.").setEphemeral(true).queue();
             return;
         }

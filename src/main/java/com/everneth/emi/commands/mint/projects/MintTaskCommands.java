@@ -11,7 +11,6 @@ import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.mint.MintLogTask;
 import com.everneth.emi.models.mint.MintProject;
 import com.everneth.emi.models.mint.MintTask;
-import com.everneth.emi.utils.PlayerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -67,7 +66,7 @@ public class MintTaskCommands extends BaseCommand
         }
 
         // Valid information is then into the project
-        EMIPlayer logger = PlayerUtils.getEMIPlayer(player.getName());
+        EMIPlayer logger = EMIPlayer.getEmiPlayer(player.getName());
         MintLogTask log = new MintLogTask(project.getId(), logger, null, 0, timeWorked, Utils.getCurrentDate(), Utils.buildMessage(description, 0, false));
 
         project.addTaskLog(log);
