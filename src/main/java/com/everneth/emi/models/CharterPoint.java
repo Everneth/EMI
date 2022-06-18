@@ -73,7 +73,7 @@ public class CharterPoint {
 
     public long issuePoint()
     {
-        DbRow issuer = EMIPlayer.getPlayerRow(UUID.fromString(this.getIssuer().getUniqueId()));
+        EMIPlayer issuer = EMIPlayer.getEmiPlayer(UUID.fromString(this.getIssuer().getUniqueId()));
         Date now = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -88,7 +88,7 @@ public class CharterPoint {
                     this.getRecipient().getId(),
                     this.getReason(),
                     this.getAmount(),
-                    issuer.getInt("player_id"),
+                    issuer.getId(),
                     format.format(now),
                     format.format(cal.getTime()));
         }
@@ -114,7 +114,7 @@ public class CharterPoint {
             }
         }
 
-        EMIPlayer player = EMIPlayer.getEMIPlayer(this.recipient.getName());
+        EMIPlayer player = EMIPlayer.getEmiPlayer(this.recipient.getName());
         Calendar cal = Calendar.getInstance();
         switch(points)
         {
@@ -178,11 +178,11 @@ public class CharterPoint {
     public static long pardonPlayer(String name, Player sender, boolean removeFlag)
     {
         int retVal = 0;
-        DbRow playerRecord = EMIPlayer.getPlayerRow(name);
+        EMIPlayer recipient = EMIPlayer.getEmiPlayer(name);
         LocalDateTime now = LocalDateTime.now();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        if(playerRecord.isEmpty())
+        if(recipient.isEmpty())
         {
             return retVal;
         }
@@ -190,7 +190,7 @@ public class CharterPoint {
             try {
                 DB.executeUpdateAsync("UPDATE charter_points SET date_expired = ? WHERE issued_to = ? AND date_expired > NOW()",
                         format.format(now),
-                        playerRecord.getInt("player_id")).get();
+                        recipient.getId()).get();
                 retVal = 1;
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -198,15 +198,10 @@ public class CharterPoint {
         }
         if(removeFlag)
         {
-            DB.executeUpdateAsync("UPDATE players SET flagged = 0 WHERE player_id = ?", playerRecord.getInt("player_id"));
+            DB.executeUpdateAsync("UPDATE players SET flagged = 0 WHERE player_id = ?", recipient.getId());
         }
 
         // build point to issue after pardon is complete
-            EMIPlayer recipient = new EMIPlayer(
-                    playerRecord.getString("player_uuid"),
-                    playerRecord.getString("player_name"),
-                    playerRecord.getInt("player_id")
-            );
             EMIPlayer senderPlayer = new EMIPlayer(
                     sender.getUniqueId().toString(),
                     sender.getName()

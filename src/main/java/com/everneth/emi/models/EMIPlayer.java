@@ -12,6 +12,8 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -22,13 +24,18 @@ public class EMIPlayer {
     private String name;
     private String altName;
     private int id;
+    private long discordId;
+    private LocalDateTime dateAltAdded;
+    private String altUuid;
 
+    public EMIPlayer() {}
     public EMIPlayer(String uuid, String name, String altName)
     {
         this.uuid = uuid;
         this.name = name;
         this.altName = altName;
         this.id = 0;
+        this.discordId = 0L;
     }
     public EMIPlayer(String uuid, String name, String altName, int id)
     {
@@ -36,12 +43,31 @@ public class EMIPlayer {
         this.name = name;
         this.altName = altName;
         this.id = id;
+        this.discordId = 0L;
     }
 
     public EMIPlayer(String uuid, String name, int id) {
         this.uuid = uuid;
         this.name = name;
         this.id = id;
+    }
+
+    public EMIPlayer(String uuid, String name, String altName, int id, long discordId) {
+        this.uuid = uuid;
+        this.name = name;
+        this.altName = altName;
+        this.id = id;
+        this.discordId = id;
+    }
+
+    public EMIPlayer(String uuid, String name, String altName, int id, long discordId, LocalDateTime dateAltAdded, String altUuid) {
+        this.uuid = uuid;
+        this.name = name;
+        this.altName = altName;
+        this.id = id;
+        this.discordId = id;
+        this.dateAltAdded = dateAltAdded;
+        this.altUuid = altUuid;
     }
 
     public EMIPlayer(String uuid, String name) {
@@ -65,7 +91,26 @@ public class EMIPlayer {
     {
         return this.id;
     }
+    public long getDiscordId()
+    {
+        return this.discordId;
+    }
 
+    public LocalDateTime getDateAltAdded() {
+        return dateAltAdded;
+    }
+
+    public void setDateAltAdded(LocalDateTime dateAltAdded) {
+        this.dateAltAdded = dateAltAdded;
+    }
+
+    public String getAltUuid() {
+        return altUuid;
+    }
+
+    public void setAltUuid(String altUuid) {
+        this.altUuid = altUuid;
+    }
     public void setUniqueId(String uuid)
     {
         this.uuid = uuid;
@@ -79,77 +124,60 @@ public class EMIPlayer {
     {
         this.id = id;
     }
-
-    public static DbRow getPlayerRow(String playerName)
+    public void setDiscordId(long discordId)
     {
-        CompletableFuture<DbRow> futurePlayer;
-        DbRow player = new DbRow();
-        futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE ? IN (player_name,alt_name)", playerName);
-        try {
-            player = futurePlayer.get();
-        }
-        catch (Exception e)
-        {
-            EMI.getPlugin().getLogger().info(e.getMessage());
-        }
-        return player;
+        this.discordId = discordId;
     }
 
-    public static DbRow getPlayerRow(int id)
+    public static <T> EMIPlayer getEmiPlayer(T t)
     {
         CompletableFuture<DbRow> futurePlayer;
-        DbRow player = new DbRow();
-        futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE player_id = ?", id);
+        DbRow player;
+
+        if (t instanceof Integer) {
+            futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE player_id = ?", t);
+        } else if (t instanceof UUID) {
+            futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE ? IN (player_uuid,alt_uuid)", t.toString());
+        } else if (t instanceof Long) {
+            futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE discord_id = ?", t);
+        } else if (t instanceof String) {
+            futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE ? IN (player_name,alt_name)", t);
+        } else {
+            return new EMIPlayer();
+        }
+
         try {
             player = futurePlayer.get();
+            return new EMIPlayer(player.getString("player_uuid"),
+                    player.getString("player_name"),
+                    player.getString("alt_name"),
+                    player.getInt("player_id"),
+                    player.getLong("discord_id"),
+                    player.get("date_alt_added"),
+                    player.getString("alt_uuid"));
         }
         catch (Exception e)
         {
             EMI.getPlugin().getLogger().info(e.getMessage());
+            return new EMIPlayer();
         }
-        return player;
     }
 
-    public static DbRow getPlayerRow(long discordId)
+    public boolean isEmpty()
     {
-        CompletableFuture<DbRow> futurePlayer;
-        DbRow player = new DbRow();
-        futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE discord_id = ?", discordId);
-        try {
-            player = futurePlayer.get();
-        }
-        catch (Exception e)
-        {
-            EMI.getPlugin().getLogger().info(e.getMessage());
-        }
-        return player;
-    }
-
-    public static DbRow getPlayerRow(UUID uuid)
-    {
-        CompletableFuture<DbRow> futurePlayer;
-        DbRow player = new DbRow();
-        futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE ? IN (player_uuid,alt_uuid)", uuid.toString());
-        try {
-            player = futurePlayer.get();
-        }
-        catch (Exception e)
-        {
-            EMI.getPlugin().getLogger().info(e.getMessage());
-        }
-        return player;
+        return this.getId() == 0;
     }
 
     public static List<DbRow> getAllPoints(String name)
     {
-        DbRow recipient = getPlayerRow(name);
+        EMIPlayer recipient = EMIPlayer.getEmiPlayer(name);
 
         List<DbRow> recordsList = new ArrayList<DbRow>();
         try {
             recordsList = DB.getResultsAsync("SELECT charter_point_id, p1.player_name as 'issued_to', p1.player_uuid as 'recipient_uuid', p2.player_name as 'issued_by', p2.player_uuid as 'issuer_uuid', reason, amount, date_issued, date_expired, expunged FROM charter_points c INNER JOIN\n" +
                             "players p1 ON c.issued_to = p1.player_id\n" +
                             "JOIN players p2 ON c.issued_by = p2.player_id WHERE issued_to = ?",
-                    recipient.getInt("player_id")).get();
+                    recipient.getId()).get();
         }
         catch (Exception e)
         {
@@ -176,24 +204,12 @@ public class EMIPlayer {
         }
         else
         {
-            DbRow issuer = getPlayerRow(record.getInt("issued_by"));
-            DbRow recipient = getPlayerRow(record.getInt("issued_to"));
+            EMIPlayer issuer = getEmiPlayer(record.getInt("issued_by"));
+            EMIPlayer recipient = getEmiPlayer(record.getInt("issued_to"));
 
-            EMIPlayer issuerPlayer = new EMIPlayer(
-                    issuer.getString("player_uuid"),
-                    issuer.getString("player_name"),
-                    issuer.getString("alt_name"),
-                    issuer.getInt("player_id")
-            );
-            EMIPlayer recipientPlayer = new EMIPlayer(
-                    recipient.getString("player_uuid"),
-                    recipient.getString("player_name"),
-                    recipient.getString("alt_name"),
-                    recipient.getInt("player_id")
-            );
             return new CharterPoint(
-                    issuerPlayer,
-                    recipientPlayer,
+                    issuer,
+                    recipient,
                     record.getString("reason"),
                     record.getInt("amount")
             );
@@ -216,55 +232,18 @@ public class EMIPlayer {
     }
 
     public static boolean syncExists(UUID uuid) {
-        DbRow playerRow = getPlayerRow(uuid);
-        Long discordId = 0L;
-        if (playerRow != null)
-            discordId = playerRow.getLong("discord_id");
-
-        return discordId != null && discordId != 0;
+        EMIPlayer player = EMIPlayer.getEmiPlayer(uuid);
+        return player.getDiscordId() != 0;
     }
 
     public static boolean syncExists(User user) {
-        DbRow playerRow = getPlayerRow(user.getIdLong());
-        Long discordId = 0L;
-        if (playerRow != null)
-            discordId = playerRow.getLong("discord_id");
-
-        return discordId != null && discordId != 0;
+        EMIPlayer player = EMIPlayer.getEmiPlayer(user.getIdLong());
+        return player.getDiscordId() != 0;
     }
 
-    public static boolean isMember(long discordId)
-    {
-        CompletableFuture<DbRow> futurePlayer;
-        DbRow player = new DbRow();
-        futurePlayer = DB.getFirstRowAsync("SELECT * FROM players WHERE discord_id = ?", discordId);
-        try {
-            player = futurePlayer.get();
-        }
-        catch (Exception e)
-        {
-            EMI.getPlugin().getLogger().info(e.getMessage());
-        }
-        if(player == null)
-            return false;
-        else
-            return true;
-    }
-    public static EMIPlayer getEMIPlayer(String name)
-    {
-        DbRow playerRow = EMIPlayer.getPlayerRow(name);
-        return new EMIPlayer(playerRow.getString("player_uuid"),
-                playerRow.getString("player_name"),
-                playerRow.getString("alt_name"),
-                playerRow.getInt("player_id"));
-    }
-    public static EMIPlayer getEMIPlayer(UUID uuid)
-    {
-        DbRow playerRow = EMIPlayer.getPlayerRow(uuid);
-        return new EMIPlayer(playerRow.getString("player_uuid"),
-                playerRow.getString("player_name"),
-                playerRow.getString("alt_name"),
-                playerRow.getInt("player_id"));
+    public static boolean syncExists(long discordId) {
+        EMIPlayer player = EMIPlayer.getEmiPlayer(discordId);
+        return player.getDiscordId() != 0;
     }
 
     public static UUID getPlayerUUID(String name) {

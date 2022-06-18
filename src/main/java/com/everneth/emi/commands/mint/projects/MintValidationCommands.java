@@ -128,7 +128,7 @@ public class MintValidationCommands extends BaseCommand
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
         MintProject project = manager.getProject(mintProject);
-        EMIPlayer validator = EMIPlayer.getEMIPlayer(player.getName());
+        EMIPlayer validator = EMIPlayer.getEmiPlayer(player.getName());
 
         // Validate the material or task log
         if(project.getQueuedValidateMaterial().containsKey(player.getUniqueId()))
@@ -162,7 +162,7 @@ public class MintValidationCommands extends BaseCommand
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
         MintProject project = manager.getProject(mintProject);
-        EMIPlayer validator = EMIPlayer.getEMIPlayer(player.getName());
+        EMIPlayer validator = EMIPlayer.getEmiPlayer(player.getName());
 
         // Reject the material or task log
         if(project.getQueuedValidateMaterial().containsKey(player.getUniqueId()))

@@ -41,7 +41,7 @@ public class CloseReportCommand extends SlashCommand {
         if(event.getChannel().getName().contains("_staff"))
         {
             UUID uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
-            EMIPlayer player = EMIPlayer.getEMIPlayer(uuid);
+            EMIPlayer player = EMIPlayer.getEmiPlayer(uuid);
             // Lets check them
             for (Role role : roleList) {
                 if (role.getIdLong() == staffRoleId) {
@@ -74,7 +74,7 @@ public class CloseReportCommand extends SlashCommand {
         else if(event.getChannel().getName().contains("_mint"))
         {
             UUID uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
-            EMIPlayer player = EMIPlayer.getEMIPlayer(uuid);
+            EMIPlayer player = EMIPlayer.getEmiPlayer(uuid);
             // Lets check them
             for (Role role : roleList) {
                 if (role.getIdLong() == staffRoleId || role.getIdLong() == mintRoleId) {

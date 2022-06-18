@@ -82,7 +82,7 @@ public class MintMaterialCommands extends BaseCommand
         }
 
         // Valid information is then put into the project
-        EMIPlayer logger = EMIPlayer.getEMIPlayer(player.getName());
+        EMIPlayer logger = EMIPlayer.getEmiPlayer(player.getName());
         MintLogMaterial log = new MintLogMaterial(project.getId(), material.getId(), logger, null, 0, amount, timeWorked, Utils.getCurrentDate(), Utils.buildMessage(description, 0, false));
 
         project.addMaterialLog(log);

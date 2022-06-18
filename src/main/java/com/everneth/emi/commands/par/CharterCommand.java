@@ -67,21 +67,15 @@ public class CharterCommand extends BaseCommand {
     public void onIssueCommand(CommandSender sender, String player, int amount, String reason)
     {
         Player issuer = (Player) sender;
-        DbRow recipientRecord = EMIPlayer.getPlayerRow(player);
+        EMIPlayer recipient = EMIPlayer.getEmiPlayer(player);
         long pointRecordId = 0;
 
-        if(recipientRecord == null)
+        if(recipient.isEmpty())
         {
             issuer.sendMessage(Utils.color("&9[Charter] &cERROR: Player not found! &3Is the name spelled correctly?"));
         }
         else
         {
-            EMIPlayer recipient = new EMIPlayer(
-                    recipientRecord.getString("player_uuid"),
-                    recipientRecord.getString("player_name"),
-                    recipientRecord.getString("alt_name"),
-                    recipientRecord.getInt("player_id")
-            );
             EMIPlayer issuerPlayer = new EMIPlayer(
                     issuer.getUniqueId().toString(),
                     issuer.getName(),
@@ -99,26 +93,20 @@ public class CharterCommand extends BaseCommand {
     public void onBanCommand(CommandSender sender, String player, @Optional String reason)
     {
         Player issuer = (Player) sender;
-        DbRow recipientRecord = EMIPlayer.getPlayerRow(player);
+        EMIPlayer recipient = EMIPlayer.getEmiPlayer(player);
         if(reason == null)
         {
             reason = "You have exceeded 5 charter points and are permanently banned. Please contact staff on discord if you wish to appeal.";
         }
-        if(recipientRecord == null)
+        if(recipient.isEmpty())
         {
             issuer.sendMessage(Utils.color("&9[Charter] &cERROR: Player not found! &3Is the name spelled correctly?"));
         }
         else
         {
-            EMIPlayer recipient = new EMIPlayer(
-                    recipientRecord.getString("player_uuid"),
-                    recipientRecord.getString("player_name"),
-                    recipientRecord.getString("alt_name"),
-                    recipientRecord.getInt("player_id")
-            );
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + player + Utils.color(" &c" + reason));
             sender.sendMessage(Utils.color("Banned &c" + player));
-            String altName = recipientRecord.getString("alt_name");
+            String altName = recipient.getAltName();
             if (altName != null) {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + player + Utils.color(" &c" + reason));
                 sender.sendMessage(Utils.color("Banned &c" + altName));
@@ -134,8 +122,8 @@ public class CharterCommand extends BaseCommand {
     public void onHistoryCommand(CommandSender sender, String name, @Default("false") boolean includeExpired)
     {
         //before doing anything does this player exist?
-        DbRow player = EMIPlayer.getPlayerRow(name);
-        if(player == null || player.isEmpty())
+        EMIPlayer player = EMIPlayer.getEmiPlayer(name);
+        if(player.isEmpty())
         {
             sender.sendMessage(Utils.color("&9[Charter]&3 This player does not exist in our system."));
         }
@@ -296,9 +284,9 @@ public class CharterCommand extends BaseCommand {
         }
         else
         {
-            DbRow playerRow = EMIPlayer.getPlayerRow(name);
-            String playerName = playerRow.getString("player_name");
-            String altName = playerRow.getString("alt_name");
+            EMIPlayer playerRow = EMIPlayer.getEmiPlayer(name);
+            String playerName = playerRow.getName();
+            String altName = playerRow.getAltName();
             Bukkit.getBanList(BanList.Type.NAME).pardon(playerName);
             if (altName != null) {
                 Bukkit.getBanList(BanList.Type.NAME).pardon(altName);

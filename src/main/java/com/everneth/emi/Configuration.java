@@ -122,8 +122,6 @@ public class Configuration {
         commandManager = new BukkitCommandManager(plugin);
         commandManager.registerCommand(new MintCommand());
         commandManager.registerCommand(new ReportCommand());
-        commandManager.registerCommand(new ReportReplyCommand());
-        commandManager.registerCommand(new GetRepliesCommand());
         commandManager.registerCommand(new SupportCommand());
         commandManager.registerCommand(new DiscordSyncCommands());
         commandManager.registerCommand(new CharterCommand());
@@ -171,11 +169,7 @@ public class Configuration {
 
         for(DbRow projectRow : projects)
         {
-            DbRow playerRow = EMIPlayer.getPlayerRow(projectRow.getInt("leader"));
-            EMIPlayer playerLead = new EMIPlayer(playerRow.getString("player_uuid"),
-                    playerRow.getString("player_name"),
-                    playerRow.getString("alt_name"),
-                    playerRow.getInt("player_id"));
+            EMIPlayer playerLead = EMIPlayer.getEmiPlayer(projectRow.getInt("leader"));
             LocalDateTime endDateTime = projectRow.get("end_date");
             String endDate = null;
 
@@ -201,14 +195,9 @@ public class Configuration {
                     continue;
                 }
 
-                DbRow player = EMIPlayer.getPlayerRow(worker.getInt("player_id"));
-                if (player != null) {
-                    EMIPlayer emiPlayer = new EMIPlayer(player.getString("player_uuid"),
-                            player.getString("player_name"),
-                            player.getString("alt_name"),
-                            player.getInt("player_id"));
-
-                    project.getWorkers().add(emiPlayer);
+                EMIPlayer player = EMIPlayer.getEmiPlayer(worker.getInt("player_id"));
+                if (!player.isEmpty()) {
+                    project.getWorkers().add(player);
                 }
             }
 
@@ -263,28 +252,8 @@ public class Configuration {
                     continue;
                 }
 
-                DbRow loggedByRow = EMIPlayer.getPlayerRow(taskLogRow.getInt("logged_by"));
-                EMIPlayer loggedBy = null;
-                if (loggedByRow != null) {
-                    loggedBy = new EMIPlayer(loggedByRow.getString("player_uuid"),
-                            loggedByRow.getString("player_name"),
-                            loggedByRow.getString("alt_name"),
-                            loggedByRow.getInt("player_id"));
-                }
-                EMIPlayer validatedBy;
-
-                try
-                {
-                    DbRow validatedByRow = EMIPlayer.getPlayerRow(taskLogRow.getInt("validated_by"));
-                    validatedBy = new EMIPlayer(validatedByRow.getString("player_uuid"),
-                            validatedByRow.getString("player_name"),
-                            validatedByRow.getString("alt_name"),
-                            validatedByRow.getInt("player_id"));
-                }
-                catch (NullPointerException e)
-                {
-                    validatedBy = null;
-                }
+                EMIPlayer loggedBy = EMIPlayer.getEmiPlayer(taskLogRow.getInt("logged_by"));
+                EMIPlayer validatedBy = EMIPlayer.getEmiPlayer(taskLogRow.getInt("validated_by"));
 
                 MintLogTask log = new MintLogTask(
                         taskLogRow.getInt("log_id"),
@@ -313,28 +282,8 @@ public class Configuration {
                     continue;
                 }
 
-                DbRow loggedByRow = EMIPlayer.getPlayerRow(materialLogRow.getInt("logged_by"));
-                EMIPlayer loggedBy = null;
-                if (loggedByRow != null) {
-                    loggedBy = new EMIPlayer(loggedByRow.getString("player_uuid"),
-                            loggedByRow.getString("player_name"),
-                            loggedByRow.getString("alt_name"),
-                            loggedByRow.getInt("player_id"));
-                }
-                EMIPlayer validatedBy;
-
-                try
-                {
-                    DbRow validatedByRow = EMIPlayer.getPlayerRow(materialLogRow.getInt("validated_by"));
-                    validatedBy = new EMIPlayer(validatedByRow.getString("player_uuid"),
-                            validatedByRow.getString("player_name"),
-                            validatedByRow.getString("alt_name"),
-                            validatedByRow.getInt("player_id"));
-                }
-                catch (NullPointerException e)
-                {
-                    validatedBy = null;
-                }
+                EMIPlayer loggedBy = EMIPlayer.getEmiPlayer(materialLogRow.getInt("logged_by"));
+                EMIPlayer validatedBy = EMIPlayer.getEmiPlayer(materialLogRow.getInt("validated_by"));
 
                 MintLogMaterial log = new MintLogMaterial(
                         materialLogRow.getInt("log_id"),

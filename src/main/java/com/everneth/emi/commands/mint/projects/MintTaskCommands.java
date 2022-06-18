@@ -66,7 +66,7 @@ public class MintTaskCommands extends BaseCommand
         }
 
         // Valid information is then into the project
-        EMIPlayer logger = EMIPlayer.getEMIPlayer(player.getName());
+        EMIPlayer logger = EMIPlayer.getEmiPlayer(player.getName());
         MintLogTask log = new MintLogTask(project.getId(), logger, null, 0, timeWorked, Utils.getCurrentDate(), Utils.buildMessage(description, 0, false));
 
         project.addTaskLog(log);

@@ -51,10 +51,10 @@ public class JoinEvent implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event)
     {
         Player player = event.getPlayer();
-        DbRow playerRow = EMIPlayer.getPlayerRow(player.getUniqueId());
+        EMIPlayer playerRow = EMIPlayer.getEmiPlayer(player.getUniqueId());
 
         // Did we find anything?
-        if (playerRow == null) {
+        if (playerRow.isEmpty()) {
             //No records returned. Add player to database.
             try {
                 DB.executeInsert(
@@ -66,8 +66,8 @@ public class JoinEvent implements Listener {
                 EMI.getPlugin().getLogger().warning(e.getMessage());
             }
         }
-        else if (!playerRow.getString("player_name").equals(player.getName())
-                && playerRow.getString("player_uuid").equals(player.getUniqueId().toString()))
+        else if (!playerRow.getName().equals(player.getName())
+                && playerRow.getUniqueId().equals(player.getUniqueId().toString()))
         {
             //Record found, name mismatch. Update the record with the players current name.
             DB.executeUpdateAsync(
@@ -76,9 +76,9 @@ public class JoinEvent implements Listener {
                   player.getUniqueId().toString()
             );
         }
-        else if (playerRow.getString("alt_name") != null
-                && !playerRow.getString("alt_name").equals(player.getName())
-                && playerRow.getString("alt_uuid").equals(player.getUniqueId().toString()))
+        else if (playerRow.getAltName() != null
+                && !playerRow.getAltName().equals(player.getName())
+                && playerRow.getAltUuid().equals(player.getUniqueId().toString()))
         {
             // Name mismatch on the alt account, update it.
             DB.executeUpdateAsync("UPDATE players SET alt_name = ? WHERE player_uuid = ?",
@@ -91,16 +91,6 @@ public class JoinEvent implements Listener {
         for(Motd motd : motdManager.getMotds().values())
         {
             player.sendMessage(Utils.color(motd.displayMotd()));
-        }
-
-        ReportManager rm = ReportManager.getReportManager();
-        if(rm.hasActiveReport(player.getUniqueId()))
-        {
-            int numMissed = rm.messagesMissed(player.getUniqueId());
-            if(numMissed > 0)
-            {
-                player.sendMessage(Utils.color("&c[!]&f You have &6" + numMissed + " &fmissed messages on your report. Please use &c/getreplies&f to view them."));
-            }
         }
     }
 }

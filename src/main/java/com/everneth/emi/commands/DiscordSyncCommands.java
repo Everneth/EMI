@@ -87,9 +87,9 @@ public class DiscordSyncCommands extends BaseCommand {
     @Subcommand("unsync")
     @Description("If you have lost access to your discord account, you may unsync and re-sync with a different account.")
     public void onDiscordUnsync(Player player) {
-        DbRow playerRow = EMIPlayer.getPlayerRow(player.getUniqueId());
-        Long discordId = playerRow.getLong("discord_id");
-        if (discordId == null || discordId == 0) {
+        EMIPlayer playerRow = EMIPlayer.getEmiPlayer(player.getUniqueId());
+        long discordId = playerRow.getDiscordId();
+        if (discordId == 0) {
             player.sendMessage("You do not have a discord account synced with your minecraft account.");
             return;
         }

@@ -23,15 +23,15 @@ public class UnsyncCommand extends SlashCommand {
     @Override
     public void execute(SlashCommandEvent event) {
         // the player does not have a synced account, we can ignore them
-        Long memberId = event.getMember().getIdLong();
-        if (!EMIPlayer.isMember(memberId)) {
+        long memberId = event.getMember().getIdLong();
+        if (!EMIPlayer.syncExists(memberId)) {
             event.reply("Your account is not synchronized.").setEphemeral(true).queue();
             return;
         }
 
-        DbRow playerRow = EMIPlayer.getPlayerRow(event.getMember().getIdLong());
-        String playerUsername = playerRow.getString("player_name");
-        String altUsername = playerRow.getString("alt_name");
+        EMIPlayer player = EMIPlayer.getEmiPlayer(event.getMember().getIdLong());
+        String playerUsername = player.getName();
+        String altUsername = player.getAltName();
 
         BukkitScheduler scheduler = EMI.getPlugin().getServer().getScheduler();
         scheduler.callSyncMethod(EMI.getPlugin(), () ->

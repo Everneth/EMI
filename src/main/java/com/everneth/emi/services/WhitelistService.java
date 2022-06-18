@@ -29,9 +29,9 @@ public class WhitelistService {
         scheduler.scheduleSyncDelayedTask(EMI.getPlugin(), new Runnable() {
             @Override
             public void run() {
-                DbRow playerRow = EMIPlayer.getPlayerRow(name);
+                EMIPlayer player = EMIPlayer.getEmiPlayer(name);
                 // If row or discord_id is null, the player did not sync and needs to be removed from the whitelist
-                if (playerRow == null || playerRow.getLong("discord_id") == null) {
+                if (player.isEmpty() || player.getDiscordId() == 0) {
                     EMI.getPlugin().getServer().getScheduler().callSyncMethod(EMI.getPlugin(), () ->
                             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "whitelist remove " + name));
                     whitelistedPlayers.remove(name);

@@ -26,17 +26,17 @@ public class RequestWhitelistCommand extends SlashCommand {
 
     @Override
     protected void execute(SlashCommandEvent event) {
-        DbRow playerRow = EMIPlayer.getPlayerRow(event.getMember().getIdLong());
-        if (playerRow != null) {
+        EMIPlayer player = EMIPlayer.getEmiPlayer(event.getMember().getIdLong());
+        if (!player.isEmpty()) {
             event.reply("You are already synced, you do not need to apply for temporary whitelisting.").setEphemeral(true).queue();
             return;
         }
         String username = event.getOption("name").getAsString();
-        if (username == null || username.isEmpty()) {
+        if (username.isEmpty()) {
             event.reply("You did not provide a name for me to whitelist").setEphemeral(true).queue();
             return;
         }
-        if (EMIPlayer.getPlayerRow(username) != null || WhitelistService.getService().isWhitelisted(username)) {
+        if (!EMIPlayer.getEmiPlayer(username).isEmpty() || WhitelistService.getService().isWhitelisted(username)) {
             event.reply("That user is already on the whitelist. If this is an error please contact Staff.").setEphemeral(true).queue();
             return;
         }

@@ -25,22 +25,21 @@ public class InfoCommand extends BaseCommand {
     @Description("Request some useful information about a user")
     @CommandPermission("emi.par.info")
     public void onInfo(CommandSender sender, String username) {
-        DbRow playerRow = EMIPlayer.getPlayerRow(username);
+        EMIPlayer player = EMIPlayer.getEmiPlayer(username);
 
-        if (playerRow == null) {
+        if (player.isEmpty()) {
             sender.sendMessage(Utils.color("&cCould not find a user with the name " + username + "."));
             return;
         }
 
         String report = Utils.color("&c-= &fReport for " + username + " &c=-\n");
         report += Utils.color("&c==================================\n");
-        report += Utils.color("&cMain Account&f: " + playerRow.getString("player_name") + "\n");
+        report += Utils.color("&cMain Account&f: " + player.getName() + "\n");
 
         // if there is no associated alternate account, just append N/A
-        String altName = playerRow.getString("alt_name");
-        if (altName != null) {
-            report += Utils.color("&aAlternate Account&f: " + altName + "\n");
-            LocalDateTime dateAdded = playerRow.get("date_alt_added");
+        if (player.getAltName() != null) {
+            report += Utils.color("&aAlternate Account&f: " + player.getAltName() + "\n");
+            LocalDateTime dateAdded = player.getDateAltAdded();
             report += Utils.color("&aAlt Whitelisted&f: " + dateAdded.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "\n\n");
         }
         else {
@@ -49,8 +48,8 @@ public class InfoCommand extends BaseCommand {
         }
 
         // if there is no associated discord account we just need to append N/A for username and Id
-        Long discordId = playerRow.getLong("discord_id");
-        if (discordId != null) {
+        long discordId = player.getDiscordId();
+        if (discordId != 0) {
             String discordUsername = EMI.getJda()
                     .getGuildById(EMI.getPlugin().getConfig().getLong("guild-id"))
                     .getMemberById(discordId)
