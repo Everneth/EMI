@@ -5,8 +5,7 @@ import com.everneth.emi.EMI;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-
+import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import java.util.UUID;
 
 /**

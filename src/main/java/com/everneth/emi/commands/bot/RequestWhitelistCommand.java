@@ -6,7 +6,7 @@ import com.everneth.emi.EMI;
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.services.WhitelistService;
 import com.jagrosh.jdautilities.command.SlashCommand;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 

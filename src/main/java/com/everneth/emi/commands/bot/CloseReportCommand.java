@@ -9,8 +9,7 @@ import com.jagrosh.jdautilities.command.SlashCommand;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-
+import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;

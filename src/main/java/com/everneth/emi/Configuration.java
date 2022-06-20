@@ -74,7 +74,7 @@ public class Configuration {
 
         registerCommands();
         registerListeners();
-        //initBot();
+        initBot();
         initMint();
         initMotds();
     }
