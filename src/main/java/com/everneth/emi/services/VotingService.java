@@ -8,9 +8,9 @@ import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.WhitelistVote;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -43,7 +43,7 @@ public class VotingService {
         voteMap.put(id, vote);
     }
 
-    public void endVote(long id, boolean approved, ButtonClickEvent event)
+    public void endVote(long id, boolean approved, ButtonInteractionEvent event)
     {
         WhitelistVote vote = voteMap.get(id);
         // Get all the roles that may need to be modified based on the vote outcome
@@ -185,7 +185,7 @@ public class VotingService {
         }
     }
 
-    public void onPositiveVoter(ButtonClickEvent event) {
+    public void onPositiveVoter(ButtonInteractionEvent event) {
         WhitelistVote vote = getVoteByMessageId(event.getMessageIdLong());
         if (vote == null) {
             disableMessage(event);
@@ -195,7 +195,7 @@ public class VotingService {
         onVote(event, vote);
     }
 
-    public void onNegativeVoter(ButtonClickEvent event) {
+    public void onNegativeVoter(ButtonInteractionEvent event) {
         WhitelistVote vote = getVoteByMessageId(event.getMessageIdLong());
         if (vote == null) {
             disableMessage(event);
@@ -205,7 +205,7 @@ public class VotingService {
         onVote(event, vote);
     }
 
-    private void onVote(ButtonClickEvent event, WhitelistVote vote) {
+    private void onVote(ButtonInteractionEvent event, WhitelistVote vote) {
         updateVoteEmbed(event);
 
         DbRow application = EMIPlayer.getAppRecord(getVoteByMessageId(event.getMessage().getIdLong()).getApplicantDiscordId());
@@ -234,7 +234,7 @@ public class VotingService {
         return (voters.size() * 100) / staffCount >= percentRequired;
     }
 
-    private void updateVoteEmbed(ButtonClickEvent event) {
+    private void updateVoteEmbed(ButtonInteractionEvent event) {
         EmbedBuilder builder = new EmbedBuilder(event.getMessage().getEmbeds().get(0));
         builder.clearFields();
 
@@ -254,7 +254,7 @@ public class VotingService {
         event.editMessageEmbeds(builder.build()).queue();
     }
 
-    private void disableMessage(ButtonClickEvent event) {
+    private void disableMessage(ButtonInteractionEvent event) {
         List<Button> disabledButtons = new ArrayList<>();
         event.getMessage().getButtons().forEach(button -> disabledButtons.add(button.asDisabled()));
         event.editMessage("Something has gone wrong. Vote ended.")
