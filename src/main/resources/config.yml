@@ -58,7 +58,7 @@ user-not-found-error: "Could not find that user on Discord. Either the name is w
 # player-not-found-error - The error displayed when a player cannot be found in the db
 player-not-found-error: "Could not find a player by that name."
 
-# message-send-failure - The error displayed when a user could not be messaged via Discord
+# message-send-error - The error displayed when a user could not be messaged via Discord
 message-send-error: "Could not message user on Discord. They do not allow direct messages from Everneth's Discord members."
 
 # points-accumulated-alert - The message that will be displayed to the staff member issuing points to another user
