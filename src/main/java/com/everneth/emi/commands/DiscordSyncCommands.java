@@ -15,9 +15,11 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 /**
@@ -31,6 +33,7 @@ import java.util.List;
 @Description("Discord account sync manager")
 public class DiscordSyncCommands extends BaseCommand {
     Plugin plugin = EMI.getPlugin();
+    private FileConfiguration config = plugin.getConfig();
 
     @Subcommand("sync")
     @Description("Sync your discord account to your minecraft account.")
@@ -43,7 +46,7 @@ public class DiscordSyncCommands extends BaseCommand {
         }
 
         // Get a list of guild members, and individual strings for the passed in member
-        List<Member> memberList = EMI.getJda().getGuildById(plugin.getConfig().getLong("guild-id")).getMembers();
+        List<Member> memberList = EMI.getJda().getGuildById(config.getLong("guild-id")).getMembers();
         String name, discriminator;
         // If the input does not contain the discriminator don't even attempt to find the user
         if (discordDetails.contains("#")) {
@@ -68,20 +71,18 @@ public class DiscordSyncCommands extends BaseCommand {
             User user = member.getUser();
             if (user.getName().equalsIgnoreCase(name) && user.getDiscriminator().equals(discriminator)) {
                 user.openPrivateChannel()
-                        .flatMap(privateChannel -> privateChannel.sendMessage(player.getName() + " is attempting to link their minecraft account with our Discord guild. " +
-                                "If this is you, please use `/confirmsync` to complete the account synchronization. " +
-                                "If this is not done by you, please use `/denysync` and forward this message to staff immediately. Thank you!"))
+                        .flatMap(privateChannel -> privateChannel.sendMessage(MessageFormat.format(config.getString("account-sync-alert"), player.getName())))
                         .queue(message -> {
                             dsm.addSyncRequest(player, user);
                             player.sendMessage(Utils.color("&aMessage sent. Please check your discord DMs to confirm your synchronization!"));
                         }, new ErrorHandler()
                                 .handle(ErrorResponse.CANNOT_SEND_TO_USER, (error) -> {
-                                    player.sendMessage(Utils.color("&cRequest failed. Please enable direct messages from server members"));
+                                    player.sendMessage(Utils.color("&c" + config.getString("message-send-error")));
                                 }));
                 return;
             }
         }
-        player.sendMessage(Utils.color("&cUser not found! Please check your details and try again. If this is your third attempt, please contact Staff."));
+        player.sendMessage(Utils.color("&c" + config.getString("user-not-found-error")));
     }
 
     @Subcommand("unsync")
@@ -93,18 +94,16 @@ public class DiscordSyncCommands extends BaseCommand {
             player.sendMessage("You do not have a discord account synced with your minecraft account.");
             return;
         }
-        Guild guild = EMI.getJda().getGuildById(plugin.getConfig().getLong("guild-id"));
+        Guild guild = EMI.getJda().getGuildById(config.getLong("guild-id"));
         Member member = guild.getMemberById(discordId);
 
         member.getUser().openPrivateChannel()
-                .flatMap(privateChannel -> privateChannel.sendMessage("Your discord account has been unsynced with your minecraft account. " +
-                        "If you did not request an unsync please contact staff immediately."))
+                .flatMap(privateChannel -> privateChannel.sendMessage(config.getString("account-unsync-alert")))
                 .queue(null, new ErrorHandler()
                         .handle(ErrorResponse.CANNOT_SEND_TO_USER, (error) ->
-                            player.sendMessage(Utils.color("&cI tried to message you on discord and could not. " +
-                                    "Please enable direct messages from Everneth server members for future purposes."))));
+                            player.sendMessage(Utils.color("&c" + config.getString("message-send-error")))));
 
-        Role syncRole = guild.getRoleById(EMI.getPlugin().getConfig().getLong("synced-role-id"));
+        Role syncRole = guild.getRoleById(config.getLong("synced-role-id"));
         guild.removeRoleFromMember(member, syncRole).queue();
 
         DB.executeUpdateAsync("UPDATE players SET discord_id = NULL WHERE ? IN (player_uuid,alt_uuid)", player.getUniqueId().toString());

@@ -14,6 +14,7 @@ import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -26,6 +27,8 @@ import java.util.*;
 
 @CommandAlias("charter")
 public class CharterCommand extends BaseCommand {
+    private FileConfiguration config = EMI.getPlugin().getConfig();
+
     @CommandPermission("emi.par.charter.pg")
     @Syntax("<page #>")
     @Subcommand("pg")
@@ -72,7 +75,7 @@ public class CharterCommand extends BaseCommand {
 
         if(recipient.isEmpty())
         {
-            issuer.sendMessage(Utils.color("&9[Charter] &cERROR: Player not found! &3Is the name spelled correctly?"));
+            issuer.sendMessage(Utils.color("&9[Charter] &c" + config.getString("player-not-found-error")));
         }
         else
         {
@@ -92,28 +95,12 @@ public class CharterCommand extends BaseCommand {
     @Syntax("<player> [reason]")
     public void onBanCommand(CommandSender sender, String player, @Optional String reason)
     {
-        Player issuer = (Player) sender;
-        EMIPlayer recipient = EMIPlayer.getEmiPlayer(player);
         if(reason == null)
         {
-            reason = "You have exceeded 5 charter points and are permanently banned. Please contact staff on discord if you wish to appeal.";
+            reason = Utils.color("&c" + config.getString("default-ban-reason"));
         }
-        if(recipient.isEmpty())
-        {
-            issuer.sendMessage(Utils.color("&9[Charter] &cERROR: Player not found! &3Is the name spelled correctly?"));
-        }
-        else
-        {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + player + Utils.color(" &c" + reason));
-            sender.sendMessage(Utils.color("Banned &c" + player));
-            String altName = recipient.getAltName();
-            if (altName != null) {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + player + Utils.color(" &c" + reason));
-                sender.sendMessage(Utils.color("Banned &c" + altName));
-            }
-            sender.sendMessage(Utils.color("&9[Charter] &3" + recipient.getName() + " and any whitelisted alts have been permanently banned." +
-                    "Please login to the test server and manually ban any of these accounts."));
-        }
+
+        onIssueCommand(sender, player, 5, reason);
     }
     @CommandPermission("emi.par.charter.history")
     @Subcommand("history")
@@ -125,7 +112,7 @@ public class CharterCommand extends BaseCommand {
         EMIPlayer player = EMIPlayer.getEmiPlayer(name);
         if(player.isEmpty())
         {
-            sender.sendMessage(Utils.color("&9[Charter]&3 This player does not exist in our system."));
+            sender.sendMessage(Utils.color("&9[Charter]&3 " + config.getString("player-not-found-error")));
         }
         else
         {
@@ -280,7 +267,7 @@ public class CharterCommand extends BaseCommand {
         long pardonPointSuccess = CharterPoint.pardonPlayer(name, player, removeFlag);
         if(pardonPointSuccess == 0)
         {
-            player.sendMessage(Utils.color("&9[Charter] &3Could not pardon " + name + ". Either there is no player by this name, it has changed, or its misspelled."));
+            player.sendMessage(Utils.color("&9[Charter] &3" + config.getString("player-not-found-error")));
         }
         else
         {
