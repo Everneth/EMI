@@ -59,7 +59,7 @@ public class HelpClearCommand extends SlashCommand {
         // We've got a history, lets clear out
         for (Message msg : messageList) {
             // Is message the root?
-            if (msg.getIdLong() == EMI.getPlugin().getConfig().getLong("root-report-msg"))
+            if (msg.getIdLong() == EMI.getPlugin().getConfig().getLong("root-help-msg"))
                 continue;
 
             try {
@@ -82,7 +82,7 @@ public class HelpClearCommand extends SlashCommand {
 
         for (Message msg : reverse)
         {
-            if(msg.getIdLong() == EMI.getPlugin().getConfig().getLong("root-report-msg"))
+            if(msg.getIdLong() == EMI.getPlugin().getConfig().getLong("root-help-msg"))
             {
                 continue;
             }

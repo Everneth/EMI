@@ -6,6 +6,7 @@ import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
+import com.everneth.emi.models.ConfigMessage;
 import com.everneth.emi.models.EMIPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -111,7 +112,7 @@ public class AltAccountCommands extends BaseCommand {
     {
         EMIPlayer player = EMIPlayer.getEmiPlayer(username);
         if (player.isEmpty()) {
-            sender.sendMessage(Utils.color("&cThere is nobody with that username."));
+            sender.sendMessage(Utils.color("&c") + ConfigMessage.PLAYER_NOT_FOUND.get());
             return;
         }
         String playerUsername = player.getName();

@@ -4,6 +4,7 @@ import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 
 import com.everneth.emi.EMI;
+import com.everneth.emi.models.ConfigMessage;
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.WhitelistVote;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -13,8 +14,10 @@ import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -26,6 +29,7 @@ public class VotingService {
 
     private HashMap<Long, WhitelistVote> voteMap = new HashMap<>();
     public static VotingService service;
+    private FileConfiguration config = EMI.getPlugin().getConfig();
 
     private VotingService() {}
 
@@ -47,9 +51,9 @@ public class VotingService {
     {
         WhitelistVote vote = voteMap.get(id);
         // Get all the roles that may need to be modified based on the vote outcome
-        Role pendingRole = EMI.getGuild().getRoleById(EMI.getConfigLong("pending-role-id"));
-        Role citizenRole = EMI.getGuild().getRoleById(EMI.getConfigLong("member-role-id"));
-        Role syncedRole = EMI.getGuild().getRoleById(EMI.getConfigLong("synced-role-id"));
+        Role pendingRole = EMI.getGuild().getRoleById(config.getLong("pending-role-id"));
+        Role citizenRole = EMI.getGuild().getRoleById(config.getLong("member-role-id"));
+        Role syncedRole = EMI.getGuild().getRoleById(config.getLong("synced-role-id"));
 
         Guild guild = EMI.getGuild();
         DbRow application = EMIPlayer.getAppRecord(vote.getApplicantDiscordId());
@@ -61,24 +65,16 @@ public class VotingService {
 
             WhitelistAppService.getService().approveWhitelistAppRecord(applicant.getIdLong(), vote.getMessageId());
 
-            guild.getTextChannelById(EMI.getPlugin().getConfig().getLong("whitelist-channel-id"))
-                    .sendMessage(applicant.getAsMention() + " has been whitelisted! Congrats!").queue();
+            guild.getTextChannelById(config.getLong("announcement-channel-id"))
+                    .sendMessage(ConfigMessage.APPLICATION_APPROVED.getWithArgs(applicant.getAsMention())).queue();
         }
         else {
             applicant.getUser().openPrivateChannel().queue(privateChannel ->
-                    privateChannel.sendMessage("Hey, " + applicant.getEffectiveName() +
-                                    "!\n\nI'm here to notify you that your application has been unfortunately denied. You can ask a staff member " +
-                                    "for specifics but the most common reasons for denial include:\n" +
-                                    "**1)** An incorrect secret word (Did you read the rules?).\n" +
-                                    "**2)** General lack of effort put into the application. You don't have to write an essay, we just want to know " +
-                                    "a little bit about you!\n" +
-                                    "**3)** Behavior deemed inappropriate while interacting with our community members.\n\n" +
-                                    "You are welcome to submit another application a week from now, if you so choose. Feel free to stick around " +
-                                    "and chat until then!")
+                    privateChannel.sendMessage(ConfigMessage.APPLICATION_DENIED.getWithArgs(applicant.getEffectiveName()))
                             .queue(null, new ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER,
                                     error ->
-                                        EMI.getGuild().getTextChannelById(EMI.getConfigLong("voting-channel-id"))
-                                                .sendMessage("Could not message applicant. Please notify them that they have been denied.")
+                                        EMI.getGuild().getTextChannelById(config.getLong("voting-channel-id"))
+                                                .sendMessage(ConfigMessage.DISCORD_MESSAGE_FAILED.get()).queue()
                                     )));
         }
 
