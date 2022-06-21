@@ -64,7 +64,7 @@ message-send-error: "Could not message user on Discord. They do not allow direct
 # points-accumulated-alert - The message that will be displayed to the staff member issuing points to another user
 # {0}: The user's name
 # {1}: The amount of points the user has accumulated
-points-accumulated-alert: "{0} accumulated {1} {1,choice,1#point|1<points} and has been messaged/banned accordingly. Please go ahead and manually ban these accounts on test."
+points-accumulated-alert: "{0} accumulated {1} {1,choice,1#point|1<points} and has been messaged/banned accordingly."
 
 # account-sync-alert - The message sent on Discord to the user attempting to sync their account
 # {0}: The in-game name of the person attempting to sync to the account
