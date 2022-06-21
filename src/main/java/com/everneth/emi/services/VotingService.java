@@ -4,6 +4,7 @@ import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 
 import com.everneth.emi.EMI;
+import com.everneth.emi.models.ConfigMessage;
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.WhitelistVote;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -65,15 +66,15 @@ public class VotingService {
             WhitelistAppService.getService().approveWhitelistAppRecord(applicant.getIdLong(), vote.getMessageId());
 
             guild.getTextChannelById(config.getLong("announcement-channel-id"))
-                    .sendMessage(MessageFormat.format(config.getString("application-approved-alert"), applicant.getAsMention())).queue();
+                    .sendMessage(ConfigMessage.APPLICATION_APPROVED.getWithArgs(applicant.getAsMention())).queue();
         }
         else {
             applicant.getUser().openPrivateChannel().queue(privateChannel ->
-                    privateChannel.sendMessage(MessageFormat.format(config.getString("application-denied-alert"), applicant.getEffectiveName()))
+                    privateChannel.sendMessage(ConfigMessage.APPLICATION_DENIED.getWithArgs(applicant.getEffectiveName()))
                             .queue(null, new ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER,
                                     error ->
                                         EMI.getGuild().getTextChannelById(config.getLong("voting-channel-id"))
-                                                .sendMessage(config.getString("message-send-error")).queue()
+                                                .sendMessage(ConfigMessage.DISCORD_MESSAGE_FAILED.get()).queue()
                                     )));
         }
 

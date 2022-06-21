@@ -7,6 +7,7 @@ import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
 import com.everneth.emi.models.CharterPoint;
+import com.everneth.emi.models.ConfigMessage;
 import com.everneth.emi.models.EMIPlayer;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
@@ -75,7 +76,7 @@ public class CharterCommand extends BaseCommand {
 
         if(recipient.isEmpty())
         {
-            issuer.sendMessage(Utils.color("&9[Charter] &c" + config.getString("player-not-found-error")));
+            issuer.sendMessage(Utils.color("&9[Charter] &c") + ConfigMessage.PLAYER_NOT_FOUND.get());
         }
         else
         {
@@ -97,7 +98,7 @@ public class CharterCommand extends BaseCommand {
     {
         if(reason == null)
         {
-            reason = Utils.color("&c" + config.getString("default-ban-reason"));
+            reason = Utils.color("&c") + ConfigMessage.DEFAULT_BAN_REASON.get();
         }
 
         onIssueCommand(sender, player, 5, reason);
@@ -112,7 +113,7 @@ public class CharterCommand extends BaseCommand {
         EMIPlayer player = EMIPlayer.getEmiPlayer(name);
         if(player.isEmpty())
         {
-            sender.sendMessage(Utils.color("&9[Charter]&3 " + config.getString("player-not-found-error")));
+            sender.sendMessage(Utils.color("&9[Charter]&3 ") + ConfigMessage.PLAYER_NOT_FOUND.get());
         }
         else
         {
@@ -267,7 +268,7 @@ public class CharterCommand extends BaseCommand {
         long pardonPointSuccess = CharterPoint.pardonPlayer(name, player, removeFlag);
         if(pardonPointSuccess == 0)
         {
-            player.sendMessage(Utils.color("&9[Charter] &3" + config.getString("player-not-found-error")));
+            player.sendMessage(Utils.color("&9[Charter] &3") + ConfigMessage.PLAYER_NOT_FOUND.get());
         }
         else
         {

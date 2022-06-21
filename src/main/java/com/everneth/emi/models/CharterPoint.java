@@ -25,8 +25,6 @@ public class CharterPoint {
     private int amount;
     private int pointId;
 
-    private FileConfiguration config = EMI.getPlugin().getConfig();
-
     public CharterPoint(EMIPlayer issuer, EMIPlayer recipient, String reason, int amount)
     {
         this.issuer = issuer;
@@ -143,7 +141,7 @@ public class CharterPoint {
                 break;
         }
 
-        String response = MessageFormat.format(config.getString("points-accumulated-alert"), recipient.getName(), points);
+        String response = ConfigMessage.POINTS_ACCRUED.getWithArgs(recipient.getName(), points);
         sender.sendMessage(Utils.color("&9[Charter] &3" + response));
 
         if (points >= 2) {
@@ -158,21 +156,25 @@ public class CharterPoint {
                         points >= 5 ? null : cal.getTime(),
                         null);
 
-                sender.sendMessage(Utils.color("Banned &c" + name));
+                sender.sendMessage(Utils.color("&9[Charter] &fBanned &c" + name));
+            }
+
+            if (points >= 5) {
+                sender.sendMessage(Utils.color("&9[Charter] &3Please manually ban any of their accounts on the test server."));
             }
         }
 
         // This will eventually be replaced with a much nicer method in the EMIPlayer model
         User user = EMI.getJda().getUserById(recipient.getId());
         if (user != null) {
-            String message = MessageFormat.format(config.getString("issued-point-alert"),
+            String message = ConfigMessage.POINTS_GAINED_WARNING.getWithArgs(
                     user.getName(), amount, issuer.getName(), reason, points, cal.getTimeInMillis() / 1000);
             user.openPrivateChannel()
                     .flatMap(privateChannel -> privateChannel.sendMessage(message))
                     .queue(null,
                             new ErrorHandler()
                                     .handle(ErrorResponse.CANNOT_SEND_TO_USER, (error) -> {
-                                        sender.sendMessage(Utils.color("&c" + config.getString("message-send-error")));
+                                        sender.sendMessage(Utils.color("&c" + ConfigMessage.DISCORD_MESSAGE_FAILED.get()));
                                     }));
         }
     }

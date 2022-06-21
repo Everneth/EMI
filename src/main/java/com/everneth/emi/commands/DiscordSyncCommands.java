@@ -7,6 +7,7 @@ import co.aikar.idb.DbRow;
 import com.everneth.emi.Utils;
 import com.everneth.emi.managers.DiscordSyncManager;
 import com.everneth.emi.EMI;
+import com.everneth.emi.models.ConfigMessage;
 import com.everneth.emi.models.EMIPlayer;
 
 import net.dv8tion.jda.api.entities.Guild;
@@ -71,13 +72,13 @@ public class DiscordSyncCommands extends BaseCommand {
             User user = member.getUser();
             if (user.getName().equalsIgnoreCase(name) && user.getDiscriminator().equals(discriminator)) {
                 user.openPrivateChannel()
-                        .flatMap(privateChannel -> privateChannel.sendMessage(MessageFormat.format(config.getString("account-sync-alert"), player.getName())))
+                        .flatMap(privateChannel -> privateChannel.sendMessage(ConfigMessage.ACCOUNT_SYNCED.getWithArgs(player.getName())))
                         .queue(message -> {
                             dsm.addSyncRequest(player, user);
                             player.sendMessage(Utils.color("&aMessage sent. Please check your discord DMs to confirm your synchronization!"));
                         }, new ErrorHandler()
                                 .handle(ErrorResponse.CANNOT_SEND_TO_USER, (error) -> {
-                                    player.sendMessage(Utils.color("&c" + config.getString("message-send-error")));
+                                    player.sendMessage(Utils.color("&c") + ConfigMessage.DISCORD_MESSAGE_FAILED.get());
                                 }));
                 return;
             }
