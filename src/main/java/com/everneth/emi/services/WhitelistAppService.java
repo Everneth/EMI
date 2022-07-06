@@ -291,9 +291,10 @@ public class WhitelistAppService {
             case 1:
                 // the username containing any spaces will cause an exception, the easiest solution is to simply replace any spaces
                 data = data.trim().replace(" ", "_");
-                UUID playerUuid = EMIPlayer.getPlayerUUID(data);
-                if (playerUuid != null) {
-                    app.setMinecraftUuid(playerUuid);
+                EMIPlayer player= new EMIPlayer();
+                player.setName(data);
+                if (player.getUuid() != null) {
+                    app.setMinecraftUuid(player.getUuid());
                     app.setInGameName(data);
                 }
                 break;

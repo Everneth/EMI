@@ -81,7 +81,7 @@ public class CharterCommand extends BaseCommand {
         else
         {
             EMIPlayer issuerPlayer = new EMIPlayer(
-                    issuer.getUniqueId().toString(),
+                    issuer.getUniqueId(),
                     issuer.getName(),
                     null
             );
@@ -117,8 +117,7 @@ public class CharterCommand extends BaseCommand {
         }
         else
         {
-        List<DbRow> points;
-        points = EMIPlayer.getAllPoints(name);
+        List<DbRow> points = player.getAllPoints();
 
         if(points.isEmpty())
         {

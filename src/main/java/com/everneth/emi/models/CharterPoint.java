@@ -75,7 +75,7 @@ public class CharterPoint {
 
     public long issuePoint()
     {
-        EMIPlayer issuer = EMIPlayer.getEmiPlayer(UUID.fromString(this.getIssuer().getUniqueId()));
+        EMIPlayer issuer = EMIPlayer.getEmiPlayer(this.getIssuer().getUuid());
         Date now = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -103,7 +103,8 @@ public class CharterPoint {
 
     public void enforceCharter(CommandSender sender)
     {
-        List<DbRow> pointsList = EMIPlayer.getAllPoints(recipient.getName());
+        EMIPlayer recipient = EMIPlayer.getEmiPlayer(this.recipient.getName());
+        List<DbRow> pointsList = recipient.getAllPoints();
         int points = 0;
         LocalDateTime now = LocalDateTime.now();
 
@@ -116,7 +117,6 @@ public class CharterPoint {
             }
         }
 
-        EMIPlayer player = EMIPlayer.getEmiPlayer(recipient.getName());
         Calendar cal = Calendar.getInstance();
         switch(points)
         {
@@ -137,7 +137,7 @@ public class CharterPoint {
                 break;
             default:
                 // 5+ points, a permanent ban, flag the user in case of potential future pardons
-                flagPlayer(player);
+                flagPlayer(recipient);
                 break;
         }
 
@@ -146,7 +146,7 @@ public class CharterPoint {
 
         if (points >= 2) {
             // Both accounts need to be banned with expiry set to the same time
-            String names[] = { player.getName(), player.getAltName() };
+            String names[] = { recipient.getName(), recipient.getAltName() };
             for (String name : names) {
                 if (name == null) continue;
 
@@ -164,24 +164,37 @@ public class CharterPoint {
             }
         }
 
-        // This will eventually be replaced with a much nicer method in the EMIPlayer model
-        User user = EMI.getJda().getUserById(recipient.getId());
-        if (user != null) {
-            String message = ConfigMessage.POINTS_GAINED_WARNING.getWithArgs(
-                    user.getName(), amount, issuer.getName(), reason, points, cal.getTimeInMillis() / 1000);
-            user.openPrivateChannel()
-                    .flatMap(privateChannel -> privateChannel.sendMessage(message))
-                    .queue(null,
-                            new ErrorHandler()
-                                    .handle(ErrorResponse.CANNOT_SEND_TO_USER, (error) -> {
-                                        sender.sendMessage(Utils.color("&c" + ConfigMessage.DISCORD_MESSAGE_FAILED.get()));
-                                    }));
-        }
+        String message = ConfigMessage.POINTS_GAINED_WARNING.getWithArgs(
+                recipient.getGuildMember().getEffectiveName(), amount, issuer.getName(), reason, points, cal.getTimeInMillis() / 1000);
+        recipient.sendDiscordMessage(message);
     }
 
     public static CharterPoint getCharterPoint(int id)
     {
-        return EMIPlayer.getOnePoint(id);
+        DbRow record = new DbRow();
+        try {
+            record = DB.getFirstRowAsync("SELECT * FROM charter_points WHERE charter_point_id = ?", id).get();
+        }
+        catch (Exception e)
+        {
+            EMI.getPlugin().getLogger().warning(e.getMessage());
+        }
+        if(record == null)
+        {
+            return null;
+        }
+        else
+        {
+            EMIPlayer issuer = EMIPlayer.getEmiPlayer(record.getInt("issued_by"));
+            EMIPlayer recipient = EMIPlayer.getEmiPlayer(record.getInt("issued_to"));
+
+            return new CharterPoint(
+                    issuer,
+                    recipient,
+                    record.getString("reason"),
+                    record.getInt("amount")
+            );
+        }
     }
 
     public static long pardonPlayer(String name, Player sender, boolean removeFlag)
@@ -212,7 +225,7 @@ public class CharterPoint {
 
         // build point to issue after pardon is complete
             EMIPlayer senderPlayer = new EMIPlayer(
-                    sender.getUniqueId().toString(),
+                    sender.getUniqueId(),
                     sender.getName()
             );
 
@@ -225,7 +238,7 @@ public class CharterPoint {
 
     private void flagPlayer(EMIPlayer player)
     {
-        DB.executeUpdateAsync("UPDATE players SET flagged = 1 WHERE player_uuid = ?", player.getUniqueId());
+        DB.executeUpdateAsync("UPDATE players SET flagged = 1 WHERE player_uuid = ?", player.getUuid());
     }
 
     public boolean updateCharterPoint(CharterPoint charterPoint, int id)

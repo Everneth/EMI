@@ -1,7 +1,6 @@
 package com.everneth.emi.commands.bot;
 
 import co.aikar.idb.DB;
-import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.models.EMIPlayer;
 import com.jagrosh.jdautilities.command.SlashCommand;
@@ -24,7 +23,8 @@ public class UnsyncCommand extends SlashCommand {
     public void execute(SlashCommandEvent event) {
         // the player does not have a synced account, we can ignore them
         long memberId = event.getMember().getIdLong();
-        if (!EMIPlayer.syncExists(memberId)) {
+        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(memberId);
+        if (!emiPlayer.isSynced()) {
             event.reply("Your account is not synchronized.").setEphemeral(true).queue();
             return;
         }

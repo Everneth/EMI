@@ -35,7 +35,7 @@ public class ReportCommand extends BaseCommand {
         // Get the player and supply all potentially useful
         // information to the embed builder
         Player player = (Player)sender;
-
+        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(player.getUniqueId());
         if(rm.hasActiveReport(player.getUniqueId()))
         {
             player.sendMessage(Utils.color("<&6The Wench&f> You already have an active report in our system. Please use " +
@@ -44,7 +44,7 @@ public class ReportCommand extends BaseCommand {
         else {
             Report.buildPrivateChannel(player, message, "_staff");
             // Make the bot post the embed to the channel and notify the player
-            if(EMIPlayer.syncExists(player.getUniqueId()))
+            if(emiPlayer.isSynced())
                 player.sendMessage(Utils.color("<&6The Wench&f> I have created a direct channel with &9staff&f. &a&lProceed to Discord to continue the chat. &d<3"));
             else
                 player.sendMessage(Utils.color("<&6The Wench&f> I have created a direct channel with &9staff&f. Please use &6/rr <message>&f to message staff directly! A staff member " +

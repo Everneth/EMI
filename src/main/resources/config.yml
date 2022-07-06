@@ -53,7 +53,7 @@ items-per-page: 5
 ###############################################################################################
 
 # user-not-found-error - The error displayed when a Discord user cannot be found
-user-not-found-error: "Could not find that user on Discord. Either the name is wrong or they are not in the guild."
+user-not-found-error: "Could not find user on Discord. Either the name is wrong or they are not in the guild."
 
 # player-not-found-error - The error displayed when a player cannot be found in the db
 player-not-found-error: "Could not find a player by that name."

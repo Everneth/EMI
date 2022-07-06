@@ -33,12 +33,13 @@ public class ConfirmSyncCommand extends SlashCommand {
     {
         DiscordSyncManager dsm = DiscordSyncManager.getDSM();
         User toFind = dsm.findSyncRequest(event.getUser());
+        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(event.getUser().getId());
 
         if (toFind == null) {
             event.reply("No sync request exists for your account or it has already been synced.").setEphemeral(true).queue();
             return;
         }
-        else if (EMIPlayer.syncExists(toFind)) {
+        else if (emiPlayer.isSynced()) {
             event.reply("You have already synced this account. If this is in error, please contact staff.").setEphemeral(true).queue();
             return;
         }
