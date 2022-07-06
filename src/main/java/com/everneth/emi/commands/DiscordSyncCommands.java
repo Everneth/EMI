@@ -6,7 +6,7 @@ import co.aikar.idb.DB;
 import com.everneth.emi.Utils;
 import com.everneth.emi.managers.DiscordSyncManager;
 import com.everneth.emi.EMI;
-import com.everneth.emi.models.ConfigMessage;
+import com.everneth.emi.models.enums.ConfigMessage;
 import com.everneth.emi.models.EMIPlayer;
 
 import net.dv8tion.jda.api.entities.Guild;

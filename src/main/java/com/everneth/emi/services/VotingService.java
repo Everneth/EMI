@@ -4,7 +4,7 @@ import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 
 import com.everneth.emi.EMI;
-import com.everneth.emi.models.ConfigMessage;
+import com.everneth.emi.models.enums.ConfigMessage;
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.WhitelistVote;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -17,7 +17,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;

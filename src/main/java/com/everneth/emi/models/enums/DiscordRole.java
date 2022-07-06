@@ -1,4 +1,4 @@
-package com.everneth.emi.models;
+package com.everneth.emi.models.enums;
 
 import com.everneth.emi.EMI;
 import net.dv8tion.jda.api.entities.Role;

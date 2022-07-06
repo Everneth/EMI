@@ -7,7 +7,7 @@ import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
 import com.everneth.emi.models.CharterPoint;
-import com.everneth.emi.models.ConfigMessage;
+import com.everneth.emi.models.enums.ConfigMessage;
 import com.everneth.emi.models.EMIPlayer;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
