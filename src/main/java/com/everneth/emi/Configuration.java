@@ -84,7 +84,7 @@ public class Configuration {
         DB.close();
 
         // remove all the registered slash commands from the guild and shutdown
-        unregisterCommands(true);
+        //unregisterCommands(true);
         EMI.getJda().shutdown();
 
         // In the event someone requested temporary whitelisting less than 5 minutes before a server shutdown,
