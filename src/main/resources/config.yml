@@ -37,6 +37,7 @@ synced-role-id: 0
 member-role-id: 0
 mint-role-id: 0
 staff-role-id: 0
+bot-role-id: 0
 
 # root-help-msg: 0 - Message to preserve in help channel (IE: rules/info message at start of channel)
 help-channel-id: 0

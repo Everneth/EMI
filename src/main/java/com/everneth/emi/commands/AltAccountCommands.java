@@ -5,7 +5,7 @@ import co.aikar.commands.annotation.*;
 import co.aikar.idb.DB;
 import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
-import com.everneth.emi.models.ConfigMessage;
+import com.everneth.emi.models.enums.ConfigMessage;
 import com.everneth.emi.models.EMIPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;

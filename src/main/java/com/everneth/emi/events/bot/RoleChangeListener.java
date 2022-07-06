@@ -2,6 +2,7 @@ package com.everneth.emi.events.bot;
 
 import com.everneth.emi.EMI;
 import com.everneth.emi.models.WhitelistVote;
+import com.everneth.emi.models.enums.DiscordRole;
 import com.everneth.emi.services.VotingService;
 import com.everneth.emi.services.WhitelistAppService;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -21,13 +22,10 @@ public class RoleChangeListener extends ListenerAdapter {
 
     @Override
     public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
-        Role pendingRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("pending-role-id"));
-        Role applicantRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("applicant-role-id"));
-
-        if (event.getRoles().contains(pendingRole)) {
+        if (event.getRoles().contains(DiscordRole.PENDING.get())) {
             // the user does not have an application, let's remove the pending role from them
             if (!WhitelistAppService.getService().appExists(event.getMember().getIdLong())) {
-                EMI.getGuild().removeRoleFromMember(event.getMember(), pendingRole).queue();
+                EMI.getGuild().removeRoleFromMember(event.getMember(), DiscordRole.PENDING.get()).queue();
                 return;
             }
 
@@ -44,7 +42,7 @@ public class RoleChangeListener extends ListenerAdapter {
                                 ));
                             }
                     );
-            event.getGuild().removeRoleFromMember(event.getMember(), applicantRole).queue();
+            event.getGuild().removeRoleFromMember(event.getMember(), DiscordRole.APPLICANT.get()).queue();
         }
     }
 

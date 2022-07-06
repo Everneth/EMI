@@ -3,6 +3,7 @@ package com.everneth.emi.commands.bot;
 import co.aikar.idb.DB;
 import com.everneth.emi.EMI;
 import com.everneth.emi.models.EMIPlayer;
+import com.everneth.emi.models.enums.DiscordRole;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import net.dv8tion.jda.api.entities.Role;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
@@ -41,9 +42,7 @@ public class UnsyncCommand extends SlashCommand {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "whitelist remove " + altUsername));
         }
 
-        long guildId = EMI.getPlugin().getConfig().getLong("guild-id");
-        Role syncedRole = event.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("synced-role-id"));
-        EMI.getJda().getGuildById(guildId).removeRoleFromMember(event.getMember(), syncedRole).queue();
+        EMI.getGuild().removeRoleFromMember(event.getMember(), DiscordRole.SYNCED.get()).queue();
         // remove the user from the DB so their accounts are not read as already whitelisted
         DB.executeUpdateAsync("DELETE FROM players WHERE discord_id = ?",
                 event.getMember().getIdLong());
