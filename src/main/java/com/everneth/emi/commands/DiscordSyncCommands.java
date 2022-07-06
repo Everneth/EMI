@@ -9,6 +9,7 @@ import com.everneth.emi.EMI;
 import com.everneth.emi.models.enums.ConfigMessage;
 import com.everneth.emi.models.EMIPlayer;
 
+import com.everneth.emi.models.enums.DiscordRole;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -75,18 +76,17 @@ public class DiscordSyncCommands extends BaseCommand {
     @Subcommand("unsync")
     @Description("If you have lost access to your discord account, you may unsync and re-sync with a different account.")
     public void onDiscordUnsync(Player player) {
-        EMIPlayer member = EMIPlayer.getEmiPlayer(player.getUniqueId());
-        long discordId = member.getDiscordId();
+        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(player.getUniqueId());
+        long discordId = emiPlayer.getDiscordId();
         if (discordId == 0) {
             player.sendMessage("You do not have a discord account synced with your minecraft account.");
             return;
         }
 
-        boolean messageSent = member.sendDiscordMessage(ConfigMessage.ACCOUNT_UNSYNCED.get(), player);
+        boolean messageSent = emiPlayer.sendDiscordMessage(ConfigMessage.ACCOUNT_UNSYNCED.get(), player);
         if (messageSent) {
-            Guild guild = EMI.getJda().getGuildById(config.getLong("guild-id"));
-            Role syncRole = guild.getRoleById(config.getLong("synced-role-id"));
-            guild.removeRoleFromMember(member.getGuildMember(), syncRole).queue();
+            Guild guild = EMI.getGuild();
+            guild.removeRoleFromMember(emiPlayer.getGuildMember(), DiscordRole.SYNCED.get()).queue();
 
             DB.executeUpdateAsync("UPDATE players SET discord_id = NULL WHERE ? IN (player_uuid,alt_uuid)", player.getUniqueId().toString());
             player.sendMessage(Utils.color("Your discord account has been successfully unsynced. " +

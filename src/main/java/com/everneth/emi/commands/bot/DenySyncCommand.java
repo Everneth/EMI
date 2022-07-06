@@ -2,6 +2,8 @@ package com.everneth.emi.commands.bot;
 
 import com.everneth.emi.managers.DiscordSyncManager;
 import com.everneth.emi.EMI;
+import com.everneth.emi.models.EMIPlayer;
+import com.everneth.emi.models.enums.DiscordRole;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -28,12 +30,12 @@ public class DenySyncCommand extends SlashCommand {
     public void execute(SlashCommandEvent event)
     {
         UUID key = dsm.findSyncRequestUUID(event.getUser());
-
-        if(key == null && !hasSyncRole(event))
+        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(event.getUser().getIdLong());
+        if(key == null && !emiPlayer.isSynced())
         {
             event.reply("No request found. It either expired or the server was restarted.").setEphemeral(true).queue();
         }
-        else if (key == null && hasSyncRole(event))
+        else if (key == null && emiPlayer.isSynced())
         {
             event.reply("Your account is already synced and running this command did nothing.").setEphemeral(true).queue();
         }
@@ -42,13 +44,5 @@ public class DenySyncCommand extends SlashCommand {
             dsm.removeSyncRequest(key.toString());
             event.reply("Sync request denied successfully.").queue();
         }
-    }
-
-    private boolean hasSyncRole(SlashCommandEvent event)
-    {
-        long guildId = EMI.getPlugin().getConfig().getLong("guild-id");
-        long syncRoleId = EMI.getPlugin().getConfig().getLong("synced-role-id");
-        Role syncRole = EMI.getJda().getGuildById(guildId).getRoleById(syncRoleId);
-        return EMI.getJda().getGuildById(guildId).getMemberById(event.getUser().getIdLong()).getRoles().contains(syncRole);
     }
 }

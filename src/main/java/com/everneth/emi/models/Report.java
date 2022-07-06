@@ -2,6 +2,7 @@ package com.everneth.emi.models;
 
 import com.everneth.emi.EMI;
 import com.everneth.emi.managers.ReportManager;
+import com.everneth.emi.models.enums.DiscordRole;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -66,13 +67,9 @@ public class Report {
     {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        Member discordMember;
         GuildManager guildManager = EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getManager();
-        Role staffRole = guildManager.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("staff-role-id"));
-        Role mintRole = guildManager.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("mint-role-id"));
-        Role botRole = guildManager.getGuild().getRolesByName(EMI.getJda().getSelfUser().getName(), true).get(0);
-        ReportManager rm = ReportManager.getReportManager();
 
+        ReportManager rm = ReportManager.getReportManager();
         EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(player.getUniqueId());
 
         switch(reportType) {
@@ -94,15 +91,15 @@ public class Report {
                     long userPermissions = Permission.ALL_TEXT_PERMISSIONS
                             + Permission.VIEW_CHANNEL.getRawValue()
                             - Permission.MESSAGE_MANAGE.getRawValue();
-                    discordMember = guildManager.getGuild().getMemberById(emiPlayer.getDiscordId());
+
                     ChannelAction<TextChannel> channelAction = guildManager.getGuild().createTextChannel(player.getName().toLowerCase() + reportType);
                     channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
-                            .addPermissionOverride(staffRole, Permission.ALL_CHANNEL_PERMISSIONS, 0)
-                            .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0)
-                            .addPermissionOverride(discordMember, userPermissions, 0).queue(
+                            .addPermissionOverride(DiscordRole.STAFF.get(), Permission.ALL_CHANNEL_PERMISSIONS, 0)
+                            .addPermissionOverride(DiscordRole.BOT.get(), Permission.ALL_TEXT_PERMISSIONS, 0)
+                            .addPermissionOverride(emiPlayer.getGuildMember(), userPermissions, 0).queue(
                             channel -> {
                                 Report reportToAdd = new Report(channel.getIdLong());
-                                reportToAdd.setDiscordUserId(discordMember.getUser().getIdLong());
+                                reportToAdd.setDiscordUserId(emiPlayer.getDiscordId());
                                 rm.addReport(player.getUniqueId(), reportToAdd);
                                 rm.addReportRecord(reportToAdd, emiPlayer.getId());
                                 channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessageEmbeds(ebs.build()).queue();
@@ -112,8 +109,8 @@ public class Report {
                 {
                     ChannelAction<TextChannel> channelAction = guildManager.getGuild().createTextChannel(player.getName().toLowerCase() + reportType);
                     channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
-                            .addPermissionOverride(staffRole, Permission.ALL_TEXT_PERMISSIONS, 0)
-                            .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0).queue(
+                            .addPermissionOverride(DiscordRole.STAFF.get(), Permission.ALL_TEXT_PERMISSIONS, 0)
+                            .addPermissionOverride(DiscordRole.BOT.get(), Permission.ALL_TEXT_PERMISSIONS, 0).queue(
                             channel -> {
                                 Report reportToAdd = new Report(channel.getIdLong());
                                 rm.addReport(player.getUniqueId(), reportToAdd);
@@ -140,16 +137,15 @@ public class Report {
                     long userPermissions = Permission.ALL_TEXT_PERMISSIONS
                             + Permission.VIEW_CHANNEL.getRawValue()
                             - Permission.MESSAGE_MANAGE.getRawValue();
-                    discordMember = guildManager.getGuild().getMemberById(emiPlayer.getDiscordId());
                     ChannelAction<TextChannel> channelAction = guildManager.getGuild().createTextChannel(player.getName().toLowerCase() + reportType);
                     channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
-                            .addPermissionOverride(staffRole, Permission.ALL_CHANNEL_PERMISSIONS, 0)
-                            .addPermissionOverride(mintRole, Permission.ALL_CHANNEL_PERMISSIONS, 0)
-                            .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0)
-                            .addPermissionOverride(discordMember, userPermissions, 0).queue(
+                            .addPermissionOverride(DiscordRole.STAFF.get(), Permission.ALL_CHANNEL_PERMISSIONS, 0)
+                            .addPermissionOverride(DiscordRole.MINT.get(), Permission.ALL_CHANNEL_PERMISSIONS, 0)
+                            .addPermissionOverride(DiscordRole.BOT.get(), Permission.ALL_TEXT_PERMISSIONS, 0)
+                            .addPermissionOverride(emiPlayer.getGuildMember(), userPermissions, 0).queue(
                             channel -> {
                                 Report reportToAdd = new Report(channel.getIdLong());
-                                reportToAdd.setDiscordUserId(discordMember.getUser().getIdLong());
+                                reportToAdd.setDiscordUserId(emiPlayer.getDiscordId());
                                 rm.addReport(player.getUniqueId(), reportToAdd);
                                 rm.addReportRecord(reportToAdd, emiPlayer.getId());
                                 channel.getGuild().getTextChannelById(channel.getIdLong()).sendMessageEmbeds(ebm.build()).queue();
@@ -159,9 +155,9 @@ public class Report {
                 {
                     ChannelAction<TextChannel> channelAction = guildManager.getGuild().createTextChannel(player.getName().toLowerCase() + reportType);
                     channelAction.addPermissionOverride(guildManager.getGuild().getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
-                            .addPermissionOverride(staffRole, Permission.ALL_CHANNEL_PERMISSIONS, 0)
-                            .addPermissionOverride(mintRole, Permission.ALL_CHANNEL_PERMISSIONS, 0)
-                            .addPermissionOverride(botRole, Permission.ALL_TEXT_PERMISSIONS, 0).queue(
+                            .addPermissionOverride(DiscordRole.STAFF.get(), Permission.ALL_CHANNEL_PERMISSIONS, 0)
+                            .addPermissionOverride(DiscordRole.MINT.get(), Permission.ALL_CHANNEL_PERMISSIONS, 0)
+                            .addPermissionOverride(DiscordRole.BOT.get(), Permission.ALL_TEXT_PERMISSIONS, 0).queue(
                             channel -> {
                                 Report reportToAdd = new Report(channel.getIdLong());
                                 rm.addReport(player.getUniqueId(), reportToAdd);

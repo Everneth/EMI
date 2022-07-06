@@ -7,6 +7,7 @@ import com.everneth.emi.EMI;
 import com.everneth.emi.models.enums.ConfigMessage;
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.WhitelistVote;
+import com.everneth.emi.models.enums.DiscordRole;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -49,18 +50,14 @@ public class VotingService {
     public void endVote(long id, boolean approved, ButtonInteractionEvent event)
     {
         WhitelistVote vote = voteMap.get(id);
-        // Get all the roles that may need to be modified based on the vote outcome
-        Role pendingRole = EMI.getGuild().getRoleById(config.getLong("pending-role-id"));
-        Role citizenRole = EMI.getGuild().getRoleById(config.getLong("member-role-id"));
-        Role syncedRole = EMI.getGuild().getRoleById(config.getLong("synced-role-id"));
 
         Guild guild = EMI.getGuild();
         DbRow application = EMIPlayer.getAppRecord(vote.getApplicantDiscordId());
         Member applicant = guild.getMemberById(application.getLong("applicant_discord_id"));
 
         if (approved) {
-            guild.addRoleToMember(applicant, citizenRole).queue();
-            guild.addRoleToMember(applicant, syncedRole).queue();
+            guild.addRoleToMember(applicant, DiscordRole.CITIZEN.get()).queue();
+            guild.addRoleToMember(applicant, DiscordRole.SYNCED.get()).queue();
 
             WhitelistAppService.getService().approveWhitelistAppRecord(applicant.getIdLong(), vote.getMessageId());
 
@@ -223,8 +220,7 @@ public class VotingService {
     }
 
     private boolean hasMajority(HashSet<Member> voters, int percentRequired) {
-        Role staffRole = EMI.getGuild().getRoleById(EMI.getConfigLong("staff-role-id"));
-        int staffCount = EMI.getGuild().getMembersWithRoles(staffRole).size();
+        int staffCount = EMI.getGuild().getMembersWithRoles(DiscordRole.STAFF.get()).size();
 
         return (voters.size() * 100) / staffCount >= percentRequired;
     }

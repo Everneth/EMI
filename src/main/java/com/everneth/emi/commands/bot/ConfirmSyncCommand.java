@@ -5,6 +5,7 @@ import com.everneth.emi.managers.DiscordSyncManager;
 import com.everneth.emi.EMI;
 
 import com.everneth.emi.models.EMIPlayer;
+import com.everneth.emi.models.enums.DiscordRole;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import net.dv8tion.jda.api.entities.User;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
@@ -33,7 +34,7 @@ public class ConfirmSyncCommand extends SlashCommand {
     {
         DiscordSyncManager dsm = DiscordSyncManager.getDSM();
         User toFind = dsm.findSyncRequest(event.getUser());
-        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(event.getUser().getId());
+        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(event.getUser().getIdLong());
 
         if (toFind == null) {
             event.reply("No sync request exists for your account or it has already been synced.").setEphemeral(true).queue();
@@ -50,15 +51,9 @@ public class ConfirmSyncCommand extends SlashCommand {
             return;
         }
 
-        long guildId = EMI.getPlugin().getConfig().getLong("guild-id");
-        long syncRoleId = EMI.getPlugin().getConfig().getLong("synced-role-id");
-
         UUID key = dsm.findSyncRequestUUID(event.getUser());
         dsm.removeSyncRequest(key.toString());
-        EMI.getJda().getGuildById(guildId).addRoleToMember(
-                EMI.getJda().getGuildById(guildId).getMemberById(event.getUser().getIdLong()),
-                EMI.getJda().getGuildById(guildId).getRoleById(syncRoleId)
-        ).queue();
+        EMI.getGuild().addRoleToMember(emiPlayer.getGuildMember(), DiscordRole.SYNCED.get()).queue();
 
         event.reply("Your account has been synced and your roles updated!").queue();
     }

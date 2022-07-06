@@ -4,6 +4,7 @@ import com.everneth.emi.EMI;
 import com.everneth.emi.models.enums.ConfigMessage;
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.WhitelistApp;
+import com.everneth.emi.models.enums.DiscordRole;
 import com.everneth.emi.services.WhitelistAppService;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import net.dv8tion.jda.api.entities.Role;
@@ -21,14 +22,13 @@ public class ApplyCommand extends SlashCommand {
     public void execute(SlashCommandEvent event)
     {
         EMIPlayer applicant = new EMIPlayer();
-        Role memberRole = EMI.getGuild().getRoleById(EMI.getConfigLong("member-role-id"));
         applicant.setDiscordId(event.getUser().getIdLong());
 
         if(WhitelistAppService.getService().findByDiscordId(event.getUser().getIdLong()) != null) {
             event.reply("You already have an active application!").setEphemeral(true).queue();
             return;
         }
-        else if (event.getMember().getRoles().contains(memberRole)) {
+        else if (event.getMember().getRoles().contains(DiscordRole.CITIZEN.get())) {
             event.reply("You're already a member!").setEphemeral(true).queue();
             return;
         }

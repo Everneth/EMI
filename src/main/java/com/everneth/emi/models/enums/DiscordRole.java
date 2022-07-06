@@ -9,7 +9,8 @@ public enum DiscordRole {
     STAFF("staff-role-id"),
     APPLICANT("applicant-role-id"),
     PENDING("pending-role-id"),
-    SYNCED("synced-role-id");
+    SYNCED("synced-role-id"),
+    BOT("bot-role-id");
 
     private final String keyValue;
 
@@ -18,6 +19,11 @@ public enum DiscordRole {
     }
 
     public Role get() {
-        return EMI.getGuild().getRoleById(EMI.getConfigLong(keyValue));
+        Role role = EMI.getGuild().getRoleById(EMI.getConfigLong(keyValue));
+        // In the extremely unlikely event that the role does not exist, we can instead just return the bot role which will have virtually no effect
+        if (role == null) {
+            EMI.getGuild().getBotRole();
+        }
+        return role;
     }
 }

@@ -6,6 +6,7 @@ import com.everneth.emi.EMI;
 
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.WhitelistApp;
+import com.everneth.emi.models.enums.DiscordRole;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.managers.GuildManager;
@@ -78,8 +79,7 @@ public class WhitelistAppService {
     public void changeRoleToApplicant(long discordId)
     {
         GuildManager manager = EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id")).getManager();
-        Role applicant = manager.getGuild().getRoleById(EMI.getPlugin().getConfig().getLong("applicant-role-id"));
-        manager.getGuild().addRoleToMember(manager.getGuild().getMemberById(discordId), applicant).queue();
+        manager.getGuild().addRoleToMember(manager.getGuild().getMemberById(discordId), DiscordRole.APPLICANT.get()).queue();
     }
 
     public void messageStaffWithEmbed(EmbedBuilder eb2)

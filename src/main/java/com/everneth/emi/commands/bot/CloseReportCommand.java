@@ -3,6 +3,7 @@ package com.everneth.emi.commands.bot;
 import com.everneth.emi.EMI;
 import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.models.EMIPlayer;
+import com.everneth.emi.models.enums.DiscordRole;
 import com.everneth.emi.utils.FileUtils;
 
 import com.jagrosh.jdautilities.command.SlashCommand;
@@ -26,10 +27,6 @@ public class CloseReportCommand extends SlashCommand {
 
     @Override
     protected void execute(SlashCommandEvent event) {
-
-        long mintRoleId = EMI.getPlugin().getConfig().getLong("mint-role-id");
-        long staffRoleId = EMI.getPlugin().getConfig().getLong("staff-role-id");
-
         // We need to make sure the command sender has the correct authorized roles.
         // Assume no one has roles
         boolean hasRequiredRoles = false;
@@ -42,12 +39,9 @@ public class CloseReportCommand extends SlashCommand {
             UUID uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
             EMIPlayer player = EMIPlayer.getEmiPlayer(uuid);
             // Lets check them
-            for (Role role : roleList) {
-                if (role.getIdLong() == staffRoleId) {
-                    // Found a required role, no need to continue, break from the loop
-                    hasRequiredRoles = true;
-                    break;
-                }
+            if (roleList.contains(DiscordRole.STAFF.get())) {
+                // Found a required role, no need to continue, break from the loop
+                hasRequiredRoles = true;
             }
             // We've looped through. Do we have the role?
             if (hasRequiredRoles) {
