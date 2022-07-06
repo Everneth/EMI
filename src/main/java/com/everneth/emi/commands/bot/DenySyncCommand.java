@@ -1,13 +1,10 @@
 package com.everneth.emi.commands.bot;
 
 import com.everneth.emi.managers.DiscordSyncManager;
-import com.everneth.emi.EMI;
 import com.everneth.emi.models.EMIPlayer;
-import com.everneth.emi.models.enums.DiscordRole;
 import com.jagrosh.jdautilities.command.SlashCommand;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
+
 import java.util.UUID;
 
 /**

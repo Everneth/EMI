@@ -1,18 +1,19 @@
 package com.everneth.emi.commands;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.*;
+import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.Description;
+import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.Syntax;
 import co.aikar.idb.DB;
+import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
 import com.everneth.emi.managers.DiscordSyncManager;
-import com.everneth.emi.EMI;
-import com.everneth.emi.models.enums.ConfigMessage;
 import com.everneth.emi.models.EMIPlayer;
-
+import com.everneth.emi.models.enums.ConfigMessage;
 import com.everneth.emi.models.enums.DiscordRole;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;

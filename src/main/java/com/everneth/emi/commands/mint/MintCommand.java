@@ -1,7 +1,10 @@
 package com.everneth.emi.commands.mint;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.*;
+import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandPermission;
+import co.aikar.commands.annotation.Dependency;
+import co.aikar.commands.annotation.Subcommand;
 import com.everneth.emi.Utils;
 import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.models.EMIPlayer;

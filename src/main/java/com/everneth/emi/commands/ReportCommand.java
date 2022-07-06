@@ -5,11 +5,10 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Dependency;
 import com.everneth.emi.EMI;
-import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.Utils;
+import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.Report;
-
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;

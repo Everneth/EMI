@@ -1,7 +1,6 @@
 package com.everneth.emi.services;
 
 import co.aikar.idb.DB;
-import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.models.EMIPlayer;
 import org.bukkit.Bukkit;

@@ -2,14 +2,11 @@ package com.everneth.emi.events;
 
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
-
-import com.everneth.emi.managers.MotdManager;
-import com.everneth.emi.managers.ReportManager;
-import com.everneth.emi.Utils;
 import com.everneth.emi.EMI;
+import com.everneth.emi.Utils;
+import com.everneth.emi.managers.MotdManager;
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.Motd;
-
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

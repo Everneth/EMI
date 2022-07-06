@@ -5,7 +5,6 @@ import com.everneth.emi.EMI;
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.enums.DiscordRole;
 import com.jagrosh.jdautilities.command.SlashCommand;
-import net.dv8tion.jda.api.entities.Role;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitScheduler;

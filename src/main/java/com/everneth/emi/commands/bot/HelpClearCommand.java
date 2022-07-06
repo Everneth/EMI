@@ -3,11 +3,10 @@ package com.everneth.emi.commands.bot;
 import com.everneth.emi.EMI;
 import com.everneth.emi.utils.FileUtils;
 import com.jagrosh.jdautilities.command.SlashCommand;
+import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageHistory;
-import net.dv8tion.jda.api.entities.Role;
-import com.jagrosh.jdautilities.command.SlashCommandEvent;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;

@@ -1,8 +1,10 @@
 package com.everneth.emi.commands.mint.projects;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.*;
-import co.aikar.idb.DbRow;
+import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandPermission;
+import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.Syntax;
 import com.everneth.emi.Utils;
 import com.everneth.emi.managers.MintProjectManager;
 import com.everneth.emi.models.EMIPlayer;

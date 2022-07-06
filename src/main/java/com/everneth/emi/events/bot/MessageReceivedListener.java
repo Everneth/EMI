@@ -3,18 +3,15 @@ package com.everneth.emi.events.bot;
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
-import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.Utils;
-
+import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.WhitelistApp;
 import com.everneth.emi.services.WhitelistAppService;
 import net.dv8tion.jda.api.EmbedBuilder;
-
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 

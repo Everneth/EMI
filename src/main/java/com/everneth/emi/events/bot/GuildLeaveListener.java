@@ -2,11 +2,9 @@ package com.everneth.emi.events.bot;
 
 
 import co.aikar.idb.DB;
-import com.everneth.emi.EMI;
 import com.everneth.emi.models.enums.DiscordRole;
 import com.everneth.emi.services.VotingService;
 import com.everneth.emi.services.WhitelistAppService;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 

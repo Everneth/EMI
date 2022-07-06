@@ -3,14 +3,11 @@ package com.everneth.emi.services;
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
-
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.WhitelistApp;
 import com.everneth.emi.models.enums.DiscordRole;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.managers.GuildManager;
-
 import org.apache.commons.lang.StringUtils;
 
 import java.sql.SQLException;

@@ -1,7 +1,6 @@
 package com.everneth.emi.commands.bot;
 
 
-import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.services.WhitelistService;

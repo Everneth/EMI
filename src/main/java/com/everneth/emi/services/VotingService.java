@@ -2,14 +2,15 @@ package com.everneth.emi.services;
 
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
-
 import com.everneth.emi.EMI;
-import com.everneth.emi.models.enums.ConfigMessage;
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.WhitelistVote;
+import com.everneth.emi.models.enums.ConfigMessage;
 import com.everneth.emi.models.enums.DiscordRole;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -18,7 +19,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;

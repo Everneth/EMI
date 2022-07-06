@@ -5,15 +5,18 @@ import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.enums.DiscordRole;
 import com.everneth.emi.utils.FileUtils;
-
 import com.jagrosh.jdautilities.command.SlashCommand;
+import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
-import com.jagrosh.jdautilities.command.SlashCommandEvent;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 public class CloseReportCommand extends SlashCommand {
 
