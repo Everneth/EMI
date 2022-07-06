@@ -3,7 +3,6 @@ package com.everneth.emi.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import co.aikar.idb.DB;
-import co.aikar.idb.DbRow;
 import com.everneth.emi.Utils;
 import com.everneth.emi.managers.DiscordSyncManager;
 import com.everneth.emi.EMI;
@@ -13,15 +12,9 @@ import com.everneth.emi.models.EMIPlayer;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.exceptions.ErrorHandler;
-import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-
-import java.text.MessageFormat;
-import java.util.List;
 
 /**
  * Class: DiscordSyncCommands
@@ -41,13 +34,12 @@ public class DiscordSyncCommands extends BaseCommand {
     @Syntax("<Name#0000>")
     public void onDiscordsync(Player player, String discordDetails) {
         // If the account is already synced, notify the user and return
-        if (EMIPlayer.syncExists(player.getUniqueId())) {
+        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(player.getUniqueId());
+        if (emiPlayer.isSynced()) {
             player.sendMessage(Utils.color("&cYou have already synced this account. If this is in error, please contact staff."));
             return;
         }
 
-        // Get a list of guild members, and individual strings for the passed in member
-        List<Member> memberList = EMI.getJda().getGuildById(config.getLong("guild-id")).getMembers();
         String name, discriminator;
         // If the input does not contain the discriminator don't even attempt to find the user
         if (discordDetails.contains("#")) {
@@ -66,48 +58,39 @@ public class DiscordSyncCommands extends BaseCommand {
         }
 
         DiscordSyncManager dsm = DiscordSyncManager.getDSM();
-        // Search the guild member list for all users with the same name
-        for (Member member : memberList) {
-            // If we find a user matching the name and discriminator, proceed with sync request
-            User user = member.getUser();
-            if (user.getName().equalsIgnoreCase(name) && user.getDiscriminator().equals(discriminator)) {
-                user.openPrivateChannel()
-                        .flatMap(privateChannel -> privateChannel.sendMessage(ConfigMessage.ACCOUNT_SYNCED.getWithArgs(player.getName())))
-                        .queue(message -> {
-                            dsm.addSyncRequest(player, user);
-                            player.sendMessage(Utils.color("&aMessage sent. Please check your discord DMs to confirm your synchronization!"));
-                        }, new ErrorHandler()
-                                .handle(ErrorResponse.CANNOT_SEND_TO_USER, (error) -> {
-                                    player.sendMessage(Utils.color("&c") + ConfigMessage.DISCORD_MESSAGE_FAILED.get());
-                                }));
-                return;
+        Member member = EMI.getJda().getGuildById(config.getLong("guild-id")).getMemberByTag(name, discriminator);
+        if (member == null) {
+            player.sendMessage(Utils.color("&c") + ConfigMessage.USER_NOT_FOUND);
+        }
+        else {
+            // We've found the member in the guild and want to attempt to message them, open a sync request if message sends
+            emiPlayer.setDiscordId(member.getIdLong());
+            boolean messageSent = emiPlayer.sendDiscordMessage(ConfigMessage.ACCOUNT_SYNCED.getWithArgs(player.getName()), player);
+            if (messageSent) {
+                dsm.addSyncRequest(player, member.getUser());
             }
         }
-        player.sendMessage(Utils.color("&c" + config.getString("user-not-found-error")));
     }
 
     @Subcommand("unsync")
     @Description("If you have lost access to your discord account, you may unsync and re-sync with a different account.")
     public void onDiscordUnsync(Player player) {
-        EMIPlayer playerRow = EMIPlayer.getEmiPlayer(player.getUniqueId());
-        long discordId = playerRow.getDiscordId();
+        EMIPlayer member = EMIPlayer.getEmiPlayer(player.getUniqueId());
+        long discordId = member.getDiscordId();
         if (discordId == 0) {
             player.sendMessage("You do not have a discord account synced with your minecraft account.");
             return;
         }
-        Guild guild = EMI.getJda().getGuildById(config.getLong("guild-id"));
-        Member member = guild.getMemberById(discordId);
 
-        member.getUser().openPrivateChannel()
-                .flatMap(privateChannel -> privateChannel.sendMessage(config.getString("account-unsync-alert")))
-                .queue(null, new ErrorHandler()
-                        .handle(ErrorResponse.CANNOT_SEND_TO_USER, (error) ->
-                            player.sendMessage(Utils.color("&c" + config.getString("message-send-error")))));
+        boolean messageSent = member.sendDiscordMessage(ConfigMessage.ACCOUNT_UNSYNCED.get(), player);
+        if (messageSent) {
+            Guild guild = EMI.getJda().getGuildById(config.getLong("guild-id"));
+            Role syncRole = guild.getRoleById(config.getLong("synced-role-id"));
+            guild.removeRoleFromMember(member.getGuildMember(), syncRole).queue();
 
-        Role syncRole = guild.getRoleById(config.getLong("synced-role-id"));
-        guild.removeRoleFromMember(member, syncRole).queue();
-
-        DB.executeUpdateAsync("UPDATE players SET discord_id = NULL WHERE ? IN (player_uuid,alt_uuid)", player.getUniqueId().toString());
-        player.sendMessage(Utils.color("Your discord account has been successfully unsynced. Please use &a/discord sync &fto set up with a new account."));
+            DB.executeUpdateAsync("UPDATE players SET discord_id = NULL WHERE ? IN (player_uuid,alt_uuid)", player.getUniqueId().toString());
+            player.sendMessage(Utils.color("Your discord account has been successfully unsynced. " +
+                    "Please use &a/discord sync &fto set up with a new account."));
+        }
     }
 }

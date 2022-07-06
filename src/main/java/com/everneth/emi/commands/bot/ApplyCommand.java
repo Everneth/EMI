@@ -1,6 +1,8 @@
 package com.everneth.emi.commands.bot;
 
 import com.everneth.emi.EMI;
+import com.everneth.emi.models.ConfigMessage;
+import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.WhitelistApp;
 import com.everneth.emi.services.WhitelistAppService;
 import com.jagrosh.jdautilities.command.SlashCommand;
@@ -20,20 +22,27 @@ public class ApplyCommand extends SlashCommand {
     @Override
     public void execute(SlashCommandEvent event)
     {
-        long applicationRoleId = EMI.getPlugin().getConfig().getLong("applicant-role-id");
-        Role applicantRole = event.getGuild().getRoleById(applicationRoleId);
+        EMIPlayer applicant = new EMIPlayer();
+        Role memberRole = EMI.getGuild().getRoleById(EMI.getConfigLong("member-role-id"));
+        applicant.setDiscordId(event.getUser().getIdLong());
 
-        if(WhitelistAppService.getService().findByDiscordId(event.getUser().getIdLong()) == null) {
-            event.getUser().openPrivateChannel().queue(privateChannel ->
-                    privateChannel.sendMessage("What is your Minecraft IGN? **NOTE:** If you enter an invalid IGN, you will be asked again.")
-                            .queue(message -> {
-                                event.reply("I have messaged you the first question!").queue();
-                                WhitelistAppService.getService().addApp(event.getUser().getIdLong(), new WhitelistApp());
-                            }, new ErrorHandler()
-                                    .handle(ErrorResponse.CANNOT_SEND_TO_USER, error ->
-                                        event.reply("Please enable direct messages from Everneth's server members. (Right Click the Everneth Discord Icon > Privacy Settings)")
-                                                .setEphemeral(true).queue()))
-            );
+        if(WhitelistAppService.getService().findByDiscordId(event.getUser().getIdLong()) != null) {
+            event.reply("You already have an active application!").setEphemeral(true).queue();
+            return;
+        }
+        else if (event.getMember().getRoles().contains(memberRole)) {
+            event.reply("You're already a member!").setEphemeral(true).queue();
+            return;
+        }
+        boolean messageSent = applicant.sendDiscordMessage("What is your Minecraft IGN? " +
+                "**NOTE:** If you enter an invalid IGN, you will be asked again.");
+
+        if (messageSent) {
+            event.reply("I have messaged you the first question!").queue();
+            WhitelistAppService.getService().addApp(event.getUser().getIdLong(), new WhitelistApp());
+        }
+        else {
+            event.reply(ConfigMessage.DISCORD_MESSAGE_FAILED.get()).setEphemeral(true).queue();
         }
     }
 }

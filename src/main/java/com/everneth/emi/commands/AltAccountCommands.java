@@ -3,7 +3,6 @@ package com.everneth.emi.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import co.aikar.idb.DB;
-import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
 import com.everneth.emi.models.ConfigMessage;
@@ -29,50 +28,39 @@ public class AltAccountCommands extends BaseCommand {
     @Description("Register an alternate account for personal use and add it to the whitelist.")
     @Syntax("<name>")
     public void onAddAlt(Player player, String requestedName) {
-        if (player.getName().equalsIgnoreCase(requestedName)) {
-            player.sendMessage("You cannot add yourself as an alt account");
+        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(player.getUniqueId());
+        EMIPlayer requestedAlt = EMIPlayer.getEmiPlayer(requestedName);
+        if (!requestedAlt.isEmpty()) {
+            player.sendMessage("That account is already whitelisted.");
             return;
         }
-        if (!EMIPlayer.syncExists(player.getUniqueId())) {
+        else if (!emiPlayer.isSynced()) {
             player.sendMessage(Utils.color("&7You must have a synced discord account to add an alt."));
             return;
         }
-        UUID uuid = EMIPlayer.getPlayerUUID(requestedName);
-        if (uuid == null) {
-            player.sendMessage("Could not find a minecraft user by that name.");
-            return;
+        else if (emiPlayer.getAltUuid() != null) {
+            player.sendMessage("You already have an alternate account synced.");
+        }
+        else {
+            emiPlayer.setAltName(requestedName);
         }
 
-        EMIPlayer dbRow = EMIPlayer.getEmiPlayer(player.getName());
-        String dbUsername = dbRow.getName();
-        String altUsername = dbRow.getAltName();
+        // We've confirmed that the requested name is not whitelisted already, we should confirm it actually exists
+        if (emiPlayer.getAltUuid() == null) {
+            player.sendMessage(Utils.color("&cCould not find a Minecraft user by that name."));
+            return;
+        }
 
         Date now = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         // the player does not have an alt already whitelisted, we want to check if the requested account is already whitelisted
-        if (altUsername == null) {
-            EMIPlayer requestedAlt = EMIPlayer.getEmiPlayer(requestedName);
-
-            // if the last query returned null, the account has not been whitelisted already
-            if (requestedAlt.isEmpty()) {
-                EMI.getPlugin().getServer().dispatchCommand(Bukkit.getConsoleSender(), "whitelist add " + requestedName);
-                DB.executeUpdateAsync("UPDATE players SET alt_name = ?, alt_uuid = ?, date_alt_added = ? WHERE player_uuid = ?",
-                        requestedName,
-                        uuid.toString(),
-                        format.format(now),
-                        player.getUniqueId().toString());
-                player.sendMessage(Utils.color("&6" + requestedName + " &fhas been whitelisted as your alt."));
-            }
-            else {
-                player.sendMessage(Utils.color("That account has been whitelisted by someone else.\n&cContact staff if you believe this is an error."));
-            }
-        }
-        else if (altUsername.equals(player.getName())) {
-            player.sendMessage("You cannot use an alternate account to whitelist alternate accounts.");
-        }
-        else {
-            player.sendMessage(Utils.color("&cYour alternate account, &6" + altUsername + "&c, is already whitelisted."));
-        }
+        EMI.getPlugin().getServer().dispatchCommand(Bukkit.getConsoleSender(), "whitelist add " + requestedName);
+        DB.executeUpdateAsync("UPDATE players SET alt_name = ?, alt_uuid = ?, date_alt_added = ? WHERE player_uuid = ?",
+                requestedName,
+                emiPlayer.getAltUuid().toString(),
+                format.format(now),
+                player.getUniqueId().toString());
+        player.sendMessage(Utils.color("&6" + requestedName + " &fhas been whitelisted as your alt."));
     }
 
     @Subcommand("remove")

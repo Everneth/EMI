@@ -31,6 +31,7 @@ public class MintCommand extends BaseCommand
         // Get the player and supply all potentially useful
         // information to the embed builder
         Player player = (Player)sender;
+        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(player.getUniqueId());
 
         if(rm.hasActiveReport(player.getUniqueId()))
         {
@@ -40,7 +41,7 @@ public class MintCommand extends BaseCommand
         else {
             Report.buildPrivateChannel(player, message, "_mint");
             // Make the bot post the embed to the channel and notify the player
-            if(EMIPlayer.syncExists(player.getUniqueId()))
+            if(emiPlayer.isSynced())
                 player.sendMessage(Utils.color("<&6The Wench&f> I have created a direct channel with the &dMinistry of the Interior&f. &a&lProceed to Discord to continue the chat. &d<3"));
             else
                 player.sendMessage(Utils.color("<&6The Wench&f> I have created a direct channel with the &dMinistry of the Interior&f. Please use &6/rr <message>&f to message MINT directly! A member " +
