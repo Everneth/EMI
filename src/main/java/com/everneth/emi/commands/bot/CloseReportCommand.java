@@ -38,13 +38,8 @@ public class CloseReportCommand extends SlashCommand {
         {
             UUID uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
             EMIPlayer player = EMIPlayer.getEmiPlayer(uuid);
-            // Lets check them
+            // Lets check if the user is a staff member
             if (roleList.contains(DiscordRole.STAFF.get())) {
-                // Found a required role, no need to continue, break from the loop
-                hasRequiredRoles = true;
-            }
-            // We've looped through. Do we have the role?
-            if (hasRequiredRoles) {
                 // Got the role! Lets build a list of messages to clear.
                 List<Message> messageList = event.getTextChannel().getIterableHistory().complete();
                 // Take our messages and build a string, we'll dump that string into a message file
@@ -68,15 +63,8 @@ public class CloseReportCommand extends SlashCommand {
         {
             UUID uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
             EMIPlayer player = EMIPlayer.getEmiPlayer(uuid);
-            // Lets check them
-            for (Role role : roleList) {
-                if (role.getIdLong() == staffRoleId || role.getIdLong() == mintRoleId) {
-                    // Found a required role, no need to continue, break from the loop
-                    hasRequiredRoles = true;
-                    break;
-                }
-            }
-            // We've looped through. Do we have the role?
+            // Lets check if the user has either of the required roles
+            hasRequiredRoles = roleList.contains(DiscordRole.STAFF.get()) || roleList.contains(DiscordRole.MINT.get());
             if (hasRequiredRoles) {
                 // Got the role! Lets build a list of messages to clear.
                 List<Message> messageList = event.getTextChannel().getIterableHistory().complete();
