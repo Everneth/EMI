@@ -53,7 +53,7 @@ public class HelpClearCommand extends SlashCommand {
         // and embed the file into a message
         File embedFile = transcribe(messageList);
         Message message = new MessageBuilder().append("Transcript from #help").build();
-        Long staffChannelId = EMI.getPlugin().getConfig().getLong("staff-channel-id");
+        long staffChannelId = EMI.getPlugin().getConfig().getLong("staff-channel-id");
         event.getGuild().getTextChannelById(staffChannelId).sendMessage(message).addFile(embedFile).queue();
 
         // We've got a history, lets clear out
@@ -83,10 +83,12 @@ public class HelpClearCommand extends SlashCommand {
         for (Message msg : reverse)
         {
             if(msg.getIdLong() == EMI.getPlugin().getConfig().getLong("root-help-msg"))
-            {
                 continue;
+
+            String logMsg = msg.getAuthor().getName() + ": " + msg.getContentRaw() + "\n";
+            for (Message.Attachment attachment : msg.getAttachments()) {
+                logMsg += attachment.getUrl() + '\n';
             }
-            String logMsg = msg.getMember().getEffectiveName() + ": " + msg.getContentRaw() + "\n";
             sb.append(logMsg);
         }
         try {
