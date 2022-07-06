@@ -41,6 +41,7 @@ public class AltAccountCommands extends BaseCommand {
         }
         else if (emiPlayer.getAltUuid() != null) {
             player.sendMessage("You already have an alternate account synced.");
+            return;
         }
         else {
             emiPlayer.setAltName(requestedName);
