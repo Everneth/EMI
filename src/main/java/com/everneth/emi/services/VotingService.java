@@ -81,7 +81,7 @@ public class VotingService {
         event.getMessage().editMessage("The vote is now over. Applicant " + applicant.getAsMention() + (approved ? " accepted." : " denied."))
                 .setActionRow(disabledButtons).queueAfter(2, TimeUnit.SECONDS);
 
-        guild.removeRoleFromMember(applicant, pendingRole).queue();
+        guild.removeRoleFromMember(applicant, DiscordRole.PENDING.get()).queue();
         vote.setInactive();
         voteMap.remove(id);
         WhitelistAppService.getService().removeApp(applicant.getIdLong());
