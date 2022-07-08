@@ -13,7 +13,6 @@ import com.everneth.emi.events.JoinEvent;
 import com.everneth.emi.events.LeaveEvent;
 import com.everneth.emi.events.bot.ButtonListener;
 import com.everneth.emi.events.bot.GuildLeaveListener;
-import com.everneth.emi.events.bot.MessageReceivedListener;
 import com.everneth.emi.events.bot.RoleChangeListener;
 import com.everneth.emi.managers.MintProjectManager;
 import com.everneth.emi.managers.MotdManager;
@@ -29,22 +28,25 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Configuration {
 
     private static EMI plugin;
     private String configPath;
+    private String cachePath;
     private File configFile;
+    private File cacheDir;
     private static JDA jda;
 
     private static BukkitCommandManager commandManager;
@@ -52,10 +54,10 @@ public class Configuration {
 
     public Configuration() {
         String configPath = EMI.getPlugin().getDataFolder() + System.getProperty("file.separator") + "config.yml";
+        String cachePath = EMI.getPlugin().getDataFolder() + File.separator + "cache" + File.separator;
         File configFile = new File(configPath);
-
+        File cacheDir = new File(cachePath);
     }
-
     public void startup()
     {
         EMI.getPlugin().getLogger().info("Ministry Interface started.");
@@ -63,6 +65,11 @@ public class Configuration {
         {
             EMI.getPlugin().saveDefaultConfig();
             this.config = EMI.getPlugin().getConfig();
+        }
+        if(!cacheDir.exists())
+        {
+            try { Files.createDirectory(Paths.get(cachePath)); }
+            catch (IOException e) { EMI.getPlugin().getLogger().severe(e.getMessage()); }
         }
         Utils.chatTag = config.getString("chat-tag");
 
@@ -340,7 +347,6 @@ public class Configuration {
         try {
             jda = JDABuilder.createDefault(config.getString("bot-token"))
                     .addEventListeners(client, globalClient,
-                            new MessageReceivedListener(),
                             new ButtonListener(),
                             new RoleChangeListener(),
                             new GuildLeaveListener())
@@ -385,22 +391,6 @@ public class Configuration {
         {
             Motd motd = new Motd(dbRow.getString("sanitized_tag"), dbRow.getString("tag"), dbRow.getString("message"));
             motdManager.getMotds().put(motd.getSanitizedTag(), motd);
-        }
-    }
-
-    private void unregisterCommands(boolean keepGlobal)
-    {
-        Guild guild = EMI.getJda().getGuildById(plugin.getConfig().getLong("guild-id"));
-
-        List<Command> commands = guild.retrieveCommands().complete();
-        for (Command command : commands)
-            command.delete().complete();
-
-        if (!keepGlobal) {
-            List<Command> globalCommands = EMI.getJda().retrieveCommands().complete();
-            for (Command command : globalCommands) {
-                command.delete().complete();
-            }
         }
     }
     public static JDA getJda() { return jda; }
