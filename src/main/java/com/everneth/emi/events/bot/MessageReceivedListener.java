@@ -30,7 +30,7 @@ public class MessageReceivedListener extends ListenerAdapter {
 
             UUID player_uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
             EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(player_uuid);
-            if(emiPlayer.getUniqueId() != null) {
+            if(emiPlayer.getUuid().toString() != null) {
                 if(!emiPlayer.isSynced()) {
                     OfflinePlayer offlinePlayer = EMI.getPlugin().getServer().getOfflinePlayer(player_uuid);
 
