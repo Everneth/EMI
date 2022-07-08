@@ -13,7 +13,6 @@ import com.everneth.emi.events.JoinEvent;
 import com.everneth.emi.events.LeaveEvent;
 import com.everneth.emi.events.bot.ButtonListener;
 import com.everneth.emi.events.bot.GuildLeaveListener;
-import com.everneth.emi.events.bot.MessageReceivedListener;
 import com.everneth.emi.events.bot.RoleChangeListener;
 import com.everneth.emi.managers.MintProjectManager;
 import com.everneth.emi.managers.MotdManager;
@@ -348,7 +347,6 @@ public class Configuration {
         try {
             jda = JDABuilder.createDefault(config.getString("bot-token"))
                     .addEventListeners(client, globalClient,
-                            new MessageReceivedListener(),
                             new ButtonListener(),
                             new RoleChangeListener(),
                             new GuildLeaveListener())
