@@ -1,9 +1,6 @@
 package com.everneth.emi.events;
 
-import com.everneth.emi.EMI;
 import com.everneth.emi.managers.MintProjectManager;
-import com.everneth.emi.managers.ReportManager;
-import com.everneth.emi.models.Report;
 import com.everneth.emi.models.mint.MintLogMaterial;
 import com.everneth.emi.models.mint.MintLogTask;
 import com.everneth.emi.models.mint.MintProject;
@@ -25,13 +22,6 @@ public class LeaveEvent implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event)
     {
         Player player = event.getPlayer();
-        ReportManager rm = ReportManager.getReportManager();
-
-        if(rm.hasActiveReport(player.getUniqueId()))
-        {
-            Report report = rm.findReportById(player.getUniqueId());
-            EMI.getJda().getTextChannelById(report.getChannelId()).sendMessage("***" + player.getName() + "** has left the game.*").queue();
-        }
 
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
         for(MintProject project : manager.getProjects().values())
