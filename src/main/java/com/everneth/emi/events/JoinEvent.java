@@ -1,7 +1,6 @@
 package com.everneth.emi.events;
 
 import co.aikar.idb.DB;
-import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
 import com.everneth.emi.managers.MotdManager;
@@ -15,8 +14,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.sql.SQLException;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 /**
  *     Class: JoinEvent
@@ -26,18 +23,7 @@ import java.util.concurrent.CompletableFuture;
  */
 
 public class JoinEvent implements Listener {
-
-
-    private final String INT_INTRO = "&7[&dMINT&7] ";
-    private final String COMP_INTRO = "&7[&cCOMP&7] ";
-    private final String COMM_INTRO = "&7[&9COMM&7] ";
     private final Plugin plugin;
-
-    private List<Motd> motdList;
-    private CompletableFuture<List<DbRow>> futureList;
-    private CompletableFuture<DbRow> playerObjectFuture;
-    private DbRow playerRow;
-    private List<DbRow> rows;
 
     public JoinEvent(Plugin plugin)
     {
@@ -64,7 +50,7 @@ public class JoinEvent implements Listener {
             }
         }
         else if (!playerRow.getName().equals(player.getName())
-                && playerRow.getUniqueId().equals(player.getUniqueId().toString()))
+                && playerRow.getUuid().toString().equals(player.getUniqueId().toString()))
         {
             //Record found, name mismatch. Update the record with the players current name.
             DB.executeUpdateAsync(
