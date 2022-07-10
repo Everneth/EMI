@@ -18,9 +18,6 @@ public class RequestWhitelistCommand extends SlashCommand {
 
         this.options = new ArrayList<>();
         this.options.add(new OptionData(OptionType.STRING, "name", "Your minecraft username").setRequired(true));
-
-        this.defaultEnabled = false;
-        this.enabledRoles = new String[]{EMI.getPlugin().getConfig().getString("member-role-id")};
     }
 
     @Override

@@ -14,9 +14,6 @@ public class UnsyncCommand extends SlashCommand {
     public UnsyncCommand() {
         this.name = "unsync";
         this.help = "If you lost access to your minecraft account, use this to remove the sync to it.";
-
-        this.defaultEnabled = false;
-        this.enabledRoles = new String[]{EMI.getPlugin().getConfig().getString("synced-role-id")};
     }
 
     @Override
