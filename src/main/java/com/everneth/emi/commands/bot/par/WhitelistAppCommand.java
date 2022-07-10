@@ -68,9 +68,6 @@ public class WhitelistAppCommand extends SlashCommand {
         {
             this.name = "all";
             this.help = "Gets the applications for all current applicants.";
-
-            this.defaultEnabled = false;
-            this.enabledRoles = new String[]{EMI.getPlugin().getConfig().getString("staff-role-id")};
         }
         @Override
         protected void execute(SlashCommandEvent event)
@@ -96,9 +93,6 @@ public class WhitelistAppCommand extends SlashCommand {
 
             this.options = new ArrayList<>();
             this.options.add(new OptionData(OptionType.STRING, "id", "The user's unique identifier").setRequired(true));
-
-            this.defaultEnabled = false;
-            this.enabledRoles = new String[]{EMI.getPlugin().getConfig().getString("staff-role-id")};
         }
         @Override
         protected void execute(SlashCommandEvent event)
@@ -125,9 +119,6 @@ public class WhitelistAppCommand extends SlashCommand {
         private ReloadApps() {
             this.name = "reload";
             this.help = "Reload all active applications into memory from the table.";
-
-            this.defaultEnabled = false;
-            this.enabledRoles = new String[]{EMI.getPlugin().getConfig().getString("staff-role-id")};
         }
 
         @Override

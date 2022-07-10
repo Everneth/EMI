@@ -25,9 +25,6 @@ public class HelpClearCommand extends SlashCommand {
     {
         this.name = "help-clear";
         this.help = "Clears the help channel, but must be used inside of that channel.";
-
-        this.defaultEnabled = false;
-        this.enabledRoles = new String[]{EMI.getPlugin().getConfig().getString("staff-role-id")};
     }
     @Override
     protected void execute(SlashCommandEvent event)
