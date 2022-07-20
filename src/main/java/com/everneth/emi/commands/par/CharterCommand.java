@@ -3,6 +3,7 @@ package com.everneth.emi.commands.par;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.annotation.*;
+import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @CommandAlias("charter")
 public class CharterCommand extends BaseCommand {
@@ -189,7 +191,36 @@ public class CharterCommand extends BaseCommand {
     @CommandAlias("crecent")
     public void onRecentCommand(CommandSender sender)
     {
+        List<DbRow> points = CharterPoint.getRecentPoints();
+        if (points == null) {
+            sender.sendMessage(Utils.color("&cUnable to retrieve recent charter points."));
+            return;
+        }
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        SortedMap<Integer, String> map = new TreeMap<>();
+        int index = 1;
+        for (DbRow charterPoint : points) {
+            String msg = "&3#" + charterPoint.getInt("charter_point_id") + "&7 - (&b" +
+                    formatter.format(charterPoint.get("date_issued")) + "&7) &c" + charterPoint.getInt("amount") +
+                    "&o point(s)&7 issued to &c" + charterPoint.getString("issued_to") + " &7&oby &l&d" + charterPoint.getString("issued_by") + "&r.&3&o \nReason: &7&o" +
+                    charterPoint.getString("reason") + " -- &o[Expires: &b&o" +
+                    formatter.format(charterPoint.get("date_expired")) + "&b&o]";
+            map.put(index, msg);
+            index++;
+        }
+
+        Gson gson = new Gson();
+        Player commandSender = (Player) sender;
+        try (FileWriter file = new FileWriter(EMI.getPlugin().getDataFolder() + File.separator + "cache" + File.separator + commandSender.getUniqueId() + ".json")) {
+            file.write(gson.toJson(map));
+            file.flush();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+        paginate(sender, map, 1, EMI.getPlugin().getConfig().getInt("items-per-page"));
+        sender.sendMessage(Utils.color("&e==== Here are the 50 most recently issued charter points ===="));
+        sender.sendMessage(Utils.color("&eUse /cpage [page #] to move to the next page"));
     }
 
     @CommandPermission("emi.par.charter.edit")

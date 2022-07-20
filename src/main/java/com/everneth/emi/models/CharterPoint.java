@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class CharterPoint {
     private EMIPlayer issuer;
@@ -194,6 +195,19 @@ public class CharterPoint {
                     record.getInt("amount")
             );
         }
+    }
+
+    public static List<DbRow> getRecentPoints() {
+        List<DbRow> points = null;
+        try {
+            CompletableFuture<List<DbRow>> futurePoints = DB.getResultsAsync("SELECT * FROM charter_points ORDER BY charter_point_id DESC LIMIT 50");
+            points = futurePoints.get();
+        }
+        catch (Exception e) {
+            EMI.getPlugin().getLogger().warning(e.getMessage());
+        }
+
+        return points;
     }
 
     public static long pardonPlayer(String name, Player sender, boolean removeFlag)
