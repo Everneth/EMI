@@ -228,22 +228,26 @@ public class EMIPlayer {
         }
     }
 
-    public List<DbRow> getAllPoints()
+    public List<CharterPoint> getAllPoints()
     {
-        List<DbRow> recordsList = new ArrayList<>();
+        List<CharterPoint> recordList = new ArrayList<>();
         try {
-            recordsList = DB.getResultsAsync("""
+            List<DbRow> rows = DB.getResultsAsync("""
                             SELECT charter_point_id, p1.player_name as 'issued_to', p1.player_uuid as 'recipient_uuid', p2.player_name as 'issued_by', p2.player_uuid as 'issuer_uuid', reason, amount, date_issued, date_expired, expunged FROM charter_points c INNER JOIN
                             players p1 ON c.issued_to = p1.player_id
                             JOIN players p2 ON c.issued_by = p2.player_id WHERE issued_to = ?""",
                     getId()).get();
+
+            for (DbRow row : rows) {
+                recordList.add(CharterPoint.dbRowToCharterPoint(row));
+            }
         }
         catch (Exception e)
         {
             System.out.println(e.getMessage());
         }
 
-        return recordsList;
+        return recordList;
     }
 
     public static DbRow getAppRecord(long discordId)
