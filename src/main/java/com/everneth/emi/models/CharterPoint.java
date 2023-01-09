@@ -11,11 +11,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class CharterPoint {
     private EMIPlayer issuer;
@@ -23,6 +27,9 @@ public class CharterPoint {
     private String reason;
     private int amount;
     private int pointId;
+    private LocalDateTime issueDate;
+    private LocalDateTime expirationDate;
+    boolean isExpunged;
 
     public CharterPoint(EMIPlayer issuer, EMIPlayer recipient, String reason, int amount)
     {
@@ -67,12 +74,17 @@ public class CharterPoint {
     public int getPointId() {
         return pointId;
     }
-    public void setPointId(int pointId)
-    {
-        this.pointId = pointId;
+
+    public boolean isExpired() {
+        LocalDateTime now = LocalDateTime.now();
+        return now.isAfter(this.expirationDate);
     }
 
-    public long issuePoint()
+    public boolean isExpunged() {
+        return isExpunged;
+    }
+
+    public long issue()
     {
         EMIPlayer issuer = EMIPlayer.getEmiPlayer(this.getIssuer().getUuid());
         Date now = new Date();
@@ -103,18 +115,12 @@ public class CharterPoint {
     public void enforceCharter(CommandSender sender)
     {
         EMIPlayer recipient = EMIPlayer.getEmiPlayer(this.recipient.getName());
-        List<DbRow> pointsList = recipient.getAllPoints();
+        List<CharterPoint> pointsList = recipient.getAllPoints();
         int points = 0;
-        LocalDateTime now = LocalDateTime.now();
 
-        for(DbRow point : pointsList)
-        {
-            boolean isExpired = now.isAfter(point.get("date_expired"));
-            boolean isExpunged = point.get("expunged");
-            if(!isExpired && !isExpunged) {
-                points += point.getInt("amount");
-            }
-        }
+        // Add up the total points for every point not expired or expunged
+        for(CharterPoint point : pointsList)
+            points += (!isExpired() && !isExpunged) ? point.amount : 0;
 
         Calendar cal = Calendar.getInstance();
         switch(points)
@@ -184,16 +190,24 @@ public class CharterPoint {
         }
         else
         {
-            EMIPlayer issuer = EMIPlayer.getEmiPlayer(record.getInt("issued_by"));
-            EMIPlayer recipient = EMIPlayer.getEmiPlayer(record.getInt("issued_to"));
-
-            return new CharterPoint(
-                    issuer,
-                    recipient,
-                    record.getString("reason"),
-                    record.getInt("amount")
-            );
+            return dbRowToCharterPoint(record);
         }
+    }
+
+    public static List<CharterPoint> getRecentPoints() {
+        List<CharterPoint> points = new ArrayList<>();
+        try {
+            CompletableFuture<List<DbRow>> futurePoints = DB.getResultsAsync("SELECT * FROM charter_points ORDER BY charter_point_id DESC LIMIT 50");
+            List<DbRow> rows = futurePoints.get();
+            for (DbRow row : rows) {
+                points.add(dbRowToCharterPoint(row));
+            }
+        }
+        catch (Exception e) {
+            EMI.getPlugin().getLogger().warning(e.getMessage());
+        }
+
+        return points;
     }
 
     public static long pardonPlayer(String name, Player sender, boolean removeFlag)
@@ -230,7 +244,7 @@ public class CharterPoint {
 
 
             CharterPoint charterPoint = new CharterPoint(senderPlayer, recipient, "You have been issued 1 point as part of the pardon process.", 1);
-            long pointRecord = charterPoint.issuePoint();
+            long pointRecord = charterPoint.issue();
             charterPoint.enforceCharter(sender);
             return retVal;
     }
@@ -254,27 +268,59 @@ public class CharterPoint {
             System.out.println(e.getMessage());
             return false;
         }
-        if(retVal != 0)
-            return true;
-        else
-            return false;
+
+        return retVal != 0;
     }
 
-    public boolean removeCharterPoint(int id)
+    public boolean removeCharterPoint()
     {
         int retVal = 0;
         try {
-            retVal = DB.executeUpdateAsync("UPDATE charter_points SET expunged = 1 WHERE charter_point_id = ?",
-                    id
+            expirationDate = LocalDateTime.now();
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            retVal = DB.executeUpdateAsync("UPDATE charter_points SET expunged = 1, date_expired = ? WHERE charter_point_id = ?",
+                    format.format(expirationDate),
+                    pointId
             ).get();
         } catch (Exception e)
         {
             System.out.println(e.getMessage());
             return false;
         }
-        if(retVal != 0)
-            return true;
-        else
-            return false;
+        return retVal != 0;
+    }
+
+    // Method to quickly convert a row from the charter point table to a CharterPoint object
+    public static CharterPoint dbRowToCharterPoint(DbRow row) {
+        EMIPlayer issuer = EMIPlayer.getEmiPlayer(row.getInt("issued_by"));
+        EMIPlayer recipient = EMIPlayer.getEmiPlayer(row.getInt("issued_to"));
+
+        CharterPoint point = new CharterPoint(
+                issuer,
+                recipient,
+                row.getString("reason"),
+                row.getInt("amount"));
+
+        point.pointId = row.getInt("charter_point_id");
+
+        // Need to parse the date strings in from the table of format yyyy-MM-dd HH:mm:ss
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        point.issueDate = LocalDateTime.parse(row.getString("date_issued"));
+        point.expirationDate = LocalDateTime.parse(row.getString("date_expired"), formatter);
+
+        point.isExpunged = row.get("expunged");
+        return point;
+    }
+
+    @Override
+    public String toString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        // Differentiate expired from non-expired by changing the color coding from blue to yellow
+        String dateColor = (isExpired() || isExpunged) ? "&e" : "&b";
+        String expiry = (isExpired() || isExpunged) ? "Expired" : "Expires";
+        String msg = " &3#" + pointId + "&7 - ({0}" + formatter.format(issueDate) + "&7) &c" + amount +
+                " point(s)&7 issued to &c" + recipient.getName() + " &7&oby &l&d" + issuer.getName() + "&7.\n&3Reason: &7&o" +
+                reason + "&7-- ({0}{1}: &o" + formatter.format(expirationDate) + "&7)";
+        return MessageFormat.format(msg, dateColor, expiry);
     }
 }
