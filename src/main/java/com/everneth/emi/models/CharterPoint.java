@@ -84,7 +84,7 @@ public class CharterPoint {
         return isExpunged;
     }
 
-    public long issuePoint()
+    public long issue()
     {
         EMIPlayer issuer = EMIPlayer.getEmiPlayer(this.getIssuer().getUuid());
         Date now = new Date();
@@ -244,7 +244,7 @@ public class CharterPoint {
 
 
             CharterPoint charterPoint = new CharterPoint(senderPlayer, recipient, "You have been issued 1 point as part of the pardon process.", 1);
-            long pointRecord = charterPoint.issuePoint();
+            long pointRecord = charterPoint.issue();
             charterPoint.enforceCharter(sender);
             return retVal;
     }

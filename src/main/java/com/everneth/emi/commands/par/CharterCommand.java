@@ -3,7 +3,6 @@ package com.everneth.emi.commands.par;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.annotation.*;
-import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
 import com.everneth.emi.models.CharterPoint;
@@ -22,7 +21,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -75,7 +73,7 @@ public class CharterCommand extends BaseCommand {
                     null
             );
             CharterPoint point = new CharterPoint(issuerPlayer, recipient, reason, amount);
-            pointRecordId = point.issuePoint();
+            pointRecordId = point.issue();
             point.enforceCharter(sender);
         }
     }
