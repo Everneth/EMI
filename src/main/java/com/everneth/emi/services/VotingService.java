@@ -46,14 +46,14 @@ public class VotingService {
         }
         return service;
     }
-    public void startVote(long id, WhitelistVote vote)
+    public void startVote(long messageId, WhitelistVote vote)
     {
-        voteMap.put(id, vote);
+        voteMap.put(messageId, vote);
     }
 
-    public void endVote(long id, boolean approved, ButtonInteractionEvent event)
+    public void endVote(long messageId, boolean approved, ButtonInteractionEvent event)
     {
-        WhitelistVote vote = voteMap.get(id);
+        WhitelistVote vote = voteMap.get(messageId);
 
         Guild guild = EMI.getGuild();
         DbRow application = EMIPlayer.getAppRecord(vote.getApplicantDiscordId());
@@ -85,24 +85,26 @@ public class VotingService {
 
         guild.removeRoleFromMember(applicant, DiscordRole.PENDING.get()).queue();
         vote.setInactive();
-        voteMap.remove(id);
+        voteMap.remove(messageId);
     }
 
-    public void removeVote(long id) { voteMap.remove(id); }
+    public void removeVote(long messageId) {
+        // Update the database and remove reference to the whitelist vote from memory
+        voteMap.remove(messageId);
+        DB.executeUpdateAsync("UPDATE votes SET is_active = 0 WHERE message_id = ?", messageId);
+    }
 
-    public DbRow getAppByDiscordId(long id)
-    {
-        CompletableFuture<DbRow> futureApp;
-        DbRow app = new DbRow();
-        futureApp = DB.getFirstRowAsync("SELECT * FROM applications WHERE applicant_discord_id = ?", id);
-        try {
-            app = futureApp.get();
+    public void removeVoteByDiscordId(long discordId) {
+        long messageId = 0;
+        for (WhitelistVote vote : voteMap.values()) {
+            if (vote.getApplicantDiscordId() == discordId) {
+                messageId = vote.getMessageId();
+                break;
+            }
         }
-        catch (Exception e)
-        {
-            EMI.getPlugin().getLogger().info(e.getMessage());
-        }
-        return app;
+
+        if (messageId != 0)
+            removeVote(messageId);
     }
 
     public boolean isVotingMessage(long messageId)
@@ -113,11 +115,6 @@ public class VotingService {
     public WhitelistVote getVoteByMessageId(long messageId)
     {
         return this.voteMap.get(messageId);
-    }
-
-    public long getMessageId(long userid)
-    {
-        return this.voteMap.get(userid).getMessageId();
     }
 
     public void load() {

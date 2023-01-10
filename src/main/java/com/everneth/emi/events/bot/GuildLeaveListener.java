@@ -16,7 +16,6 @@ public class GuildLeaveListener extends ListenerAdapter {
         if(event.getMember().getRoles().contains(DiscordRole.PENDING.get()))
         {
             VotingService.getService().removeVote(userDiscordId);
-            DB.executeUpdateAsync("UPDATE votes SET is_active = 0 WHERE applicant_id = ?", userDiscordId);
         }
     }
 }
