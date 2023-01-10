@@ -91,7 +91,7 @@ public class VotingService {
     public void removeVote(long messageId) {
         // Update the database and remove reference to the whitelist vote from memory
         voteMap.remove(messageId);
-        DB.executeUpdateAsync("UPDATE votes SET is_active = 0 WHERE message_id = ?", messageId);
+        voteMap.get(messageId).setInactive();
     }
 
     public void removeVoteByDiscordId(long discordId) {
