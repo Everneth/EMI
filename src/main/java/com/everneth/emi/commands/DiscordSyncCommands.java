@@ -84,14 +84,16 @@ public class DiscordSyncCommands extends BaseCommand {
             return;
         }
 
+        // Update database before attempting to message the user on Discord, to prevent any issues if the account has left the guild
+        DB.executeUpdateAsync("UPDATE players SET discord_id = NULL WHERE ? IN (player_uuid,alt_uuid)", player.getUniqueId().toString());
+        // sendDiscordMessage has error handling in the event that the user cannot be found in the guild
         boolean messageSent = emiPlayer.sendDiscordMessage(ConfigMessage.ACCOUNT_UNSYNCED.get(), player);
         if (messageSent) {
             Guild guild = EMI.getGuild();
             guild.removeRoleFromMember(emiPlayer.getGuildMember(), DiscordRole.SYNCED.get()).queue();
-
-            DB.executeUpdateAsync("UPDATE players SET discord_id = NULL WHERE ? IN (player_uuid,alt_uuid)", player.getUniqueId().toString());
-            player.sendMessage(Utils.color("Your discord account has been successfully unsynced. " +
-                    "Please use &a/discord sync &fto set up with a new account."));
         }
+
+        player.sendMessage(Utils.color("Your discord account has been successfully unsynced. " +
+                "Please use &a/discord sync &fto set up with a new account."));
     }
 }
