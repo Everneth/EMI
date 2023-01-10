@@ -90,8 +90,8 @@ public class VotingService {
 
     public void removeVote(long messageId) {
         // Update the database and remove reference to the whitelist vote from memory
-        voteMap.remove(messageId);
         voteMap.get(messageId).setInactive();
+        voteMap.remove(messageId);
     }
 
     public void removeVoteByDiscordId(long discordId) {
