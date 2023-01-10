@@ -1,11 +1,8 @@
 package com.everneth.emi.commands.bot;
 
-import com.everneth.emi.EMI;
 import com.everneth.emi.models.EMIPlayer;
-import com.everneth.emi.models.WhitelistApp;
 import com.everneth.emi.models.enums.ConfigMessage;
 import com.everneth.emi.models.enums.DiscordRole;
-import com.everneth.emi.services.WhitelistAppService;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
 

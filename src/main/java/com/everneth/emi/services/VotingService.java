@@ -63,8 +63,6 @@ public class VotingService {
             guild.addRoleToMember(applicant, DiscordRole.CITIZEN.get()).queue();
             guild.addRoleToMember(applicant, DiscordRole.SYNCED.get()).queue();
 
-            WhitelistAppService.getService().approveWhitelistAppRecord(applicant.getIdLong(), vote.getMessageId());
-
             guild.getTextChannelById(config.getLong("announcement-channel-id"))
                     .sendMessage(ConfigMessage.APPLICATION_APPROVED.getWithArgs(applicant.getAsMention())).queue();
         }
@@ -88,8 +86,6 @@ public class VotingService {
         guild.removeRoleFromMember(applicant, DiscordRole.PENDING.get()).queue();
         vote.setInactive();
         voteMap.remove(id);
-        // removeApp() will both set the app as inactive in the DB and remove its record from memory
-        WhitelistAppService.getService().removeApp(applicant.getIdLong());
     }
 
     public void removeVote(long id) { voteMap.remove(id); }

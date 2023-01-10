@@ -4,7 +4,6 @@ package com.everneth.emi.events.bot;
 import co.aikar.idb.DB;
 import com.everneth.emi.models.enums.DiscordRole;
 import com.everneth.emi.services.VotingService;
-import com.everneth.emi.services.WhitelistAppService;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -19,10 +18,5 @@ public class GuildLeaveListener extends ListenerAdapter {
             VotingService.getService().removeVote(userDiscordId);
             DB.executeUpdateAsync("UPDATE votes SET is_active = 0 WHERE applicant_id = ?", userDiscordId);
         }
-        else if (event.getMember().getRoles().contains(DiscordRole.APPLICANT.get()))
-        {
-            WhitelistAppService.getService().removeApp(userDiscordId);
-        }
-        event.getUser().getIdLong();
     }
 }

@@ -4,7 +4,6 @@ import com.everneth.emi.EMI;
 import com.everneth.emi.models.WhitelistVote;
 import com.everneth.emi.models.enums.DiscordRole;
 import com.everneth.emi.services.VotingService;
-import com.everneth.emi.services.WhitelistAppService;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Member;
@@ -23,7 +22,7 @@ public class RoleChangeListener extends ListenerAdapter {
     public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
         if (event.getRoles().contains(DiscordRole.PENDING.get())) {
             // the user does not have an application, let's remove the pending role from them
-            if (!WhitelistAppService.getService().appExists(event.getMember().getIdLong())) {
+            if (!event.getMember().getRoles().contains(DiscordRole.APPLICANT.get())) {
                 EMI.getGuild().removeRoleFromMember(event.getMember(), DiscordRole.PENDING.get()).queue();
                 return;
             }
