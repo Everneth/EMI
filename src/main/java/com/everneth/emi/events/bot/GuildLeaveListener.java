@@ -22,7 +22,6 @@ public class GuildLeaveListener extends ListenerAdapter {
         else if (event.getMember().getRoles().contains(DiscordRole.APPLICANT.get()))
         {
             WhitelistAppService.getService().removeApp(userDiscordId);
-            DB.executeUpdateAsync("UPDATE applications SET app_active = 0 WHERE applicant_discord_id = ?", userDiscordId);
         }
         event.getUser().getIdLong();
     }

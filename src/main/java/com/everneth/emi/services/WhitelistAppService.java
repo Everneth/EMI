@@ -68,9 +68,12 @@ public class WhitelistAppService {
         appMap.put(id, app);
     }
 
-    public void removeApp(long id)
+    public void removeApp(long discordId)
     {
-        appMap.remove(id);
+        // set the application inactive in the db and remove from memory
+        appMap.remove(discordId);
+        DB.executeUpdateAsync("UPDATE applications SET app_active = 0 WHERE applicant_discord_id = ?",
+                discordId);
     }
 
     public void changeRoleToApplicant(long discordId)
@@ -154,7 +157,7 @@ public class WhitelistAppService {
     public void approveWhitelistAppRecord(long id, long msgid)
     {
         DbRow playerToAdd = EMIPlayer.getAppRecord(id);
-        DB.executeUpdateAsync("UPDATE applications SET is_approved = 1, app_active = 0 WHERE applicant_discord_id = ?",
+        DB.executeUpdateAsync("UPDATE applications SET is_approved = 1 WHERE applicant_discord_id = ?",
                 id);
         try {
             DB.executeInsert("INSERT INTO players (player_name, player_uuid, discord_id) " +

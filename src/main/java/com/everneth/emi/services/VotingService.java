@@ -88,6 +88,7 @@ public class VotingService {
         guild.removeRoleFromMember(applicant, DiscordRole.PENDING.get()).queue();
         vote.setInactive();
         voteMap.remove(id);
+        // removeApp() will both set the app as inactive in the DB and remove its record from memory
         WhitelistAppService.getService().removeApp(applicant.getIdLong());
     }
 
@@ -183,6 +184,7 @@ public class VotingService {
 
     public void onPositiveVoter(ButtonInteractionEvent event) {
         WhitelistVote vote = getVoteByMessageId(event.getMessageIdLong());
+        // Vote should be null any time the vote is ended or set inactive
         if (vote == null) {
             disableMessage(event);
             return;
@@ -193,6 +195,7 @@ public class VotingService {
 
     public void onNegativeVoter(ButtonInteractionEvent event) {
         WhitelistVote vote = getVoteByMessageId(event.getMessageIdLong());
+        // Vote should be null any time the vote is ended or set inactive
         if (vote == null) {
             disableMessage(event);
             return;
