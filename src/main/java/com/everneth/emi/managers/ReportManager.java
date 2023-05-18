@@ -66,7 +66,7 @@ public final class ReportManager {
         }
         catch (Exception e)
         {
-            System.out.println(e.getMessage());
+            EMI.getPlugin().getLogger().info(e.getMessage());
             return null;
         }
     }
@@ -86,7 +86,7 @@ public final class ReportManager {
         }
         catch(SQLException e)
         {
-            System.out.println(e.getMessage());
+            EMI.getPlugin().getLogger().info(e.getMessage());
         }
     }
 
@@ -129,7 +129,7 @@ public final class ReportManager {
         }
         catch (Exception e)
         {
-            System.out.println(e.getMessage());
+            EMI.getPlugin().getLogger().info(e.getMessage());
         }
         if(!results.isEmpty()) {
             for (DbRow result : results) {
