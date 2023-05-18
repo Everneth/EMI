@@ -13,10 +13,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class EMI extends JavaPlugin {
     private static EMI plugin;
-    Configuration configs = new Configuration();
+    Configuration configs;
     @Override
     public void onEnable() {
         plugin = this;
+        configs = new Configuration();
         configs.startup();
     }
     @Override

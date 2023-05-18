@@ -4,7 +4,6 @@ import co.aikar.commands.BukkitCommandManager;
 import co.aikar.idb.*;
 import com.everneth.emi.commands.*;
 import com.everneth.emi.commands.bot.*;
-import com.everneth.emi.commands.bot.par.WhitelistAppCommand;
 import com.everneth.emi.commands.mint.MintCommand;
 import com.everneth.emi.commands.mint.projects.*;
 import com.everneth.emi.commands.par.CharterCommand;
@@ -31,6 +30,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +42,6 @@ import java.util.ArrayList;
 
 public class Configuration {
 
-    private static EMI plugin;
     private String configPath;
     private String cachePath;
     private File configFile;
@@ -50,22 +49,24 @@ public class Configuration {
     private static JDA jda;
 
     private static BukkitCommandManager commandManager;
-    private FileConfiguration config = EMI.getPlugin().getConfig();
+    private FileConfiguration config;
 
     public Configuration() {
-        String configPath = EMI.getPlugin().getDataFolder() + System.getProperty("file.separator") + "config.yml";
-        String cachePath = EMI.getPlugin().getDataFolder() + File.separator + "cache" + File.separator;
-        File configFile = new File(configPath);
-        File cacheDir = new File(cachePath);
+        configPath = EMI.getPlugin().getDataFolder() + File.separator + "config.yml";
+        cachePath = EMI.getPlugin().getDataFolder() + File.separator + "cache" + File.separator;
+        configFile = new File(configPath);
+        cacheDir = new File(cachePath);
     }
+
     public void startup()
     {
         EMI.getPlugin().getLogger().info("Ministry Interface started.");
         if(!configFile.exists())
         {
             EMI.getPlugin().saveDefaultConfig();
-            this.config = EMI.getPlugin().getConfig();
         }
+        this.config = EMI.getPlugin().getConfig();
+
         if(!cacheDir.exists())
         {
             try { Files.createDirectory(Paths.get(cachePath)); }
@@ -126,7 +127,7 @@ public class Configuration {
 
     private void registerCommands()
     {
-        commandManager = new BukkitCommandManager(plugin);
+        commandManager = new BukkitCommandManager(EMI.getPlugin());
         commandManager.registerCommand(new MintCommand());
         commandManager.registerCommand(new ReportCommand());
         commandManager.registerCommand(new SupportCommand());
@@ -144,6 +145,7 @@ public class Configuration {
 
     private void registerListeners()
     {
+        Plugin plugin = EMI.getPlugin();
         EMI.getPlugin().getServer().getPluginManager().registerEvents(new JoinEvent(plugin), plugin);
         EMI.getPlugin().getServer().getPluginManager().registerEvents(new LeaveEvent(plugin), plugin);
     }
@@ -328,15 +330,14 @@ public class Configuration {
 
         builder.addSlashCommands(new HelpClearCommand(),
                 new CloseReportCommand(),
-                new ApplyCommand(),
-                new WhitelistAppCommand(),
                 new RequestWhitelistCommand(),
                 new UnsyncCommand());
         builder.setOwnerId(EMI.getPlugin().getConfig().getString("bot-owner-id"));
 
         // register our global commands separately
         CommandClientBuilder globalBuilder = new CommandClientBuilder();
-        globalBuilder.setActivity(Activity.watching(EMI.getPlugin().getConfig().getString("bot-game")));
+        String status = EMI.getPlugin().getConfig().getString("bot-status");
+        globalBuilder.setActivity(Activity.watching(status));
 
         globalBuilder.addSlashCommands(new ConfirmSyncCommand(), new DenySyncCommand());
         globalBuilder.setOwnerId(EMI.getPlugin().getConfig().getString("bot-owner-id"));
@@ -351,7 +352,10 @@ public class Configuration {
                             new RoleChangeListener(),
                             new GuildLeaveListener())
                     .setMemberCachePolicy(MemberCachePolicy.ALL)
-                    .enableIntents(GatewayIntent.GUILD_MEMBERS,GatewayIntent.DIRECT_MESSAGES,GatewayIntent.GUILD_MESSAGES)
+                    .enableIntents(GatewayIntent.GUILD_MEMBERS,
+                            GatewayIntent.DIRECT_MESSAGES,
+                            GatewayIntent.GUILD_MESSAGES,
+                            GatewayIntent.MESSAGE_CONTENT)
                     .build();
             EMI.getJda().awaitReady();
             Guild guild = EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id"));
@@ -383,7 +387,7 @@ public class Configuration {
         }
         catch(SQLException e)
         {
-            plugin.getLogger().info("ERROR: EMI/initMotds: " + e.toString());
+            EMI.getPlugin().getLogger().info("ERROR: EMI/initMotds: " + e.toString());
             return;
         }
 
