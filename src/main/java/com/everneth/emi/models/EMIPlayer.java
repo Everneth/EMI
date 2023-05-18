@@ -3,10 +3,8 @@ package com.everneth.emi.models;
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
-import com.everneth.emi.Utils;
 import com.everneth.emi.models.enums.ConfigMessage;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -14,7 +12,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.bukkit.command.CommandSender;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -23,15 +20,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EMIPlayer {
-    private UUID uuid;
-    private String name;
-    private UUID altUuid;
-    private String altName;
     private int id;
+    private String name;
+    private UUID uuid;
+    private String altName;
+    private UUID altUuid;
     private long discordId;
     private LocalDateTime dateAltAdded;
+    private LocalDateTime dateCanNextRefer;
+    private EMIPlayer referredBy;
+    private LocalDateTime dateReferred;
 
     public EMIPlayer() {}
     public EMIPlayer(UUID uuid, String name, String altName)
@@ -42,20 +44,6 @@ public class EMIPlayer {
         this.id = 0;
         this.discordId = 0L;
     }
-    public EMIPlayer(UUID uuid, String name, String altName, int id)
-    {
-        this.uuid = uuid;
-        this.name = name;
-        this.altName = altName;
-        this.id = id;
-        this.discordId = 0L;
-    }
-
-    public EMIPlayer(UUID uuid, String name, int id) {
-        this.uuid = uuid;
-        this.name = name;
-        this.id = id;
-    }
 
     public EMIPlayer(UUID uuid, String name, String altName, int id, long discordId) {
         this.uuid = uuid;
@@ -65,14 +53,16 @@ public class EMIPlayer {
         this.discordId = discordId;
     }
 
-    public EMIPlayer(UUID uuid, String name, String altName, int id, long discordId, LocalDateTime dateAltAdded, UUID altUuid) {
-        this.uuid = uuid;
-        this.name = name;
-        this.altName = altName;
+    public EMIPlayer(int id, String name, UUID uuid, String altName, UUID altUuid, LocalDateTime dateAltAdded,
+                     long discordId)
+    {
         this.id = id;
-        this.discordId = discordId;
-        this.dateAltAdded = dateAltAdded;
+        this.name = name;
+        this.uuid = uuid;
+        this.altName = altName;
         this.altUuid = altUuid;
+        this.dateAltAdded = dateAltAdded;
+        this.discordId = discordId;
     }
 
     public EMIPlayer(UUID uuid, String name) {
@@ -97,14 +87,16 @@ public class EMIPlayer {
     }
 
     public UUID getAltUuid() {
-        if (altUuid == null) {
-            uuid = requestUUID(altName);
+        if (altUuid == null && altName != null) {
+            altUuid = requestUUID(altName);
         }
         return altUuid;
     }
 
     public String getAltName() { return this.altName; }
-    public void setAltName(String altName) { this.altName = altName; }
+    public void setAltName(String altName) {
+        this.altName = altName;
+    }
 
     public int getId()
     {
@@ -115,51 +107,94 @@ public class EMIPlayer {
     {
         return this.discordId;
     }
-    public void setDiscordId(long discordId) { this.discordId = discordId; }
+    public void setDiscordId(long discordId) {
+        this.discordId = discordId;
+    }
 
     public LocalDateTime getDateAltAdded() {
         return dateAltAdded;
     }
 
     public boolean isEmpty() {
-        return this.getId() == 0;
+        return this.id == 0;
     }
 
     public boolean isSynced() {
         return discordId != 0;
     }
 
-    public boolean sendDiscordMessage(String message) {
-        var successWrapper = new Object() { boolean messageSent = false; };
+    public LocalDateTime getDateCanNextRefer() {
+        if (this.dateCanNextRefer == null) {
+            try {
+                CompletableFuture<LocalDateTime> row = DB.getFirstColumnAsync("SELECT date_can_next_refer FROM players WHERE player_id = ?", this.id);
+                this.dateCanNextRefer = row.get();
+            }
+            catch (InterruptedException e) {
+                EMI.getPlugin().getLogger().warning("Interrupted while getting date referred: " + e.getMessage());
+            }
+            catch (ExecutionException e) {
+                EMI.getPlugin().getLogger().warning("Could not execute query while getting date referred: " + e.getMessage());
+            }
+        }
+        return this.dateCanNextRefer;
+    }
+    public void setDateCanNextRefer(LocalDateTime dateCanNextRefer) {
+        this.dateCanNextRefer = dateCanNextRefer;
+    }
+
+    public EMIPlayer getReferredBy() {
+        if (this.referredBy == null) {
+            try {
+                CompletableFuture<Integer> row = DB.getFirstColumnAsync("SELECT referred_by FROM players WHERE player_id = ?", this.id);
+                int referredById = row.get();
+                this.referredBy = referredById != 0 ? getEmiPlayer(referredById) : null;
+            }
+            catch (InterruptedException e) {
+                EMI.getPlugin().getLogger().warning("Interrupted while getting date referred: " + e.getMessage());
+            }
+            catch (ExecutionException e) {
+                EMI.getPlugin().getLogger().warning("Could not execute query while getting date referred: " + e.getMessage());
+            }
+        }
+        return this.referredBy;
+    }
+    public void setReferredBy(EMIPlayer referredBy) {
+        this.referredBy = referredBy;
+    }
+
+    public LocalDateTime getDateReferred() {
+        if (this.dateReferred == null)
+        {
+            try {
+                CompletableFuture<LocalDateTime> row = DB.getFirstColumnAsync("SELECT date_referred FROM players WHERE player_id = ?", this.id);
+                this.dateReferred = row.get();
+            }
+            catch (InterruptedException e) {
+                EMI.getPlugin().getLogger().warning("Interrupted while getting date referred: " + e.getMessage());
+            }
+            catch (ExecutionException e) {
+                EMI.getPlugin().getLogger().warning("Could not execute query while getting date referred: " + e.getMessage());
+            }
+        }
+        return this.dateReferred;
+    }
+    public void setDateReferred(LocalDateTime dateReferred) {
+        this.dateReferred = dateReferred;
+    }
+
+    public AtomicBoolean sendDiscordMessage(String message) {
+        AtomicBoolean sent = new AtomicBoolean();
         try {
             getGuildMember().getUser().openPrivateChannel()
                     .flatMap(privateChannel -> privateChannel.sendMessage(message))
-                    .queue(discordMessage -> successWrapper.messageSent = true,
+                    .queue(discordMessage -> sent.set(true),
                             new ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER, error ->
-                            EMI.getPlugin().getLogger().warning(ConfigMessage.DISCORD_MESSAGE_FAILED.get())));
+                                        EMI.getPlugin().getLogger().warning(ConfigMessage.DISCORD_MESSAGE_FAILED.get())));
         }
         catch (NullPointerException e) {
             EMI.getPlugin().getLogger().warning(ConfigMessage.USER_NOT_FOUND.get());
         }
-        return successWrapper.messageSent;
-    }
-
-    public boolean sendDiscordMessage(String message, CommandSender sender) {
-        var successWrapper = new Object() { boolean messageSent = false; };
-        try {
-            User user = getGuildMember().getUser();
-            user.openPrivateChannel()
-                    .flatMap(privateChannel -> privateChannel.sendMessage(message))
-                    .queue(discordMessage -> {
-                        successWrapper.messageSent = true;
-                        sender.sendMessage(Utils.color("&a" + "Discord message successfully sent to &f" + user.getName()));
-                    }, new ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER, (error) ->
-                            sender.sendMessage(Utils.color("&c") + ConfigMessage.DISCORD_MESSAGE_FAILED.get())));
-        }
-        catch (NullPointerException e) {
-            sender.sendMessage(Utils.color("&c") + ConfigMessage.USER_NOT_FOUND.get());
-        }
-        return successWrapper.messageSent;
+        return sent;
     }
 
     public Member getGuildMember() {
@@ -172,7 +207,7 @@ public class EMIPlayer {
         StringBuilder sb = null;
         try {
             CloseableHttpResponse response = httpclient.execute(httpGet);
-            if (response.getStatusLine().getStatusCode() != 204) {
+            if (response.getStatusLine().getStatusCode() != 404) {
                 JSONObject obj = new JSONObject(EntityUtils.toString(response.getEntity()));
 
                 sb = new StringBuilder(obj.getString("id"));
@@ -194,7 +229,8 @@ public class EMIPlayer {
         }
         return UUID.fromString(sb.toString());
     }
-    
+
+    // This should never return null, at worst it returns an empty player if nothing is found
     public static <T> EMIPlayer getEmiPlayer(T t)
     {
         CompletableFuture<DbRow> futurePlayer;
@@ -213,30 +249,60 @@ public class EMIPlayer {
         }
         try {
             player = futurePlayer.get();
-            return new EMIPlayer(UUID.fromString(player.getString("player_uuid")),
+            if (player == null)
+                return new EMIPlayer();
+
+            // In the event there is no alternate uuid, we can't try to parse one
+            String alt_uuid_string = player.getString("alt_uuid");
+            UUID alt_uuid = null;
+            if (alt_uuid_string != null)
+                alt_uuid = UUID.fromString(alt_uuid_string);
+
+            // The DB row is nullable because of a unique constraint but cannot be null when read in
+            Long discordId = player.getLong("discord_id");
+            discordId = discordId == null ? 0 : discordId;
+
+            return new EMIPlayer(player.getInt("player_id"),
                     player.getString("player_name"),
+                    UUID.fromString(player.getString("player_uuid")),
                     player.getString("alt_name"),
-                    player.getInt("player_id"),
-                    player.getLong("discord_id"),
+                    alt_uuid,
                     player.get("date_alt_added"),
-                    UUID.fromString(player.getString("alt_uuid")));
+                    discordId);
         }
-        catch (Exception e)
-        {
-            EMI.getPlugin().getLogger().info(e.getMessage());
-            return new EMIPlayer();
+        catch (InterruptedException e) {
+            EMI.getPlugin().getLogger().info("Interrupted while getting EMIPlayer: " + e.getMessage());
         }
+        catch (ExecutionException e) {
+            EMI.getPlugin().getLogger().info("Could not execute query to get EMIPlayer: " + e.getMessage());
+        }
+        return new EMIPlayer();
+    }
+
+    public void updatePlayerTable() {
+        DB.executeUpdateAsync("UPDATE players SET player_name = ?," +
+                        "player_uuid = ?," +
+                        "alt_name = ?," +
+                        "alt_uuid = ?," +
+                        "date_alt_added = ?," +
+                        "discord_id = ?," +
+                        "date_can_next_refer = ?," +
+                        "referred_by = ?," +
+                        "date_referred = ? WHERE player_id = ?",
+                        name, uuid, altName, altUuid, dateAltAdded, discordId, dateCanNextRefer, referredBy.id, dateReferred, id);
     }
 
     public List<CharterPoint> getAllPoints()
     {
         List<CharterPoint> recordList = new ArrayList<>();
         try {
-            List<DbRow> rows = DB.getResultsAsync("""
+            /*List<DbRow> rows = DB.getResultsAsync("""
                             SELECT charter_point_id, p1.player_name as 'issued_to', p1.player_uuid as 'recipient_uuid', p2.player_name as 'issued_by', p2.player_uuid as 'issuer_uuid', reason, amount, date_issued, date_expired, expunged FROM charter_points c INNER JOIN
                             players p1 ON c.issued_to = p1.player_id
                             JOIN players p2 ON c.issued_by = p2.player_id WHERE issued_to = ?""",
-                    getId()).get();
+                    getId()).get();*/
+            List<DbRow> rows = DB.getResultsAsync("SELECT * FROM charter_points WHERE issued_to = ?",
+                    this.id).get();
 
             for (DbRow row : rows) {
                 recordList.add(CharterPoint.dbRowToCharterPoint(row));
@@ -244,7 +310,7 @@ public class EMIPlayer {
         }
         catch (Exception e)
         {
-            System.out.println(e.getMessage());
+            EMI.getPlugin().getLogger().info(e.getMessage());
         }
 
         return recordList;

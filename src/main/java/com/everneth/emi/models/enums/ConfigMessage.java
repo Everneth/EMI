@@ -28,6 +28,11 @@ public enum ConfigMessage {
      */
     POINTS_GAINED_WARNING("issued-point-alert"),
     /**
+     * For use when notifying a user via Discord that they have had points removed and their punishment has
+     * been adjusted accordingly
+     */
+    POINTS_REMOVED_WARNING("removed-point-alert"),
+    /**
      * For use when notifying a Discord user that a player is attempting to synchronize their Minecraft
      * account to their Discord account
      */
@@ -47,11 +52,14 @@ public enum ConfigMessage {
     /**
      * For use when no ban reason has been specified
      */
-    DEFAULT_BAN_REASON("default-ban-reason");
-
+    DEFAULT_BAN_REASON("default-ban-reason"),
+    /**
+     * For use when a referrer gets a point per section IV c
+     */
+    FRIEND_ACCOUNTABILITY_REASON("friend-accountability-reason");
     private final String keyValue;
 
-    private ConfigMessage(String keyValue) {
+    ConfigMessage(String keyValue) {
         this.keyValue = keyValue;
     }
 
