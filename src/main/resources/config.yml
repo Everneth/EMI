@@ -84,11 +84,22 @@ account-unsync-alert: "Your Discord account has been unsynced with your Minecraf
 # {3}: The reason the points were issued
 # {4}: The number of points accumulated in the last 60 days
 # {5}: The unix timestamp for use in Discord's epoch formatting
+# This message contains a lot of embedded message formatters with specifically escaped characters, so it's probably best to just not touch this one
 issued-point-alert: |
-  Hey {0}. You that you have been issued {1} {1,choice,1#point|1<points} by {2} with the following reason:\n> *{3}*
+  Hey {0}. You have been issued {1} {1,choice,1#point|1<points} with the following reason:
+  > *{3}*
   {4,choice,1#As this is your only point in the last 60 days, you may consider this a warning.
-  |1<You have accumulated {4} points in the last 60 days. As per the charter, this ban {4,choice,2<will expire at the following time: <t:{5}>|5<will not expire.}}
-  \n**If you believe this to be an error or wish to appeal, feel free to contact an admin.**
+  |1<You have accumulated {4} points in the last 60 days. As per the charter, this ban '{4,choice,2<will expire at the following time: ''<''t:{5,number,''#''}:f''>''|4<will not expire.}'}
+  **If you believe this to be an error or wish to appeal, feel free to contact an admin.**
+
+# removed-point-alert - The message sent on Discord to a user who's had points removed
+# {0}: The user's name whom the point is being removed from
+# {1}: The number of points removed from the user
+# {2}: The number of points accumulated in the last 60 days
+removed-point-alert: >
+  Hey {0}. {1,choice,1#A point|1<Some points} on your record {1,choice,1#has|1<have} been expunged. 
+  You now have {2} {2,choice,0#points|1#point|1<points} in the last 60 days. If you were previously banned, 
+  it has been reduced or removed accordingly.
 
 # application-approved-alert - The message sent to the whitelist announcement channel when a user has been approved for whitelisting
 # {0}: The approved user's mention tag
@@ -105,3 +116,4 @@ application-denied-alert: |
   \nYou are welcome to submit another application a week from now, if you so choose. Feel free to stick around and chat until then!
 
 default-ban-reason: "You accumulated 5+ points and are permanently banned. Please contact staff on Discord if you wish to appeal."
+friend-accountability-reason: "You have been issued one point as per the friend accountability program. (Section IV c)"
