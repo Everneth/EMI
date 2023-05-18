@@ -3,10 +3,10 @@ package com.everneth.emi.commands.bot;
 import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.managers.DiscordSyncManager;
-import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.enums.DiscordRole;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 
 import java.util.UUID;
@@ -34,14 +34,9 @@ public class ConfirmSyncCommand extends SlashCommand {
     {
         DiscordSyncManager dsm = DiscordSyncManager.getDSM();
         User toFind = dsm.findSyncRequest(event.getUser());
-        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(event.getUser().getIdLong());
 
         if (toFind == null) {
             event.reply("No sync request exists for your account or it has already been synced.").setEphemeral(true).queue();
-            return;
-        }
-        else if (emiPlayer.isSynced()) {
-            event.reply("You have already synced this account. If this is in error, please contact staff.").setEphemeral(true).queue();
             return;
         }
 
@@ -51,9 +46,14 @@ public class ConfirmSyncCommand extends SlashCommand {
             return;
         }
 
+        Member member = EMI.getGuild().getMemberById(toFind.getIdLong());
+        if (member == null) {
+            event.reply("Something went wrong... Either try again shortly or contact an admin.").setEphemeral(true).queue();
+            return;
+        }
         UUID key = dsm.findSyncRequestUUID(event.getUser());
         dsm.removeSyncRequest(key.toString());
-        EMI.getGuild().addRoleToMember(emiPlayer.getGuildMember(), DiscordRole.SYNCED.get()).queue();
+        EMI.getGuild().addRoleToMember(member, DiscordRole.SYNCED.get()).queue();
 
         event.reply("Your account has been synced and your roles updated!").queue();
     }

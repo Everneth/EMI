@@ -249,7 +249,7 @@ public class MintProjectCommands extends BaseCommand
 
         for(EMIPlayer emiPlayer : project.getWorkers())
         {
-            if(emiPlayer.getUniqueId().equalsIgnoreCase(player.getUniqueId().toString()))
+            if(emiPlayer.getUuid().equals(player.getUniqueId()))
             {
                 player.sendMessage(Utils.color(mintProjectTag + "&cYou're already part of this project!"));
                 return;

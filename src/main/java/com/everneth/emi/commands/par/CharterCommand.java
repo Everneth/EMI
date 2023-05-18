@@ -10,27 +10,28 @@ import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.enums.ConfigMessage;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
+import org.bukkit.BanEntry;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @CommandAlias("charter")
 public class CharterCommand extends BaseCommand {
-    private FileConfiguration config = EMI.getPlugin().getConfig();
 
     @CommandPermission("emi.par.charter.pg")
-    @Syntax("<page #>")
     @Subcommand("pg")
+    @CommandAlias("cpage")
+    @Syntax("<page #>")
     public void onPageCommand(CommandSender sender, int page) {
         Player commandSender = (Player) sender;
         Gson gson = new Gson();
@@ -40,7 +41,7 @@ public class CharterCommand extends BaseCommand {
         try (JsonReader reader = new JsonReader(new FileReader(EMI.getPlugin().getDataFolder() + File.separator + "cache" + File.separator + commandSender.getUniqueId().toString() + ".json"))) {
             map = gson.fromJson(reader, SortedMap.class);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            EMI.getPlugin().getLogger().info(e.getMessage());
         }
 
         int numPages = (((map.size() % itemsPerPage) == 0) ? map.size() / itemsPerPage : (map.size() / itemsPerPage) + 1);
@@ -67,14 +68,19 @@ public class CharterCommand extends BaseCommand {
         if (recipient.isEmpty()) {
             issuer.sendMessage(Utils.color("&9[Charter] &c") + ConfigMessage.PLAYER_NOT_FOUND.get());
         } else {
-            EMIPlayer issuerPlayer = new EMIPlayer(
-                    issuer.getUniqueId(),
-                    issuer.getName(),
-                    null
-            );
+            EMIPlayer issuerPlayer = EMIPlayer.getEmiPlayer(issuer.getUniqueId());
             CharterPoint point = new CharterPoint(issuerPlayer, recipient, reason, amount);
+
+            // If they were referred less than 30 days ago, their referrer needs a point
+            EMIPlayer friend = recipient.getReferredBy();
+            if (friend != null && recipient.getDateReferred().isAfter(LocalDateTime.now().minusDays(30))) {
+                CharterPoint friendPoint = new CharterPoint(issuerPlayer, friend,
+                        ConfigMessage.FRIEND_ACCOUNTABILITY_REASON.get(), 1);
+                friendPoint.issue();
+                friendPoint.enforceCharter(sender, false);
+            }
             pointRecordId = point.issue();
-            point.enforceCharter(sender);
+            point.enforceCharter(sender, false);
         }
     }
 
@@ -136,7 +142,7 @@ public class CharterCommand extends BaseCommand {
     @CommandAlias("crecent")
     public void onRecentCommand(CommandSender sender) {
         List<CharterPoint> points = CharterPoint.getRecentPoints();
-        if (points == null) {
+        if (points.isEmpty()) {
             sender.sendMessage(Utils.color("&cUnable to retrieve recent charter points."));
             return;
         }
@@ -152,7 +158,7 @@ public class CharterCommand extends BaseCommand {
 
         writeCache(sender, map);
         paginate(sender, map, 1, EMI.getPlugin().getConfig().getInt("items-per-page"));
-        sender.sendMessage(Utils.color("&e==== Here are the 50 most recently issued charter points ===="));
+        sender.sendMessage(Utils.color("&e-= Here are the 50 most recently issued charter points =-"));
         sender.sendMessage(Utils.color("&eUse /cpage [page #] to move to the next page"));
     }
 
@@ -179,7 +185,7 @@ public class CharterCommand extends BaseCommand {
                 } else {
                     sender.sendMessage(Utils.color("&9[Charter] &3Success: [Points: " + oldAmt + " -> " + charterPoint.getAmount() + " / New reason: " + newReason + "]"));
                 }
-                charterPoint.enforceCharter(sender);
+                charterPoint.enforceCharter(sender, oldAmt > newPointAmt);
             } else {
                 sender.sendMessage(Utils.color("&cERROR: &e Please report the following to HC..."));
                 sender.sendMessage("RECORD [" + pointId + "] UPDATE TABLE FAIL. CC-onEdit()");
@@ -198,6 +204,7 @@ public class CharterCommand extends BaseCommand {
         } else {
             if (charterPoint.removeCharterPoint()) {
                 sender.sendMessage(Utils.color("&9[Charter] &3The point(s) issued to " + charterPoint.getRecipient().getName() + " have been removed (expunged) from the players history."));
+                charterPoint.enforceCharter(sender, true);
             } else {
                 sender.sendMessage(Utils.color("&9[Charter] &3Could not remove point(s) issued to " + charterPoint.getRecipient().getName() + ". DB error on update. Please notify HC."));
             }
@@ -207,12 +214,19 @@ public class CharterCommand extends BaseCommand {
     @CommandPermission("emi.par.charter.pardon")
     @Subcommand("pardon")
     @CommandAlias("cpardon")
-    @Syntax("<name> [<remove flag>]")
-    public void onPardonCommand(CommandSender sender, String name, @Default("true") boolean removeFlag) {
-        Player player = (Player) sender;
-        long pardonPointSuccess = CharterPoint.pardonPlayer(name, player, removeFlag);
+    @Syntax("<name>")
+    public void onPardonCommand(CommandSender sender, String name) {
+        if (!(sender instanceof Player player))
+            return;
+
+        BanEntry ban = Bukkit.getBanList(BanList.Type.NAME).getBanEntry(name);
+        if (ban == null || ban.getExpiration() != null) {
+            sender.sendMessage(Utils.color("&9[Charter] &3That player is not permanently banned."));
+            return;
+        }
+        long pardonPointSuccess = CharterPoint.pardonPlayer(name, player);
         if (pardonPointSuccess == 0) {
-            player.sendMessage(Utils.color("&9[Charter] &3") + ConfigMessage.PLAYER_NOT_FOUND.get());
+            sender.sendMessage(Utils.color("&9[Charter] &3") + ConfigMessage.PLAYER_NOT_FOUND.get());
         } else {
             EMIPlayer playerRow = EMIPlayer.getEmiPlayer(name);
             String playerName = playerRow.getName();
@@ -221,7 +235,7 @@ public class CharterCommand extends BaseCommand {
             if (altName != null) {
                 Bukkit.getBanList(BanList.Type.NAME).pardon(altName);
             }
-            player.sendMessage(Utils.color("&9[Charter] &3" + name + " and any listed alts have been pardoned and had their points set to 1."));
+            sender.sendMessage(Utils.color("&9[Charter] &3" + name + " and any listed alts have been pardoned and had their points set to 1."));
         }
     }
 
@@ -246,7 +260,7 @@ public class CharterCommand extends BaseCommand {
             file.write(gson.toJson(map));
             file.flush();
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            EMI.getPlugin().getLogger().info("Could not write cache: " + e.getMessage());
         }
     }
 }

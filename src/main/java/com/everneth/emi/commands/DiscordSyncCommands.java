@@ -18,6 +18,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Class: DiscordSyncCommands
  * Author: Faceman (@TptMike) and Riki
@@ -59,19 +61,31 @@ public class DiscordSyncCommands extends BaseCommand {
             return;
         }
 
-        DiscordSyncManager dsm = DiscordSyncManager.getDSM();
         Member member = EMI.getJda().getGuildById(config.getLong("guild-id")).getMemberByTag(name, discriminator);
         if (member == null) {
-            player.sendMessage(Utils.color("&c") + ConfigMessage.USER_NOT_FOUND);
+            player.sendMessage(Utils.color("&c") + ConfigMessage.USER_NOT_FOUND.get());
+            return;
         }
-        else {
-            // We've found the member in the guild and want to attempt to message them, open a sync request if message sends
-            emiPlayer.setDiscordId(member.getIdLong());
-            boolean messageSent = emiPlayer.sendDiscordMessage(ConfigMessage.ACCOUNT_SYNCED.getWithArgs(player.getName()), player);
-            if (messageSent) {
-                dsm.addSyncRequest(player, member.getUser());
+
+        DiscordSyncManager dsm = DiscordSyncManager.getDSM();
+        // We've found the member in the guild and want to attempt to message them, open a sync request if message sends
+        emiPlayer.setDiscordId(member.getIdLong());
+        AtomicBoolean messageSent = emiPlayer.sendDiscordMessage(ConfigMessage.ACCOUNT_SYNCED.getWithArgs(player.getName()));
+        // Add sync request pre-emptively so if message sends the sync request can still be confirmed before the runnable executes
+        dsm.addSyncRequest(player, member.getUser());
+        EMI.getPlugin().getServer().getScheduler().runTaskLaterAsynchronously(EMI.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+                if (messageSent.get()) {
+                    player.sendMessage(Utils.color("&a") + "Message sent. Please check your discord DMs to confirm your synchronization!");
+                } else {
+                    // ~4 seconds have passed and message has not sent. Assume it failed
+                    player.sendMessage(Utils.color("&c") + ConfigMessage.DISCORD_MESSAGE_FAILED.get());
+                    dsm.removeSyncRequest(player);
+                }
             }
-        }
+        }, 20L * 4); // time in seconds converted to ticks
+
     }
 
     @Subcommand("unsync")
@@ -86,12 +100,11 @@ public class DiscordSyncCommands extends BaseCommand {
 
         // Update database before attempting to message the user on Discord, to prevent any issues if the account has left the guild
         DB.executeUpdateAsync("UPDATE players SET discord_id = NULL WHERE ? IN (player_uuid,alt_uuid)", player.getUniqueId().toString());
-        // sendDiscordMessage has error handling in the event that the user cannot be found in the guild
-        boolean messageSent = emiPlayer.sendDiscordMessage(ConfigMessage.ACCOUNT_UNSYNCED.get(), player);
-        if (messageSent) {
-            Guild guild = EMI.getGuild();
-            guild.removeRoleFromMember(emiPlayer.getGuildMember(), DiscordRole.SYNCED.get()).queue();
-        }
+
+        // We are not relying on the success of the message send, so we can ignore the atomic return
+        emiPlayer.sendDiscordMessage(ConfigMessage.ACCOUNT_UNSYNCED.get());
+        Guild guild = EMI.getGuild();
+        guild.removeRoleFromMember(emiPlayer.getGuildMember(), DiscordRole.SYNCED.get()).queue();
 
         player.sendMessage(Utils.color("Your discord account has been successfully unsynced. " +
                 "Please use &a/discord sync &fto set up with a new account."));

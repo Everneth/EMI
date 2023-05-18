@@ -6,6 +6,7 @@ import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.enums.DiscordRole;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
+import net.dv8tion.jda.api.entities.Member;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitScheduler;
 
@@ -19,10 +20,14 @@ public class UnsyncCommand extends SlashCommand {
     @Override
     public void execute(SlashCommandEvent event) {
         // the player does not have a synced account, we can ignore them
-        long memberId = event.getMember().getIdLong();
-        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(memberId);
+        Member member = event.getMember();
+        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(member.getId());
         if (!emiPlayer.isSynced()) {
             event.reply("Your account is not synchronized.").setEphemeral(true).queue();
+            return;
+        }
+        else if (!event.getMember().getRoles().contains(DiscordRole.CITIZEN.get())) {
+            event.reply("Nice try. You're not a citizen!").setEphemeral(true).queue();
             return;
         }
 
@@ -39,9 +44,10 @@ public class UnsyncCommand extends SlashCommand {
         }
 
         EMI.getGuild().removeRoleFromMember(event.getMember(), DiscordRole.SYNCED.get()).queue();
-        // remove the user from the DB so their accounts are not read as already whitelisted
-        DB.executeUpdateAsync("DELETE FROM players WHERE discord_id = ?",
+        // Set Discord ID field back to null rather than deleting, the whitelist request will check the requested user is not whitelisted
+        DB.executeUpdateAsync("UPDATE players SET discord_id = NULL WHERE discord_id = ?",
                 event.getMember().getIdLong());
+
 
         event.reply("Your discord has been unsynced and your accounts have been removed from the whitelist. " +
                 "Please use `/whitelist <username>` to temporarily add another account to the whitelist so you may re-sync.").queue();

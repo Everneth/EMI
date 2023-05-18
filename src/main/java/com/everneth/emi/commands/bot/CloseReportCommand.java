@@ -7,9 +7,12 @@ import com.everneth.emi.models.enums.DiscordRole;
 import com.everneth.emi.utils.FileUtils;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -46,10 +49,10 @@ public class CloseReportCommand extends SlashCommand {
                 // and embed the file into a message
                 File embedFile = transcribeToFile(messageList);
                 String msg = "Log from " + player.getName() + "'s report has been attached.";
-                Message message = new MessageBuilder().append(msg).build();
+
                 event.getGuild().getTextChannelById(
                         EMI.getPlugin().getConfig().getLong("staff-channel-id")
-                ).sendMessage(message).addFile(embedFile).queue();
+                ).sendMessage(msg).addFiles(FileUpload.fromData(embedFile)).queue();
 
                 event.getTextChannel().delete().queue();
                 rm.closeReport(uuid);
@@ -72,10 +75,10 @@ public class CloseReportCommand extends SlashCommand {
                 // and embed the file into a message
                 File embedFile = transcribeToFile(messageList);
                 String msg = "Log from " + player.getName() + "'s request has been attached.";
-                Message message = new MessageBuilder().append(msg).build();
+
                 event.getGuild().getTextChannelById(
                         EMI.getPlugin().getConfig().getLong("mint-channel-id")
-                ).sendMessage(message).addFile(embedFile).queue();
+                ).sendMessage(msg).addFiles(FileUpload.fromData(embedFile)).queue();
 
                 event.getTextChannel().delete().queue();
                 rm.closeReport(uuid);

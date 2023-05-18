@@ -11,9 +11,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Class: AltAccountCommands
@@ -53,14 +52,14 @@ public class AltAccountCommands extends BaseCommand {
             return;
         }
 
-        Date now = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         // the player does not have an alt already whitelisted, we want to check if the requested account is already whitelisted
         EMI.getPlugin().getServer().dispatchCommand(Bukkit.getConsoleSender(), "whitelist add " + requestedName);
         DB.executeUpdateAsync("UPDATE players SET alt_name = ?, alt_uuid = ?, date_alt_added = ? WHERE player_uuid = ?",
                 requestedName,
                 emiPlayer.getAltUuid().toString(),
-                format.format(now),
+                now.format(formatter),
                 player.getUniqueId().toString());
         player.sendMessage(Utils.color("&6" + requestedName + " &fhas been whitelisted as your alt."));
     }
@@ -68,16 +67,15 @@ public class AltAccountCommands extends BaseCommand {
     @Subcommand("remove")
     @Description("Remove registered alternate account from the whitelist")
     public void onRemoveAlt(Player player) {
-        EMIPlayer playerData = EMIPlayer.getEmiPlayer(player.getUniqueId());
-        String playerUsername = playerData.getName();
-        String altUsername = playerData.getAltName();
+        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(player.getUniqueId());
+        String playerUsername = emiPlayer.getName();
+        String altUsername = emiPlayer.getAltName();
 
         // Use our calendar to calculate if 3 days have passed and if user is staff, don't allow if both are not true
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_MONTH, -3);
+        LocalDateTime threeDaysAgo = LocalDateTime.now().plusDays(-3L);
         if (!player.hasPermission("emi.par.alt.remove"))
         {
-            if (playerData.getDateAltAdded() != null && cal.before(playerData.getDateAltAdded())) {
+            if (emiPlayer.getDateAltAdded() != null && threeDaysAgo.isBefore(emiPlayer.getDateAltAdded())) {
                 player.sendMessage(Utils.color("&cYou must wait at least &f3 days &cafter adding an alternate account before removing it."));
                 return;
             }

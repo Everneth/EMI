@@ -36,30 +36,22 @@ public class InfoCommand extends BaseCommand {
         report += Utils.color("&cMain Account&f: " + player.getName() + "\n");
 
         // if there is no associated alternate account, just append N/A
-        if (player.getAltName() != null) {
-            report += Utils.color("&aAlternate Account&f: " + player.getAltName() + "\n");
-            LocalDateTime dateAdded = player.getDateAltAdded();
-            report += Utils.color("&aAlt Whitelisted&f: " + dateAdded.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "\n\n");
-        }
-        else {
-            report += Utils.color("&aAlternate Account&f: N/A\n");
-            report += Utils.color("&aAlt Whitelisted&f: N/A\n\n");
-        }
+        String altName = player.getAltName();
+        LocalDateTime dateAdded = player.getDateAltAdded();
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        report += Utils.color("&aAlternate Account&f: " + (altName != null ? altName : "N/A") + "\n");
+        report += Utils.color("&aAlt Whitelisted&f: " + (altName != null ? dateAdded.format(dateFormat) : "N/A") + "\n\n");
 
         // if there is no associated discord account we just need to append N/A for username and Id
         long discordId = player.getDiscordId();
-        if (discordId != 0) {
-            String discordUsername = EMI.getJda()
-                    .getGuildById(EMI.getPlugin().getConfig().getLong("guild-id"))
-                    .getMemberById(discordId)
-                    .getUser().getName();
-            report += Utils.color("&9Discord Username&f: " + discordUsername + "\n");
-            report += Utils.color("&9Discord Id&f: " + discordId + "\n");
-        }
-        else {
-            report += Utils.color("&9Discord Username&f: N/A\n");
-            report += Utils.color("&9Discord Id&f: N/A");
-        }
+        String discordUsername = discordId != 0 ?
+                EMI.getJda().getGuildById(EMI.getPlugin().getConfig().getLong("guild-id"))
+                        .getMemberById(discordId)
+                        .getUser().getName() :
+                "N/A";
+        report += Utils.color("&9Discord Username&f: " + discordUsername + "\n");
+        report += Utils.color("&9Discord Id&f: " + (discordId != 0 ? discordId : "N/A") + "\n");
+
         report += Utils.color("&c==================================");
         sender.sendMessage(report);
     }

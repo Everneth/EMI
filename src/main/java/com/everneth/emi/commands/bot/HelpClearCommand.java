@@ -4,8 +4,8 @@ import com.everneth.emi.EMI;
 import com.everneth.emi.utils.FileUtils;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,9 +48,11 @@ public class HelpClearCommand extends SlashCommand {
         // Take our messages and build a string, we'll dump that string into a message file
         // and embed the file into a message
         File embedFile = transcribe(messageList);
-        Message message = new MessageBuilder().append("Transcript from #help").build();
+
         long staffChannelId = EMI.getPlugin().getConfig().getLong("staff-channel-id");
-        event.getGuild().getTextChannelById(staffChannelId).sendMessage(message).addFile(embedFile).queue();
+        event.getGuild().getTextChannelById(staffChannelId)
+                .sendMessage("Transcript from #help")
+                .addFiles(FileUpload.fromData(embedFile)).queue();
 
         // We've got a history, lets clear out
         for (Message msg : messageList) {

@@ -1,7 +1,6 @@
 package com.everneth.emi.commands.bot;
 
 
-import com.everneth.emi.EMI;
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.services.WhitelistService;
 import com.jagrosh.jdautilities.command.SlashCommand;
@@ -32,12 +31,13 @@ public class RequestWhitelistCommand extends SlashCommand {
             event.reply("You did not provide a name for me to whitelist").setEphemeral(true).queue();
             return;
         }
-        if (!EMIPlayer.getEmiPlayer(username).isEmpty() || WhitelistService.getService().isWhitelisted(username)) {
+        boolean isWhitelisted = false;
+        if (isWhitelisted || WhitelistService.getService().isWhitelisted(username)) {
             event.reply("That user is already on the whitelist. If this is an error please contact Staff.").setEphemeral(true).queue();
             return;
         }
 
-        WhitelistService.getService().addToWhitelistTemporarily(username);
+        WhitelistService.getService().addToWhitelistTemporarily(event.getUser().getIdLong(), username);
         event.reply("Added you to the whitelist for 5 minutes. Please login to `play.everneth.com` and use `/discord sync <Name#0000>`").queue();
     }
 }
