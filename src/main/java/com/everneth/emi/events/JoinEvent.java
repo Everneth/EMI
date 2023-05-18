@@ -34,10 +34,10 @@ public class JoinEvent implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event)
     {
         Player player = event.getPlayer();
-        EMIPlayer playerRow = EMIPlayer.getEmiPlayer(player.getUniqueId());
+        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(player.getUniqueId());
 
-        // Did we find anything?
-        if (playerRow.isEmpty()) {
+                // Did we find anything?
+        if (emiPlayer.isEmpty()) {
             //No records returned. Add player to database.
             try {
                 DB.executeInsert(
@@ -46,11 +46,12 @@ public class JoinEvent implements Listener {
                         player.getUniqueId().toString()
                 );
             } catch (SQLException e) {
-                EMI.getPlugin().getLogger().warning(e.getMessage());
+
+                EMI.getPlugin().getLogger().warning("SQLException: " + e.getMessage());
             }
         }
-        else if (!playerRow.getName().equals(player.getName())
-                && playerRow.getUuid().toString().equals(player.getUniqueId().toString()))
+        else if (!emiPlayer.getName().equals(player.getName())
+                && emiPlayer.getUuid().toString().equals(player.getUniqueId().toString()))
         {
             //Record found, name mismatch. Update the record with the players current name.
             DB.executeUpdateAsync(
@@ -59,9 +60,9 @@ public class JoinEvent implements Listener {
                   player.getUniqueId().toString()
             );
         }
-        else if (playerRow.getAltName() != null
-                && !playerRow.getAltName().equals(player.getName())
-                && playerRow.getAltUuid().equals(player.getUniqueId().toString()))
+        else if (emiPlayer.getAltName() != null
+                && !emiPlayer.getAltName().equals(player.getName())
+                && emiPlayer.getAltUuid().equals(player.getUniqueId().toString()))
         {
             // Name mismatch on the alt account, update it.
             DB.executeUpdateAsync("UPDATE players SET alt_name = ? WHERE player_uuid = ?",
