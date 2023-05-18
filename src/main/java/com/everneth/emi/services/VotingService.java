@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,12 +55,12 @@ public class VotingService {
         WhitelistVote vote = voteMap.get(messageId);
 
         Guild guild = EMI.getGuild();
-        DbRow application = EMIPlayer.getAppRecord(vote.getApplicantDiscordId());
-        Member applicant = guild.getMemberById(application.getLong("applicant_discord_id"));
+        Member applicant = guild.getMemberById(vote.getApplicantDiscordId());
 
         if (approved) {
+            // Queues have to be delayed to avoid Discord removing the role due to rate limiting
             guild.addRoleToMember(applicant, DiscordRole.CITIZEN.get()).queue();
-            guild.addRoleToMember(applicant, DiscordRole.SYNCED.get()).queue();
+            guild.addRoleToMember(applicant, DiscordRole.SYNCED.get()).queueAfter(1, TimeUnit.SECONDS);
 
             guild.getTextChannelById(config.getLong("announcement-channel-id"))
                     .sendMessage(ConfigMessage.APPLICATION_APPROVED.getWithArgs(applicant.getAsMention())).queue();
@@ -83,9 +82,8 @@ public class VotingService {
         event.getMessage().editMessage("The vote is now over. Applicant " + applicant.getAsMention() + (approved ? " accepted." : " denied."))
                 .setActionRow(disabledButtons).queueAfter(2, TimeUnit.SECONDS);
 
-        guild.removeRoleFromMember(applicant, DiscordRole.PENDING.get()).queue();
-        vote.setInactive();
-        voteMap.remove(messageId);
+        guild.removeRoleFromMember(applicant, DiscordRole.PENDING.get()).queueAfter(5, TimeUnit.SECONDS);
+        removeVote(messageId);
     }
 
     public void removeVote(long messageId) {
@@ -200,11 +198,10 @@ public class VotingService {
     private void onVote(ButtonInteractionEvent event, WhitelistVote vote) {
         updateVoteEmbed(event);
 
-        DbRow application = EMIPlayer.getAppRecord(getVoteByMessageId(event.getMessage().getIdLong()).getApplicantDiscordId());
-        Member applicant = event.getGuild().getMemberById(application.getLong("applicant_discord_id"));
-
+        Member applicant = event.getGuild().getMemberById(vote.getApplicantDiscordId());
+        EMIPlayer applicantPlayer = EMIPlayer.getEmiPlayer(vote.getApplicantDiscordId());
         if (hasMajority(vote.getPositiveVoters(), 51)) {
-            String ign = application.getString("mc_ign");
+            String ign = applicantPlayer.getName();
             new BukkitRunnable() {
                 @Override
                 public void run() {
