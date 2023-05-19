@@ -2,34 +2,27 @@ package com.everneth.emi.services;
 
 import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
-
 import com.everneth.emi.EMI;
-import com.everneth.emi.models.WhitelistApp;
+import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.WhitelistVote;
-import com.everneth.emi.utils.FileUtils;
-import com.everneth.emi.utils.PlayerUtils;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.sun.jdi.ClassType;
+import com.everneth.emi.models.enums.ConfigMessage;
+import com.everneth.emi.models.enums.DiscordRole;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.Component;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.ErrorResponse;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.*;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,6 +32,7 @@ public class VotingService {
 
     private HashMap<Long, WhitelistVote> voteMap = new HashMap<>();
     public static VotingService service;
+    private FileConfiguration config = EMI.getPlugin().getConfig();
 
     private VotingService() {}
 
@@ -51,47 +45,33 @@ public class VotingService {
         }
         return service;
     }
-    public void startVote(long id, WhitelistVote vote)
+    public void startVote(long messageId, WhitelistVote vote)
     {
-        voteMap.put(id, vote);
+        voteMap.put(messageId, vote);
     }
 
-    public void endVote(long id, boolean approved, ButtonClickEvent event)
+    public void endVote(long messageId, boolean approved, ButtonInteractionEvent event)
     {
-        WhitelistVote vote = voteMap.get(id);
-        // Get all the roles that may need to be modified based on the vote outcome
-        Role pendingRole = EMI.getGuild().getRoleById(EMI.getConfigLong("pending-role-id"));
-        Role citizenRole = EMI.getGuild().getRoleById(EMI.getConfigLong("member-role-id"));
-        Role syncedRole = EMI.getGuild().getRoleById(EMI.getConfigLong("synced-role-id"));
+        WhitelistVote vote = voteMap.get(messageId);
 
         Guild guild = EMI.getGuild();
-        DbRow application = PlayerUtils.getAppRecord(vote.getApplicantDiscordId());
-        Member applicant = guild.getMemberById(application.getLong("applicant_discord_id"));
+        Member applicant = guild.getMemberById(vote.getApplicantDiscordId());
 
         if (approved) {
-            guild.addRoleToMember(applicant, citizenRole).queue();
-            guild.addRoleToMember(applicant, syncedRole).queue();
+            // Queues have to be delayed to avoid Discord removing the role due to rate limiting
+            guild.addRoleToMember(applicant, DiscordRole.CITIZEN.get()).queue();
+            guild.addRoleToMember(applicant, DiscordRole.SYNCED.get()).queueAfter(1, TimeUnit.SECONDS);
 
-            WhitelistAppService.getService().approveWhitelistAppRecord(applicant.getIdLong(), vote.getMessageId());
-
-            guild.getTextChannelById(EMI.getPlugin().getConfig().getLong("whitelist-channel-id"))
-                    .sendMessage(applicant.getAsMention() + " has been whitelisted! Congrats!").queue();
+            guild.getTextChannelById(config.getLong("announcement-channel-id"))
+                    .sendMessage(ConfigMessage.APPLICATION_APPROVED.getWithArgs(applicant.getAsMention())).queue();
         }
         else {
             applicant.getUser().openPrivateChannel().queue(privateChannel ->
-                    privateChannel.sendMessage("Hey, " + applicant.getEffectiveName() +
-                                    "!\n\nI'm here to notify you that your application has been unfortunately denied. You can ask a staff member " +
-                                    "for specifics but the most common reasons for denial include:\n" +
-                                    "**1)** An incorrect secret word (Did you read the rules?).\n" +
-                                    "**2)** General lack of effort put into the application. You don't have to write an essay, we just want to know " +
-                                    "a little bit about you!\n" +
-                                    "**3)** Behavior deemed inappropriate while interacting with our community members.\n\n" +
-                                    "You are welcome to submit another application a week from now, if you so choose. Feel free to stick around " +
-                                    "and chat until then!")
+                    privateChannel.sendMessage(ConfigMessage.APPLICATION_DENIED.getWithArgs(applicant.getEffectiveName()))
                             .queue(null, new ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER,
                                     error ->
-                                        EMI.getGuild().getTextChannelById(EMI.getConfigLong("voting-channel-id"))
-                                                .sendMessage("Could not message applicant. Please notify them that they have been denied.")
+                                        EMI.getGuild().getTextChannelById(config.getLong("voting-channel-id"))
+                                                .sendMessage(ConfigMessage.DISCORD_MESSAGE_FAILED.get()).queue()
                                     )));
         }
 
@@ -102,27 +82,27 @@ public class VotingService {
         event.getMessage().editMessage("The vote is now over. Applicant " + applicant.getAsMention() + (approved ? " accepted." : " denied."))
                 .setActionRow(disabledButtons).queueAfter(2, TimeUnit.SECONDS);
 
-        guild.removeRoleFromMember(applicant, pendingRole).queue();
-        vote.setInactive();
-        voteMap.remove(id);
-        WhitelistAppService.getService().removeApp(applicant.getIdLong());
+        guild.removeRoleFromMember(applicant, DiscordRole.PENDING.get()).queueAfter(5, TimeUnit.SECONDS);
+        removeVote(messageId);
     }
 
-    public void removeVote(long id) { voteMap.remove(id); }
+    public void removeVote(long messageId) {
+        // Update the database and remove reference to the whitelist vote from memory
+        voteMap.get(messageId).setInactive();
+        voteMap.remove(messageId);
+    }
 
-    public DbRow getAppByDiscordId(long id)
-    {
-        CompletableFuture<DbRow> futureApp;
-        DbRow app = new DbRow();
-        futureApp = DB.getFirstRowAsync("SELECT * FROM applications WHERE applicant_discord_id = ?", id);
-        try {
-            app = futureApp.get();
+    public void removeVoteByDiscordId(long discordId) {
+        long messageId = 0;
+        for (WhitelistVote vote : voteMap.values()) {
+            if (vote.getApplicantDiscordId() == discordId) {
+                messageId = vote.getMessageId();
+                break;
+            }
         }
-        catch (Exception e)
-        {
-            EMI.getPlugin().getLogger().info(e.getMessage());
-        }
-        return app;
+
+        if (messageId != 0)
+            removeVote(messageId);
     }
 
     public boolean isVotingMessage(long messageId)
@@ -133,11 +113,6 @@ public class VotingService {
     public WhitelistVote getVoteByMessageId(long messageId)
     {
         return this.voteMap.get(messageId);
-    }
-
-    public long getMessageId(long userid)
-    {
-        return this.voteMap.get(userid).getMessageId();
     }
 
     public void load() {
@@ -198,8 +173,9 @@ public class VotingService {
         }
     }
 
-    public void onPositiveVoter(ButtonClickEvent event) {
+    public void onPositiveVoter(ButtonInteractionEvent event) {
         WhitelistVote vote = getVoteByMessageId(event.getMessageIdLong());
+        // Vote should be null any time the vote is ended or set inactive
         if (vote == null) {
             disableMessage(event);
             return;
@@ -208,8 +184,9 @@ public class VotingService {
         onVote(event, vote);
     }
 
-    public void onNegativeVoter(ButtonClickEvent event) {
+    public void onNegativeVoter(ButtonInteractionEvent event) {
         WhitelistVote vote = getVoteByMessageId(event.getMessageIdLong());
+        // Vote should be null any time the vote is ended or set inactive
         if (vote == null) {
             disableMessage(event);
             return;
@@ -218,14 +195,13 @@ public class VotingService {
         onVote(event, vote);
     }
 
-    private void onVote(ButtonClickEvent event, WhitelistVote vote) {
+    private void onVote(ButtonInteractionEvent event, WhitelistVote vote) {
         updateVoteEmbed(event);
 
-        DbRow application = PlayerUtils.getAppRecord(getVoteByMessageId(event.getMessage().getIdLong()).getApplicantDiscordId());
-        Member applicant = event.getGuild().getMemberById(application.getLong("applicant_discord_id"));
-
+        Member applicant = event.getGuild().getMemberById(vote.getApplicantDiscordId());
+        EMIPlayer applicantPlayer = EMIPlayer.getEmiPlayer(vote.getApplicantDiscordId());
         if (hasMajority(vote.getPositiveVoters(), 51)) {
-            String ign = application.getString("mc_ign");
+            String ign = applicantPlayer.getName();
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -241,13 +217,12 @@ public class VotingService {
     }
 
     private boolean hasMajority(HashSet<Member> voters, int percentRequired) {
-        Role staffRole = EMI.getGuild().getRoleById(EMI.getConfigLong("staff-role-id"));
-        int staffCount = EMI.getGuild().getMembersWithRoles(staffRole).size();
+        int staffCount = EMI.getGuild().getMembersWithRoles(DiscordRole.STAFF.get()).size();
 
         return (voters.size() * 100) / staffCount >= percentRequired;
     }
 
-    private void updateVoteEmbed(ButtonClickEvent event) {
+    private void updateVoteEmbed(ButtonInteractionEvent event) {
         EmbedBuilder builder = new EmbedBuilder(event.getMessage().getEmbeds().get(0));
         builder.clearFields();
 
@@ -267,7 +242,7 @@ public class VotingService {
         event.editMessageEmbeds(builder.build()).queue();
     }
 
-    private void disableMessage(ButtonClickEvent event) {
+    private void disableMessage(ButtonInteractionEvent event) {
         List<Button> disabledButtons = new ArrayList<>();
         event.getMessage().getButtons().forEach(button -> disabledButtons.add(button.asDisabled()));
         event.editMessage("Something has gone wrong. Vote ended.")

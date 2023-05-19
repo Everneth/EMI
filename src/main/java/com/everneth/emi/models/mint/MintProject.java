@@ -477,7 +477,7 @@ public class MintProject
             materialLog.put(mintLogMaterial.getId(), mintLogMaterial);
         }
 
-        queuedValidateMaterial.remove(UUID.fromString(validator.getUniqueId()));
+        queuedValidateMaterial.remove(validator.getUuid());
         materialLogValidation.remove(mintLogMaterial.getId());
     }
 
@@ -521,7 +521,7 @@ public class MintProject
             taskLog.put(mintLogTask.getId(), mintLogTask);
         }
 
-        queuedValidateTask.remove(UUID.fromString(validator.getUniqueId()));
+        queuedValidateTask.remove(validator.getUuid());
         taskLogValidation.remove(mintLogTask.getId());
     }
 

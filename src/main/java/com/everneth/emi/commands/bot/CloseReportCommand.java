@@ -3,35 +3,33 @@ package com.everneth.emi.commands.bot;
 import com.everneth.emi.EMI;
 import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.models.EMIPlayer;
+import com.everneth.emi.models.enums.DiscordRole;
 import com.everneth.emi.utils.FileUtils;
-
-import com.everneth.emi.utils.PlayerUtils;
 import com.jagrosh.jdautilities.command.SlashCommand;
-import net.dv8tion.jda.api.MessageBuilder;
+import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 public class CloseReportCommand extends SlashCommand {
 
     public CloseReportCommand() {
         this.name = "close-report";
         this.help = "Close an open report from a user";
-
-        this.defaultEnabled = false;
-        this.enabledRoles = new String[]{EMI.getPlugin().getConfig().getString("staff-role-id")};
     }
 
     @Override
     protected void execute(SlashCommandEvent event) {
-
-        long mintRoleId = EMI.getPlugin().getConfig().getLong("mint-role-id");
-        long staffRoleId = EMI.getPlugin().getConfig().getLong("staff-role-id");
-
         // We need to make sure the command sender has the correct authorized roles.
         // Assume no one has roles
         boolean hasRequiredRoles = false;
@@ -42,27 +40,19 @@ public class CloseReportCommand extends SlashCommand {
         if(event.getChannel().getName().contains("_staff"))
         {
             UUID uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
-            EMIPlayer player = PlayerUtils.getEMIPlayer(uuid);
-            // Lets check them
-            for (Role role : roleList) {
-                if (role.getIdLong() == staffRoleId) {
-                    // Found a required role, no need to continue, break from the loop
-                    hasRequiredRoles = true;
-                    break;
-                }
-            }
-            // We've looped through. Do we have the role?
-            if (hasRequiredRoles) {
+            EMIPlayer player = EMIPlayer.getEmiPlayer(uuid);
+            // Lets check if the user is a staff member
+            if (roleList.contains(DiscordRole.STAFF.get())) {
                 // Got the role! Lets build a list of messages to clear.
                 List<Message> messageList = event.getTextChannel().getIterableHistory().complete();
                 // Take our messages and build a string, we'll dump that string into a message file
                 // and embed the file into a message
                 File embedFile = transcribeToFile(messageList);
                 String msg = "Log from " + player.getName() + "'s report has been attached.";
-                Message message = new MessageBuilder().append(msg).build();
+
                 event.getGuild().getTextChannelById(
                         EMI.getPlugin().getConfig().getLong("staff-channel-id")
-                ).sendMessage(message).addFile(embedFile).queue();
+                ).sendMessage(msg).addFiles(FileUpload.fromData(embedFile)).queue();
 
                 event.getTextChannel().delete().queue();
                 rm.closeReport(uuid);
@@ -75,16 +65,9 @@ public class CloseReportCommand extends SlashCommand {
         else if(event.getChannel().getName().contains("_mint"))
         {
             UUID uuid = rm.findReportByChannelId(event.getChannel().getIdLong());
-            EMIPlayer player = PlayerUtils.getEMIPlayer(uuid);
-            // Lets check them
-            for (Role role : roleList) {
-                if (role.getIdLong() == staffRoleId || role.getIdLong() == mintRoleId) {
-                    // Found a required role, no need to continue, break from the loop
-                    hasRequiredRoles = true;
-                    break;
-                }
-            }
-            // We've looped through. Do we have the role?
+            EMIPlayer player = EMIPlayer.getEmiPlayer(uuid);
+            // Lets check if the user has either of the required roles
+            hasRequiredRoles = roleList.contains(DiscordRole.STAFF.get()) || roleList.contains(DiscordRole.MINT.get());
             if (hasRequiredRoles) {
                 // Got the role! Lets build a list of messages to clear.
                 List<Message> messageList = event.getTextChannel().getIterableHistory().complete();
@@ -92,10 +75,10 @@ public class CloseReportCommand extends SlashCommand {
                 // and embed the file into a message
                 File embedFile = transcribeToFile(messageList);
                 String msg = "Log from " + player.getName() + "'s request has been attached.";
-                Message message = new MessageBuilder().append(msg).build();
+
                 event.getGuild().getTextChannelById(
                         EMI.getPlugin().getConfig().getLong("mint-channel-id")
-                ).sendMessage(message).addFile(embedFile).queue();
+                ).sendMessage(msg).addFiles(FileUpload.fromData(embedFile)).queue();
 
                 event.getTextChannel().delete().queue();
                 rm.closeReport(uuid);

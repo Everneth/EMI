@@ -3,21 +3,16 @@ package com.everneth.emi.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import co.aikar.idb.DB;
-import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
-import com.everneth.emi.utils.PlayerUtils;
+import com.everneth.emi.models.EMIPlayer;
+import com.everneth.emi.models.enums.ConfigMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Class: AltAccountCommands
@@ -33,65 +28,54 @@ public class AltAccountCommands extends BaseCommand {
     @Description("Register an alternate account for personal use and add it to the whitelist.")
     @Syntax("<name>")
     public void onAddAlt(Player player, String requestedName) {
-        if (player.getName().equalsIgnoreCase(requestedName)) {
-            player.sendMessage("You cannot add yourself as an alt account");
+        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(player.getUniqueId());
+        EMIPlayer requestedAlt = EMIPlayer.getEmiPlayer(requestedName);
+        if (!requestedAlt.isEmpty()) {
+            player.sendMessage("That account is already whitelisted.");
             return;
         }
-        if (!PlayerUtils.syncExists(player.getUniqueId())) {
+        else if (!emiPlayer.isSynced()) {
             player.sendMessage(Utils.color("&7You must have a synced discord account to add an alt."));
             return;
         }
-        UUID uuid = PlayerUtils.getPlayerUUID(requestedName);
-        if (uuid == null) {
-            player.sendMessage("Could not find a minecraft user by that name.");
+        else if (emiPlayer.getAltUuid() != null) {
+            player.sendMessage("You already have an alternate account synced.");
+            return;
+        }
+        else {
+            emiPlayer.setAltName(requestedName);
+        }
+
+        // We've confirmed that the requested name is not whitelisted already, we should confirm it actually exists
+        if (emiPlayer.getAltUuid() == null) {
+            player.sendMessage(Utils.color("&cCould not find a Minecraft user by that name."));
             return;
         }
 
-        DbRow dbRow = PlayerUtils.getPlayerRow(player.getName());
-        String dbUsername = dbRow.getString("player_name");
-        String altUsername = dbRow.getString("alt_name");
-
-        Date now = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         // the player does not have an alt already whitelisted, we want to check if the requested account is already whitelisted
-        if (altUsername == null) {
-            DbRow requestedAltRow = PlayerUtils.getPlayerRow(requestedName);
-
-            // if the last query returned null, the account has not been whitelisted already
-            if (requestedAltRow == null) {
-                EMI.getPlugin().getServer().dispatchCommand(Bukkit.getConsoleSender(), "whitelist add " + requestedName);
-                DB.executeUpdateAsync("UPDATE players SET alt_name = ?, alt_uuid = ?, date_alt_added = ? WHERE player_uuid = ?",
-                        requestedName,
-                        uuid.toString(),
-                        format.format(now),
-                        player.getUniqueId().toString());
-                player.sendMessage(Utils.color("&6" + requestedName + " &fhas been whitelisted as your alt."));
-            }
-            else {
-                player.sendMessage(Utils.color("That account has been whitelisted by someone else.\n&cContact staff if you believe this is an error."));
-            }
-        }
-        else if (altUsername.equals(player.getName())) {
-            player.sendMessage("You cannot use an alternate account to whitelist alternate accounts.");
-        }
-        else {
-            player.sendMessage(Utils.color("&cYour alternate account, &6" + altUsername + "&c, is already whitelisted."));
-        }
+        EMI.getPlugin().getServer().dispatchCommand(Bukkit.getConsoleSender(), "whitelist add " + requestedName);
+        DB.executeUpdateAsync("UPDATE players SET alt_name = ?, alt_uuid = ?, date_alt_added = ? WHERE player_uuid = ?",
+                requestedName,
+                emiPlayer.getAltUuid().toString(),
+                now.format(formatter),
+                player.getUniqueId().toString());
+        player.sendMessage(Utils.color("&6" + requestedName + " &fhas been whitelisted as your alt."));
     }
 
     @Subcommand("remove")
     @Description("Remove registered alternate account from the whitelist")
     public void onRemoveAlt(Player player) {
-        DbRow playerRow = PlayerUtils.getPlayerRow(player.getUniqueId());
-        String playerUsername = playerRow.getString("player_name");
-        String altUsername = playerRow.getString("alt_name");
+        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(player.getUniqueId());
+        String playerUsername = emiPlayer.getName();
+        String altUsername = emiPlayer.getAltName();
 
         // Use our calendar to calculate if 3 days have passed and if user is staff, don't allow if both are not true
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_MONTH, -3);
+        LocalDateTime threeDaysAgo = LocalDateTime.now().plusDays(-3L);
         if (!player.hasPermission("emi.par.alt.remove"))
         {
-            if (playerRow.get("date_alt_added") != null && cal.before(playerRow.get("date_alt_added"))) {
+            if (emiPlayer.getDateAltAdded() != null && threeDaysAgo.isBefore(emiPlayer.getDateAltAdded())) {
                 player.sendMessage(Utils.color("&cYou must wait at least &f3 days &cafter adding an alternate account before removing it."));
                 return;
             }
@@ -114,13 +98,13 @@ public class AltAccountCommands extends BaseCommand {
     @CommandPermission("emi.par.alt.remove")
     public void onRemoveAlt(CommandSender sender, String username)
     {
-        DbRow playerRow = PlayerUtils.getPlayerRow(username);
-        if (playerRow == null) {
-            sender.sendMessage(Utils.color("&cThere is nobody with that username."));
+        EMIPlayer player = EMIPlayer.getEmiPlayer(username);
+        if (player.isEmpty()) {
+            sender.sendMessage(Utils.color("&c") + ConfigMessage.PLAYER_NOT_FOUND.get());
             return;
         }
-        String playerUsername = playerRow.getString("player_name");
-        String altUsername = playerRow.getString("alt_name");
+        String playerUsername = player.getName();
+        String altUsername = player.getAltName();
 
         if (altUsername == null) {
             sender.sendMessage("There is no alternate account associated with that name.");

@@ -4,29 +4,14 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Dependency;
-import co.aikar.idb.DB;
-import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
-import com.everneth.emi.managers.ReportManager;
 import com.everneth.emi.Utils;
+import com.everneth.emi.managers.ReportManager;
+import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.Report;
-import com.everneth.emi.utils.PlayerUtils;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.managers.GuildManager;
-import net.dv8tion.jda.api.requests.RestAction;
-import net.dv8tion.jda.api.requests.restaction.ChannelAction;
-
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-
-import java.nio.channels.Channel;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 /**
  *     Class: ReportCommand
@@ -49,7 +34,7 @@ public class ReportCommand extends BaseCommand {
         // Get the player and supply all potentially useful
         // information to the embed builder
         Player player = (Player)sender;
-
+        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(player.getUniqueId());
         if(rm.hasActiveReport(player.getUniqueId()))
         {
             player.sendMessage(Utils.color("<&6The Wench&f> You already have an active report in our system. Please use " +
@@ -58,7 +43,7 @@ public class ReportCommand extends BaseCommand {
         else {
             Report.buildPrivateChannel(player, message, "_staff");
             // Make the bot post the embed to the channel and notify the player
-            if(PlayerUtils.syncExists(player.getUniqueId()))
+            if(emiPlayer.isSynced())
                 player.sendMessage(Utils.color("<&6The Wench&f> I have created a direct channel with &9staff&f. &a&lProceed to Discord to continue the chat. &d<3"));
             else
                 player.sendMessage(Utils.color("<&6The Wench&f> I have created a direct channel with &9staff&f. Please use &6/rr <message>&f to message staff directly! A staff member " +

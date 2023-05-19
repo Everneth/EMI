@@ -9,49 +9,111 @@ dbpass: 'secret'
 dbprefix: 'ev_'
 
 ###############################################################################################
-#########                             --Forum Settings--                              #########
-###############################################################################################
-api-key: ''
-report-log-forum-id: 0
-system-user-id: 0
-api-topic-post-url: ''
-api-topic-post-endpoint: ''
-whitelist-app-forum-id: 0
-
-###############################################################################################
 #########                              --Bot Settings--                               #########
 ###############################################################################################
 ### DEFAULTS ###
 # ============ #
 # bot-token: 'BOT-TOKEN-HERE' - replace this with your bot token from the developers portal
-# report-channel: 0 - Channel ID where reports are sent
-# root-report-msg: 0 - Message to preserve in report channel (IE: rules/info message at start of channel)
 # bot-owner-id: 0 - Should belong to the owner of the guild or bot creator (if not owner of guild)
-# bot-game: 'EMI' - Change the "game" the bot is playing
-# bot-prefix: '!!' - Command prefix for all bot commands
+# bot-status: 'EMI' - Change what the bot is set as watching ("Watching EMI")
 bot-token: 'BOT-TOKEN-HERE'
-report-channel: 0
-root-report-msg: 0
 bot-owner-id: 0
-bot-game: 'EMI'
-bot-prefix: '!!'
 guild-id: 0
+bot-status: 'EMI'
+
+###############################################################################################
+#########                            --Channel/Role Ids--                             #########
+###############################################################################################
+# announcement-channel-id: 0 - The channel in which whitelist announcements should be made
+
+staff-channel-id: 0
+voting-channel-id: 0
+announcement-channel-id: 0
+mint-channel-id: 0
+
+applicant-role-id: 0
+pending-role-id: 0
 synced-role-id: 0
 member-role-id: 0
-use-pending-role: true
-pending-role-id: 0
-staff-role-id: 0
-staff-channel-id: 0
-applicant-role-id: 0
-whitelist-channel-id: 0
-voting-channel-id: 0
 mint-role-id: 0
-mint-channel-id: 0
+staff-role-id: 0
+bot-role-id: 0
+
+# root-help-msg: 0 - Message to preserve in help channel (IE: rules/info message at start of channel)
 help-channel-id: 0
+root-help-msg: 0
 
 ###############################################################################################
 #########                              --EMI Settings--                               #########
 ###############################################################################################
 chat-tag: '&7[&6EMI&7]'
-world-folder: 'WORLD-FOLDER-NAME'
-items-per-page: 0
+items-per-page: 5
+
+###############################################################################################
+#########                                --Messages--                                 #########
+###############################################################################################
+
+# user-not-found-error - The error displayed when a Discord user cannot be found
+user-not-found-error: "Could not find user on Discord. Either the name is wrong or they are not in the guild."
+
+# player-not-found-error - The error displayed when a player cannot be found in the db
+player-not-found-error: "Could not find a player by that name."
+
+# message-send-error - The error displayed when a user could not be messaged via Discord
+message-send-error: "Could not message user on Discord. They do not allow direct messages from Everneth's Discord members."
+
+# points-accumulated-alert - The message that will be displayed to the staff member issuing points to another user
+# {0}: The user's name
+# {1}: The amount of points the user has accumulated
+points-accumulated-alert: "{0} accumulated {1} {1,choice,1#point|1<points} and has been messaged/banned accordingly."
+
+# account-sync-alert - The message sent on Discord to the user attempting to sync their account
+# {0}: The in-game name of the person attempting to sync to the account
+account-sync-alert: >
+  {0} is attempting to link their minecraft account with our Discord guild.
+  If this is you, please use `/confirmsync` to complete the account synchronization.
+  If this is not done by you, please use `/denysync` and forward this message to staff immediately. Thank you!
+
+# account-unsync-alert - The message sent on Discord to the user when they unsync their account
+account-unsync-alert: "Your Discord account has been unsynced with your Minecraft account. If you did not unsync your account please contact staff."
+
+# issued-point-alert - The message sent on Discord to a user when issued a point
+# {0}: The user's name whom the point is being issued to
+# {1}: The number of points issued to the user
+# {2}: The staff member who issued the points
+# {3}: The reason the points were issued
+# {4}: The number of points accumulated in the last 60 days
+# {5}: The unix timestamp for use in Discord's epoch formatting
+# This message contains a lot of embedded message formatters with specifically escaped characters, so it's probably best to just not touch this one
+issued-point-alert: |
+  Hey {0}. You have been issued {1} {1,choice,1#point|1<points} with the following reason:
+  > *{3}*
+  {4,choice,1#As this is your only point in the last 60 days, you may consider this a warning.
+  |1<You have accumulated {4} points in the last 60 days. As per the charter, this ban '{4,choice,2<will expire at the following time: ''<''t:{5,number,''#''}:f''>''|4<will not expire.}'}
+  **If you believe this to be an error or wish to appeal, feel free to contact an admin.**
+
+# removed-point-alert - The message sent on Discord to a user who's had points removed
+# {0}: The user's name whom the point is being removed from
+# {1}: The number of points removed from the user
+# {2}: The number of points accumulated in the last 60 days
+removed-point-alert: >
+  Hey {0}. {1,choice,1#A point|1<Some points} on your record {1,choice,1#has|1<have} been expunged. 
+  You now have {2} {2,choice,0#points|1#point|1<points} in the last 60 days. If you were previously banned, 
+  it has been reduced or removed accordingly.
+
+# application-approved-alert - The message sent to the whitelist announcement channel when a user has been approved for whitelisting
+# {0}: The approved user's mention tag
+application-approved-alert: "{0} has been whitelisted! Congrats!"
+
+# application-denied-alert - The message sent to an applicant on Discord when they have been denied for whitelisting
+# {0}: The applicant's Discord username
+application-denied-alert: |
+  Hey {0}!
+  \nI'm here to notify you that your application has been unfortunately denied. You can ask a staff member for specifics but the most common reasons for denial include:
+  **1)** An incorrect secret word (Did you read the rules?).
+  **2)** General lack of effort put into the application. You don't have to write an essay, we just want to know a little bit about you!
+  **3)** Behavior deemed inappropriate while interacting with our community members.
+  \nYou are welcome to submit another application a week from now, if you so choose. Feel free to stick around and chat until then!
+
+default-ban-reason: "You accumulated 5+ points and are permanently banned. Please contact staff on Discord if you wish to appeal."
+friend-accountability-reason: "You have been issued one point as per the friend accountability program. (Section IV c)"

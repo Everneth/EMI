@@ -1,17 +1,13 @@
 package com.everneth.emi.commands.bot;
 
-import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
-import com.everneth.emi.managers.DiscordSyncManager;
 import com.everneth.emi.EMI;
-
-import com.everneth.emi.utils.PlayerUtils;
+import com.everneth.emi.managers.DiscordSyncManager;
+import com.everneth.emi.models.enums.DiscordRole;
 import com.jagrosh.jdautilities.command.SlashCommand;
-import net.dv8tion.jda.api.entities.ChannelType;
+import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -43,10 +39,6 @@ public class ConfirmSyncCommand extends SlashCommand {
             event.reply("No sync request exists for your account or it has already been synced.").setEphemeral(true).queue();
             return;
         }
-        else if (PlayerUtils.syncExists(toFind)) {
-            event.reply("You have already synced this account. If this is in error, please contact staff.").setEphemeral(true).queue();
-            return;
-        }
 
         int playerId = dsm.syncAccount(toFind);
         if (playerId == 0) {
@@ -54,15 +46,14 @@ public class ConfirmSyncCommand extends SlashCommand {
             return;
         }
 
-        long guildId = EMI.getPlugin().getConfig().getLong("guild-id");
-        long syncRoleId = EMI.getPlugin().getConfig().getLong("synced-role-id");
-
+        Member member = EMI.getGuild().getMemberById(toFind.getIdLong());
+        if (member == null) {
+            event.reply("Something went wrong... Either try again shortly or contact an admin.").setEphemeral(true).queue();
+            return;
+        }
         UUID key = dsm.findSyncRequestUUID(event.getUser());
         dsm.removeSyncRequest(key.toString());
-        EMI.getJda().getGuildById(guildId).addRoleToMember(
-                EMI.getJda().getGuildById(guildId).getMemberById(event.getUser().getIdLong()),
-                EMI.getJda().getGuildById(guildId).getRoleById(syncRoleId)
-        ).queue();
+        EMI.getGuild().addRoleToMember(member, DiscordRole.SYNCED.get()).queue();
 
         event.reply("Your account has been synced and your roles updated!").queue();
     }

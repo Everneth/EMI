@@ -3,11 +3,9 @@ package com.everneth.emi.commands.bot;
 import com.everneth.emi.EMI;
 import com.everneth.emi.utils.FileUtils;
 import com.jagrosh.jdautilities.command.SlashCommand;
-import net.dv8tion.jda.api.MessageBuilder;
+import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageHistory;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,9 +25,6 @@ public class HelpClearCommand extends SlashCommand {
     {
         this.name = "help-clear";
         this.help = "Clears the help channel, but must be used inside of that channel.";
-
-        this.defaultEnabled = false;
-        this.enabledRoles = new String[]{EMI.getPlugin().getConfig().getString("staff-role-id")};
     }
     @Override
     protected void execute(SlashCommandEvent event)
@@ -53,14 +48,16 @@ public class HelpClearCommand extends SlashCommand {
         // Take our messages and build a string, we'll dump that string into a message file
         // and embed the file into a message
         File embedFile = transcribe(messageList);
-        Message message = new MessageBuilder().append("Transcript from #help").build();
-        Long staffChannelId = EMI.getPlugin().getConfig().getLong("staff-channel-id");
-        event.getGuild().getTextChannelById(staffChannelId).sendMessage(message).addFile(embedFile).queue();
+
+        long staffChannelId = EMI.getPlugin().getConfig().getLong("staff-channel-id");
+        event.getGuild().getTextChannelById(staffChannelId)
+                .sendMessage("Transcript from #help")
+                .addFiles(FileUpload.fromData(embedFile)).queue();
 
         // We've got a history, lets clear out
         for (Message msg : messageList) {
             // Is message the root?
-            if (msg.getIdLong() == EMI.getPlugin().getConfig().getLong("root-report-msg"))
+            if (msg.getIdLong() == EMI.getPlugin().getConfig().getLong("root-help-msg"))
                 continue;
 
             try {
@@ -83,11 +80,13 @@ public class HelpClearCommand extends SlashCommand {
 
         for (Message msg : reverse)
         {
-            if(msg.getIdLong() == EMI.getPlugin().getConfig().getLong("root-report-msg"))
-            {
+            if(msg.getIdLong() == EMI.getPlugin().getConfig().getLong("root-help-msg"))
                 continue;
+
+            String logMsg = msg.getAuthor().getName() + ": " + msg.getContentRaw() + "\n";
+            for (Message.Attachment attachment : msg.getAttachments()) {
+                logMsg += attachment.getUrl() + '\n';
             }
-            String logMsg = msg.getMember().getEffectiveName() + ": " + msg.getContentRaw() + "\n";
             sb.append(logMsg);
         }
         try {

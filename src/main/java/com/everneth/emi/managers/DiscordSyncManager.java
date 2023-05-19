@@ -1,7 +1,10 @@
 package com.everneth.emi.managers;
 
 import co.aikar.idb.DB;
+import com.everneth.emi.EMI;
 import net.dv8tion.jda.api.entities.User;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -82,15 +85,22 @@ public final class DiscordSyncManager {
     {
         DiscordSyncManager dsm = DiscordSyncManager.getDSM();
         int playerId = 0;
-        futurePlayerId = DB.executeUpdateAsync("UPDATE players SET discord_id = ? " +
-                "WHERE player_uuid = ?", user.getIdLong(), dsm.findSyncRequestUUID(user).toString());
+        UUID syncRequestUuid = dsm.findSyncRequestUUID(user);
+        OfflinePlayer player = Bukkit.getOfflinePlayer(syncRequestUuid);
+        futurePlayerId = DB.executeUpdateAsync("UPDATE players SET player_name = ?," +
+                "player_uuid = ?," +
+                "alt_name = NULL," +
+                "alt_uuid = NULL," +
+                "discord_id = ? " +
+                "WHERE ? IN (player_uuid,alt_uuid)",
+                player.getName(), syncRequestUuid.toString(), user.getIdLong(), syncRequestUuid.toString());
         // get the results from the future
         try {
             playerId = futurePlayerId.get();
         }
         catch (Exception e)
         {
-            System.out.print(e.getMessage());
+            EMI.getPlugin().getLogger().info(e.getMessage());
         }
         return playerId;
     }

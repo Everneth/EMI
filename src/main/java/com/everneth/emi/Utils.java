@@ -2,7 +2,6 @@ package com.everneth.emi;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

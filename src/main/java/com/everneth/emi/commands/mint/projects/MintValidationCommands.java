@@ -8,7 +8,6 @@ import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.mint.MintLogMaterial;
 import com.everneth.emi.models.mint.MintLogTask;
 import com.everneth.emi.models.mint.MintProject;
-import com.everneth.emi.utils.PlayerUtils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -129,7 +128,7 @@ public class MintValidationCommands extends BaseCommand
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
         MintProject project = manager.getProject(mintProject);
-        EMIPlayer validator = PlayerUtils.getEMIPlayer(player.getName());
+        EMIPlayer validator = EMIPlayer.getEmiPlayer(player.getName());
 
         // Validate the material or task log
         if(project.getQueuedValidateMaterial().containsKey(player.getUniqueId()))
@@ -163,7 +162,7 @@ public class MintValidationCommands extends BaseCommand
     {
         MintProjectManager manager = MintProjectManager.getMintProjectManager();
         MintProject project = manager.getProject(mintProject);
-        EMIPlayer validator = PlayerUtils.getEMIPlayer(player.getName());
+        EMIPlayer validator = EMIPlayer.getEmiPlayer(player.getName());
 
         // Reject the material or task log
         if(project.getQueuedValidateMaterial().containsKey(player.getUniqueId()))
