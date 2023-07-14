@@ -262,7 +262,16 @@ public class Configuration {
                 }
 
                 EMIPlayer loggedBy = EMIPlayer.getEmiPlayer(taskLogRow.getInt("logged_by"));
-                EMIPlayer validatedBy = EMIPlayer.getEmiPlayer(taskLogRow.getInt("validated_by"));
+                EMIPlayer validatedBy;
+
+                try
+                {
+                    validatedBy = EMIPlayer.getEmiPlayer(taskLogRow.getInt("validated_by"));
+                }
+                catch (NullPointerException e)
+                {
+                    validatedBy = new EMIPlayer();
+                }
 
                 MintLogTask log = new MintLogTask(
                         taskLogRow.getInt("log_id"),
@@ -292,7 +301,16 @@ public class Configuration {
                 }
 
                 EMIPlayer loggedBy = EMIPlayer.getEmiPlayer(materialLogRow.getInt("logged_by"));
-                EMIPlayer validatedBy = EMIPlayer.getEmiPlayer(materialLogRow.getInt("validated_by"));
+                EMIPlayer validatedBy;
+
+                try
+                {
+                    validatedBy = EMIPlayer.getEmiPlayer(materialLogRow.getInt("validated_by"));
+                }
+                catch (NullPointerException e)
+                {
+                    validatedBy = new EMIPlayer();
+                }
 
                 MintLogMaterial log = new MintLogMaterial(
                         materialLogRow.getInt("log_id"),
