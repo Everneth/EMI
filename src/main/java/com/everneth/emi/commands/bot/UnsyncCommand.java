@@ -21,7 +21,7 @@ public class UnsyncCommand extends SlashCommand {
     public void execute(SlashCommandEvent event) {
         // the player does not have a synced account, we can ignore them
         Member member = event.getMember();
-        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(member.getId());
+        EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(member.getIdLong());
         if (!emiPlayer.isSynced()) {
             event.reply("Your account is not synchronized.").setEphemeral(true).queue();
             return;
