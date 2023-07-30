@@ -14,10 +14,12 @@ import com.everneth.emi.models.enums.ConfigMessage;
 import com.everneth.emi.models.enums.DiscordRole;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -35,8 +37,8 @@ public class DiscordSyncCommands extends BaseCommand {
 
     @Subcommand("sync")
     @Description("Sync your discord account to your minecraft account.")
-    @Syntax("<Name#0000>")
-    public void onDiscordsync(Player player, String discordDetails) {
+    @Syntax("<discord username>")
+    public void onDiscordsync(Player player, String discordUsername) {
         // If the account is already synced, notify the user and return
         EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(player.getUniqueId());
         if (emiPlayer.isSynced()) {
@@ -44,29 +46,13 @@ public class DiscordSyncCommands extends BaseCommand {
             return;
         }
 
-        String name, discriminator;
-        // If the input does not contain the discriminator don't even attempt to find the user
-        if (discordDetails.contains("#")) {
-            int poundIndex = discordDetails.indexOf('#');
-            // If there are not four digits following the '#', return and notify the user
-            if (poundIndex + 4 != discordDetails.length() - 1) {
-                player.sendMessage(Utils.color("&cInvalid discriminator. Please make sure your discriminator has 4 digits."));
-                return;
-            }
-            name = discordDetails.substring(0, poundIndex);
-            discriminator = discordDetails.substring(poundIndex + 1);
-        }
-        else {
-            player.sendMessage(Utils.color("&cInvalid name. Please include name and discriminator (&fName#0000&c)."));
-            return;
-        }
-
-        Member member = EMI.getJda().getGuildById(config.getLong("guild-id")).getMemberByTag(name, discriminator);
-        if (member == null) {
+        // JDA does not support searching members by username directly so this is the best we got
+        List<User> users = EMI.getJda().getUsersByName(discordUsername, true);
+        if (users.size() == 0) {
             player.sendMessage(Utils.color("&c") + ConfigMessage.USER_NOT_FOUND.get());
             return;
         }
-
+        Member member = EMI.getGuild().getMemberById(users.get(0).getIdLong());
         DiscordSyncManager dsm = DiscordSyncManager.getDSM();
         // We've found the member in the guild and want to attempt to message them, open a sync request if message sends
         emiPlayer.setDiscordId(member.getIdLong());
@@ -93,7 +79,7 @@ public class DiscordSyncCommands extends BaseCommand {
     public void onDiscordUnsync(Player player) {
         EMIPlayer emiPlayer = EMIPlayer.getEmiPlayer(player.getUniqueId());
         long discordId = emiPlayer.getDiscordId();
-        if (discordId == 0) {
+        if (!emiPlayer.isSynced()) {
             player.sendMessage("You do not have a discord account synced with your minecraft account.");
             return;
         }
