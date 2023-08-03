@@ -6,10 +6,19 @@ import co.aikar.commands.annotation.*;
 import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
 import com.everneth.emi.models.CharterPoint;
+import com.everneth.emi.models.CommandResponse;
 import com.everneth.emi.models.EMIPlayer;
 import com.everneth.emi.models.enums.ConfigMessage;
+import com.everneth.emi.models.enums.ServerApiUrl;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.bukkit.BanEntry;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
@@ -236,6 +245,35 @@ public class CharterCommand extends BaseCommand {
                 Bukkit.getBanList(BanList.Type.NAME).pardon(altName);
             }
             sender.sendMessage(Utils.color("&9[Charter] &3" + name + " and any listed alts have been pardoned and had their points set to 1."));
+
+            try {
+                CloseableHttpClient httpclient = HttpClients.createDefault();
+                String url = ServerApiUrl.TEST_SERVER.get() + "/cmd/pardon/" + playerName + "?token=" +
+                        EMI.getConfigString("api-token");
+                HttpPost postRequest = new HttpPost(url);
+                postRequest.setHeader("Accept", "application/json");
+                postRequest.setHeader("Content-type", "application/json");
+                ResponseHandler<String> responseHandler = restResponse ->
+                {
+                    int status = restResponse.getStatusLine().getStatusCode();
+                    if (status >= 200 && status < 300) {
+                        HttpEntity entity = restResponse.getEntity();
+                        return entity != null ? EntityUtils.toString(entity) : null;
+                    } else {
+                        throw new ClientProtocolException("Unexpected response status: " + status);
+                    }
+                };
+                String responseBody = httpclient.execute(postRequest, responseHandler);
+                Gson gson = new Gson();
+                CommandResponse commandResponse = gson.fromJson(responseBody, CommandResponse.class);
+                sender.sendMessage(Utils.color("&9[Charter] &3 " + commandResponse.getMessage()));
+
+            }
+            catch (Exception e)
+            {
+                EMI.getPlugin().getLogger().severe(e.getMessage());
+                sender.sendMessage(Utils.color("&9[Charter] &3Please manually pardon any of their accounts on the test server."));
+            }
         }
     }
 

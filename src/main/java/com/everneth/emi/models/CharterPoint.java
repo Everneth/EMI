@@ -5,12 +5,23 @@ import co.aikar.idb.DbRow;
 import com.everneth.emi.EMI;
 import com.everneth.emi.Utils;
 import com.everneth.emi.models.enums.ConfigMessage;
+import com.everneth.emi.models.enums.ServerApiUrl;
+import com.google.gson.Gson;
 import net.dv8tion.jda.api.entities.Member;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.net.http.HttpClient;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.text.MessageFormat;
@@ -157,7 +168,34 @@ public class CharterPoint {
             }
 
             if (points >= 5) {
-                sender.sendMessage(Utils.color("&9[Charter] &3Please manually ban any of their accounts on the test server."));
+                try {
+                    CloseableHttpClient httpclient = HttpClients.createDefault();
+                    String url = ServerApiUrl.TEST_SERVER.get() + "/cmd/ban/" + recipient.getName() + "?token=" +
+                            EMI.getConfigString("api-token");
+                    HttpPost postRequest = new HttpPost(url);
+                    postRequest.setHeader("Accept", "application/json");
+                    postRequest.setHeader("Content-type", "application/json");
+                    ResponseHandler<String> responseHandler = restResponse ->
+                    {
+                        int status = restResponse.getStatusLine().getStatusCode();
+                        if (status >= 200 && status < 300) {
+                            HttpEntity entity = restResponse.getEntity();
+                            return entity != null ? EntityUtils.toString(entity) : null;
+                        } else {
+                            throw new ClientProtocolException("Unexpected response status: " + status);
+                        }
+                    };
+                    String responseBody = httpclient.execute(postRequest, responseHandler);
+                    Gson gson = new Gson();
+                    CommandResponse commandResponse = gson.fromJson(responseBody, CommandResponse.class);
+                    sender.sendMessage(Utils.color("&9[Charter] &3 " + commandResponse.getMessage()));
+
+                }
+                catch (Exception e)
+                {
+                    EMI.getPlugin().getLogger().severe(e.getMessage());
+                    sender.sendMessage(Utils.color("&9[Charter] &3Please manually ban any of their accounts on the test server."));
+                }
             }
         }
 
