@@ -28,6 +28,7 @@ public class EMI extends JavaPlugin {
     // Next 4 lines are legacy and should eventually phase out once the Configuration class takes over
     public static EMI getPlugin() { return plugin; }
     public static Long getConfigLong(String path) { return plugin.getConfig().getLong(path); }
+    public static String getConfigString(String path) { return plugin.getConfig().getString(path); }
     public static Guild getGuild() { return EMI.getJda().getGuildById(plugin.getConfig().getLong("guild-id")); }
     public static JDA getJda() { return Configuration.getJda();  }
 }
