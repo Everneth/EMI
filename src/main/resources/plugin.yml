@@ -1,5 +1,5 @@
 name: EMI
-version: 2.1.2
+version: 2.1.0
 main: com.everneth.emi.EMI
 author: tptmike, sterling, jmwren
 api-version: 1.20
