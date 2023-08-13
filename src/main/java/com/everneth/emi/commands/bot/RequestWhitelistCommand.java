@@ -38,6 +38,6 @@ public class RequestWhitelistCommand extends SlashCommand {
         }
 
         WhitelistService.getService().addToWhitelistTemporarily(event.getUser().getIdLong(), username);
-        event.reply("Added you to the whitelist for 5 minutes. Please login to `play.everneth.com` and use `/discord sync <Name#0000>`").queue();
+        event.reply("Added you to the whitelist for 5 minutes. Please login to `play.everneth.com` and use `/discord sync <discord username>`").queue();
     }
 }
