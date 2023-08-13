@@ -114,11 +114,12 @@ application-approved-alert: "{0} has been whitelisted! Congrats!"
 # {0}: The applicant's Discord username
 application-denied-alert: |
   Hey {0}!
-  \nI'm here to notify you that your application has been unfortunately denied. You can ask a staff member for specifics but the most common reasons for denial include:
+  I'm here to notify you that your application has been unfortunately denied. You can ask a staff member for specifics but the most common reasons for denial include:
   **1)** An incorrect secret word (Did you read the rules?).
   **2)** General lack of effort put into the application. You don't have to write an essay, we just want to know a little bit about you!
   **3)** Behavior deemed inappropriate while interacting with our community members.
-  \nYou are welcome to submit another application a week from now, if you so choose. Feel free to stick around and chat until then!
+  
+  You are welcome to submit another application a week from now, if you so choose. Feel free to stick around and chat until then!
 
 default-ban-reason: "You accumulated 5+ points and are permanently banned. Please contact staff on Discord if you wish to appeal."
 friend-accountability-reason: "You have been issued one point as per the friend accountability program. (Section IV c)"
