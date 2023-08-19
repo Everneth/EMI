@@ -251,8 +251,7 @@ public class CharterCommand extends BaseCommand {
                 String url = ServerApiUrl.TEST_SERVER.get() + "/cmd/pardon/" + playerName + "?token=" +
                         EMI.getConfigString("api-token");
                 HttpPost postRequest = new HttpPost(url);
-                postRequest.setHeader("Accept", "application/json");
-                postRequest.setHeader("Content-type", "application/json");
+                postRequest.setHeader("Content-type", "application/x-www-form-urlencoded");
                 ResponseHandler<String> responseHandler = restResponse ->
                 {
                     int status = restResponse.getStatusLine().getStatusCode();
